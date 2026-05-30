@@ -1,8 +1,7 @@
 """Each analyzer has a test. Green = experiment trustable.
 
-The security analyzer is now a SonarQube client (see
-test_security_analyzer.py for full coverage). Here we keep one smoke test
-that exercises the unchanged signature with the network call stubbed out.
+The security analyzer is now a local Bandit scan over the captured
+codebase (see test_security_analyzer.py for full coverage).
 """
 from auditor.analyzers import (
     complexity_analyzer,
@@ -13,12 +12,9 @@ from auditor.analyzers import (
 )
 
 
-def test_security_signature_unchanged(monkeypatch, minimal_spec):
-    monkeypatch.setattr(
-        security_analyzer, "_fetch_issues",
-        lambda key: [{"tags": ["cwe-79"]}],
-    )
-    bad = {"files": {"x.py": "eval(user_input)\n"}, "manifest": []}
+def test_security_signature_unchanged(minimal_spec):
+    bad = {"files": {"x.py": "import subprocess\nsubprocess.call('ls', shell=True)\n"},
+           "manifest": []}
     score = security_analyzer.analyze(bad, [], minimal_spec)
     assert score.name == "security_density"
     assert score.value > 0

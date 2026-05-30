@@ -37,10 +37,9 @@ def _stage_captures(captures_root: Path, run_id: str) -> None:
 
 def test_experiment_runs_all_conditions_and_writes_csv(tmp_path, monkeypatch):
     # SonarQube is the only external call — stub it deterministically.
-    monkeypatch.setattr(
-        security_analyzer, "_fetch_issues",
-        lambda key: [{"tags": ["cwe-79"]}, {"tags": ["owasp-a3"]}],
-    )
+    from auditor.models.audit_result import MetricScore
+    monkeypatch.setattr(security_analyzer, "analyze",
+                        lambda c,l,sp: MetricScore(name="security_density", value=2.0, unit="per_kloc"))
 
     run_id = "exp_run_001"
     captures = tmp_path / "captures"
@@ -86,7 +85,9 @@ def test_experiment_runs_all_conditions_and_writes_csv(tmp_path, monkeypatch):
 
 
 def test_experiment_refuses_to_overwrite_existing_report(tmp_path, monkeypatch):
-    monkeypatch.setattr(security_analyzer, "_fetch_issues", lambda key: [])
+    from auditor.models.audit_result import MetricScore
+    monkeypatch.setattr(security_analyzer, "analyze",
+                        lambda c,l,sp: MetricScore(name="security_density", value=0.0, unit="per_kloc"))
     run_id = "exp_run_002"
     captures = tmp_path / "captures"
     _stage_captures(captures, run_id)

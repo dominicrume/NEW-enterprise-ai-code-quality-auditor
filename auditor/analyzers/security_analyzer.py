@@ -1,87 +1,63 @@
-"""Security vulnerability density — SonarQube integration.
+"""Security vulnerability density — local Bandit scan of the captured codebase.
 
-See docs/METRICS.md for the exact rule sets counted. In short:
-  * issue ``type`` ∈ {VULNERABILITY, SECURITY_HOTSPOT}
-  * at least one OWASP/CWE tag (``cwe*`` or ``owasp-*``)
-  * status ∈ {OPEN, CONFIRMED, REOPENED}
+Why local Bandit instead of SonarCloud:
+  The original SonarCloud integration queries one shared project key per
+  spec, which means every condition gets the same numerator (the issues
+  found in the host repo) divided by a different LOC — a structurally
+  broken metric. Switching to a local scanner means each condition's
+  captured codebase is scanned in isolation, producing an honest
+  per-condition score with zero external infrastructure dependency.
 
-The function signature is unchanged — the engine, adapters, and tests that
-already call ``analyze(codebase, interaction_log, spec)`` keep working.
-Credentials are read from ``settings`` (i.e. ``.env``), never inlined.
+What is counted:
+  Every Bandit issue is mapped to a CWE id via Bandit's built-in metadata.
+  We count issues whose CWE id is non-null, which is the same OWASP/CWE
+  framing used in the original SonarQube contract (see docs/METRICS.md).
+
+Output: per 1,000 LOC density (preserves the unit used in METRICS.md).
 """
 from __future__ import annotations
 
-import base64
 import json
-import urllib.parse
-import urllib.request
+import subprocess
+import tempfile
+from pathlib import Path
 
-from auditor.core.config import settings
 from auditor.models.audit_result import MetricScore
 
 
-_ISSUE_TYPES = "VULNERABILITY"
-_OPEN_STATUSES = "OPEN,CONFIRMED,REOPENED"
-_PAGE_SIZE = 500
+def _write_codebase(codebase: dict, dest: Path) -> int:
+    """Materialise the in-memory codebase to disk; return python LOC."""
+    loc = 0
+    for rel, content in codebase.get("files", {}).items():
+        if not rel.endswith(".py"):
+            continue
+        target = dest / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content)
+        loc += len(content.splitlines())
+    return loc
 
 
-def _is_owasp_or_cwe(issue: dict) -> bool:
-    """True iff at least one tag identifies this as an OWASP/CWE finding."""
-    for tag in issue.get("tags", []):
-        t = tag.lower()
-        if t == "cwe" or t.startswith("cwe-") or t.startswith("owasp-"):
-            return True
-    return False
-
-
-def _fetch_issues(component_key: str) -> list[dict]:
-    """Page through SonarQube's /api/issues/search for one project."""
-    url = settings.sonarqube_url
-    token = settings.sonarqube_token
-    if not url or not token:
-        raise RuntimeError(
-            "SONARQUBE_URL and SONARQUBE_TOKEN must be set in .env to run the "
-            "security analyzer."
-        )
-    auth = base64.b64encode(f"{token}:".encode()).decode()
-    organization = settings.sonarqube_organization
-
-    issues: list[dict] = []
-    page = 1
-    while True:
-        params = {
-            "componentKeys": component_key,
-            "types": _ISSUE_TYPES,
-            "statuses": _OPEN_STATUSES,
-            "ps": _PAGE_SIZE,
-            "p": page,
-        }
-        if organization:
-            params["organization"] = organization
-        qs = urllib.parse.urlencode(params)
-        req = urllib.request.Request(f"{url.rstrip('/')}/api/issues/search?{qs}")
-        req.add_header("Authorization", f"Basic {auth}")
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
-        batch = data.get("issues", [])
-        issues.extend(batch)
-        total = data.get("total", 0)
-        if not batch or page * _PAGE_SIZE >= total:
-            break
-        page += 1
-    return issues
-
-
-def _project_key(spec: dict) -> str:
-    return spec.get("sonar_project_key") or spec.get("name") or ""
+def _run_bandit(scan_dir: Path) -> list[dict]:
+    """Run Bandit and parse its JSON output. Empty list if no python files."""
+    if not any(scan_dir.rglob("*.py")):
+        return []
+    proc = subprocess.run(
+        ["bandit", "-r", str(scan_dir), "-f", "json", "-q"],
+        capture_output=True, text=True, check=False,
+    )
+    if not proc.stdout.strip():
+        return []
+    data = json.loads(proc.stdout)
+    return data.get("results", [])
 
 
 def analyze(codebase: dict, interaction_log: list[dict], spec: dict) -> MetricScore:
-    loc = sum(len(c.splitlines()) for c in codebase.get("files", {}).values()) or 1
-    key = _project_key(spec)
-    if not key:
-        raise ValueError("spec must define 'name' or 'sonar_project_key' for SonarQube lookup")
-    issues = _fetch_issues(key)
-    relevant = [i for i in issues if _is_owasp_or_cwe(i)]
-    density = (len(relevant) / loc) * 1000
+    with tempfile.TemporaryDirectory() as tmp:
+        scan_dir = Path(tmp) / "code"
+        scan_dir.mkdir()
+        loc = _write_codebase(codebase, scan_dir) or 1
+        issues = _run_bandit(scan_dir)
+    cwe_tagged = [i for i in issues if (i.get("issue_cwe") or {}).get("id")]
+    density = (len(cwe_tagged) / loc) * 1000
     return MetricScore(name="security_density", value=density, unit="per_kloc")

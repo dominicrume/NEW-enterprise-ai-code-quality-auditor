@@ -27,7 +27,9 @@ def _stage(captures_root: Path, run_id: str) -> None:
 
 
 def test_run_command_audits_one_condition(tmp_path, monkeypatch):
-    monkeypatch.setattr(security_analyzer, "_fetch_issues", lambda key: [])
+    from auditor.models.audit_result import MetricScore
+    monkeypatch.setattr(security_analyzer, "analyze",
+                        lambda c,l,sp: MetricScore(name="security_density", value=0.0, unit="per_kloc"))
     captures = tmp_path / "captures"
     _stage(captures, "cli_run_001")
     monkeypatch.chdir(tmp_path)  # raw_root="data/raw" default → tmp
@@ -46,7 +48,9 @@ def test_run_command_audits_one_condition(tmp_path, monkeypatch):
 
 
 def test_experiment_command_writes_csv(tmp_path, monkeypatch):
-    monkeypatch.setattr(security_analyzer, "_fetch_issues", lambda key: [])
+    from auditor.models.audit_result import MetricScore
+    monkeypatch.setattr(security_analyzer, "analyze",
+                        lambda c,l,sp: MetricScore(name="security_density", value=0.0, unit="per_kloc"))
     captures = tmp_path / "captures"
     _stage(captures, "cli_exp_001")
     monkeypatch.chdir(tmp_path)
