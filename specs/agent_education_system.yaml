@@ -4,7 +4,7 @@
 
 name: agent_education_system
 version: 1.0.0
-sonar_project_key: dominicrume_ai-code-quality-auditor
+sonar_project_key: dominicrume_NEW-enterprise-ai-code-quality-auditor
 
 features:
   - id: auth.register
