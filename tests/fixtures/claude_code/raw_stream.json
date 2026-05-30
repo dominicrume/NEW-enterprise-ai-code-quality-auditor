@@ -1,0 +1,7 @@
+[
+  {"type": "system", "subtype": "init"},
+  {"type": "assistant", "tool_name": "Write"},
+  {"type": "tool_use", "tool_name": "Edit"},
+  {"type": "tool_use", "tool_name": "Bash"},
+  {"type": "result", "subtype": "success"}
+]

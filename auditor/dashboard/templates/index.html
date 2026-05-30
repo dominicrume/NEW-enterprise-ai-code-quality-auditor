@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Code Quality Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #0b0d12;
+      --bg-1: #11141c;
+      --bg-2: #181c27;
+      --line: #232838;
+      --text: #e6e8ef;
+      --muted: #8b91a4;
+      --accent: #7c5cff;
+      --accent-soft: rgba(124, 92, 255, 0.18);
+      --pilot: #f0a14a;
+      --pilot-soft: rgba(240, 161, 74, 0.15);
+      --real: #4ade80;
+      --real-soft: rgba(74, 222, 128, 0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(1000px 600px at 20% -10%, rgba(124, 92, 255, 0.12), transparent 60%),
+        radial-gradient(800px 500px at 110% 10%, rgba(74, 222, 128, 0.08), transparent 60%),
+        var(--bg-0);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; }
+    .brand-logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: conic-gradient(from 220deg, #7c5cff, #4ade80, #f0a14a, #7c5cff);
+      box-shadow: 0 6px 18px -6px rgba(124, 92, 255, 0.6);
+    }
+    .nav-meta { color: var(--muted); font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; }
+    h1 { font-size: 2.5rem; font-weight: 800; margin: 0 0 0.5rem; letter-spacing: -0.02em; }
+    .lead { color: var(--muted); font-size: 1.05rem; max-width: 60ch; line-height: 1.5; margin-bottom: 2.5rem; }
+    .lead code { background: var(--bg-2); padding: 0.1rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--bg-1), var(--bg-1) 70%, rgba(124, 92, 255, 0.03));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex; flex-direction: column; gap: 1rem;
+      position: relative; overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(124, 92, 255, 0.5);
+      box-shadow: 0 14px 40px -20px rgba(124, 92, 255, 0.45);
+    }
+    .card::after {
+      content: ''; position: absolute; inset: 0; border-radius: 16px;
+      background: radial-gradient(400px 200px at 0% 0%, rgba(124, 92, 255, 0.08), transparent 60%);
+      pointer-events: none;
+    }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .badge {
+      font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.55rem; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .badge.pilot { background: var(--pilot-soft); color: var(--pilot); border: 1px solid rgba(240, 161, 74, 0.3); }
+    .badge.real  { background: var(--real-soft);  color: var(--real);  border: 1px solid rgba(74, 222, 128, 0.3); }
+    .badge.unknown { background: var(--bg-2); color: var(--muted); border: 1px solid var(--line); }
+    .card-title { font-size: 1rem; font-weight: 600; margin: 0; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+    .card-meta { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
+    .card-meta strong { color: var(--text); font-weight: 600; }
+    .card-cta { color: var(--accent); font-weight: 500; font-size: 0.9rem; margin-top: auto; display: flex; align-items: center; gap: 0.35rem; }
+    .empty {
+      border: 1px dashed var(--line); border-radius: 16px; padding: 3rem 2rem;
+      text-align: center; color: var(--muted);
+    }
+    .empty code { background: var(--bg-2); padding: 0.15rem 0.5rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        AI Code Quality Auditor
+      </div>
+      <div class="nav-meta">{{ reports | length }} report{{ '' if reports|length == 1 else 's' }}</div>
+    </div>
+
+    <h1>Experiment reports</h1>
+    <p class="lead">
+      Five-condition comparisons of AI coding workflows against a fixed
+      specification. Each card is one immutable CSV in <code>data/reports/</code>
+      — open one to see the metric breakdown.
+    </p>
+
+    {% if reports %}
+    <div class="grid">
+      {% for r in reports %}
+      <a class="card" href="{{ url_for('report', run_id=r.run_id) }}">
+        <div class="card-top">
+          <span class="badge {{ 'pilot' if r.is_pilot else 'real' if r.is_dissertation_result else 'unknown' }}">
+            {{ 'pilot' if r.is_pilot else 'dissertation' if r.is_dissertation_result else r.kind }}
+          </span>
+          <span style="color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">{{ r.csv }}</span>
+        </div>
+        <h3 class="card-title">{{ r.run_id }}</h3>
+        <div class="card-meta">
+          {% if r.spec %}<div>Spec: <strong>{{ r.spec }}</strong></div>{% endif %}
+          {% if r.generated_at %}<div>Generated: {{ r.generated_at[:19].replace('T', ' ') }} UTC</div>{% endif %}
+        </div>
+        <div class="card-cta">Open report →</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      No reports yet. Run <code>python scripts/run_pilot.py</code> for a pilot,
+      or <code>auditor experiment</code> for a real five-condition run.
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>

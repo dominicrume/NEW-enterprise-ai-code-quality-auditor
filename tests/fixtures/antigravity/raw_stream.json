@@ -1,0 +1,6 @@
+[
+  {"kind": "plan", "phase": "begin"},
+  {"kind": "tool_use", "tool": "write_file", "phase": "ok"},
+  {"kind": "tool_use", "tool": "shell", "phase": "ok"},
+  {"kind": "finish", "phase": "success"}
+]

@@ -1,0 +1,26 @@
+# Secrets
+.env
+*.env
+!.env.example
+
+# Experiment data (regeneratable, not version-controlled)
+data/raw/*
+data/processed/*
+data/reports/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/reports/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# OS / Editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json

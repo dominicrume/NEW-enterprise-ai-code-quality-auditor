@@ -1,0 +1,11 @@
+# Cross-cutting governance rules the AI must respect regardless of feature.
+
+guardrails:
+  - id: input_validation
+    description: All API inputs validated with a schema (Pydantic or equivalent).
+  - id: auth_required
+    description: Non-public endpoints require authentication.
+  - id: secrets_not_in_code
+    description: No hardcoded secrets, API keys, or tokens in source.
+  - id: no_eval
+    description: No use of eval()/exec() on user input.

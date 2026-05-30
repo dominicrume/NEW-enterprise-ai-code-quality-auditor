@@ -1,0 +1,6 @@
+[
+  {"type": "session_start"},
+  {"type": "tool_call", "tool": "edit_file", "status": "ok"},
+  {"type": "tool_call", "tool": "run_terminal", "status": "ok"},
+  {"type": "completion", "status": "success"}
+]

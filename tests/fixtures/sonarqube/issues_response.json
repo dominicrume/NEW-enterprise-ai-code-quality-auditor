@@ -1,0 +1,43 @@
+{
+  "total": 4,
+  "p": 1,
+  "ps": 500,
+  "issues": [
+    {
+      "key": "issue-1",
+      "type": "VULNERABILITY",
+      "severity": "CRITICAL",
+      "status": "OPEN",
+      "rule": "python:S2076",
+      "message": "OS command injection",
+      "tags": ["cwe-78", "owasp-a1"]
+    },
+    {
+      "key": "issue-2",
+      "type": "SECURITY_HOTSPOT",
+      "severity": "MAJOR",
+      "status": "OPEN",
+      "rule": "python:S4426",
+      "message": "Weak crypto",
+      "tags": ["cwe", "owasp-a02"]
+    },
+    {
+      "key": "issue-3",
+      "type": "VULNERABILITY",
+      "severity": "MINOR",
+      "status": "CONFIRMED",
+      "rule": "python:S4790",
+      "message": "Weak hashing",
+      "tags": ["cwe-328"]
+    },
+    {
+      "key": "issue-4-untagged",
+      "type": "VULNERABILITY",
+      "severity": "INFO",
+      "status": "OPEN",
+      "rule": "python:S9999",
+      "message": "Not OWASP/CWE-tagged",
+      "tags": ["bad-practice"]
+    }
+  ]
+}

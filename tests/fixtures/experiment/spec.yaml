@@ -1,0 +1,7 @@
+name: experiment_test_spec
+version: "1"
+features:
+  - id: auth.login
+    description: "Allow a registered user to authenticate."
+  - id: auth.register
+    description: "Allow a new user to register."

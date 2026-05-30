@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ run_id }} · AI Code Quality Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root {
+      --bg-0: #0b0d12;
+      --bg-1: #11141c;
+      --bg-2: #181c27;
+      --bg-3: #1f2433;
+      --line: #232838;
+      --line-strong: #2e3447;
+      --text: #e6e8ef;
+      --muted: #8b91a4;
+      --dim: #5a6076;
+      --accent: #7c5cff;
+      --accent-soft: rgba(124, 92, 255, 0.15);
+      --good: #4ade80;
+      --bad:  #ef5a6f;
+      --warn: #f0a14a;
+      --pilot-soft: rgba(240, 161, 74, 0.12);
+      --pilot-border: rgba(240, 161, 74, 0.4);
+
+      --c-human_control: #94a3b8;
+      --c-claude_code:   #d97757;
+      --c-cursor_agent:  #7c5cff;
+      --c-antigravity:   #4ade80;
+      --c-replit_agent:  #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(124, 92, 255, 0.10), transparent 60%),
+        radial-gradient(700px 400px at 110% 0%, rgba(74, 222, 128, 0.06), transparent 60%),
+        var(--bg-0);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ---------- NAV ---------- */
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 700; }
+    .brand-logo { width: 28px; height: 28px; border-radius: 7px;
+      background: conic-gradient(from 220deg, #7c5cff, #4ade80, #f0a14a, #7c5cff);
+      box-shadow: 0 4px 14px -4px rgba(124, 92, 255, 0.6); }
+    .nav a { color: var(--muted); text-decoration: none; transition: color 120ms ease; font-size: 0.9rem; }
+    .nav a:hover { color: var(--text); }
+    .run-id { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 0.85rem;
+      background: var(--bg-2); padding: 0.35rem 0.7rem; border-radius: 6px; border: 1px solid var(--line); }
+
+    /* ---------- PILOT BANNER ---------- */
+    .banner {
+      display: flex; align-items: flex-start; gap: 0.85rem;
+      background: var(--pilot-soft); border: 1px solid var(--pilot-border);
+      padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 2rem;
+    }
+    .banner-icon { font-size: 1.25rem; line-height: 1; }
+    .banner strong { color: var(--warn); }
+    .banner p { margin: 0.25rem 0 0; color: var(--text); font-size: 0.92rem; line-height: 1.5; }
+
+    /* ---------- HEADER ---------- */
+    .header { margin-bottom: 2.5rem; }
+    .header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+    .header .sub { color: var(--muted); font-size: 1rem; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .chip {
+      cursor: pointer; -webkit-user-select: none; user-select: none;
+      padding: 0.4rem 0.85rem; border-radius: 999px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      font-size: 0.85rem; font-weight: 500;
+      transition: all 120ms ease;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .chip:hover { border-color: var(--line-strong); }
+    .chip[data-active="false"] { opacity: 0.35; }
+    .chip .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ---------- HERO STATS ---------- */
+    .hero-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-bottom: 2.5rem;
+    }
+    .stat {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1.25rem; position: relative; overflow: hidden;
+      transition: border-color 160ms ease;
+    }
+    .stat:hover { border-color: var(--line-strong); }
+    .stat::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0.6;
+    }
+    .stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    .stat-unit { color: var(--muted); font-size: 0.85rem; margin-left: 0.25rem; font-family: 'Inter', sans-serif; font-weight: 500; }
+    .stat-sub { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; line-height: 1.4; }
+    .stat-sub b { color: var(--good); font-weight: 600; }
+    .stat-blurb { color: var(--dim); font-size: 0.75rem; margin-top: 0.85rem; line-height: 1.4; min-height: 2.6em; }
+
+    /* ---------- SECTION CARDS ---------- */
+    .section {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 16px;
+      padding: 1.75rem; margin-bottom: 1.25rem;
+    }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+    .section h2 { font-size: 1.15rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+    .section .desc { color: var(--muted); font-size: 0.85rem; max-width: 50ch; }
+
+    .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem; }
+    @media (max-width: 880px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ---------- LEADERBOARD ---------- */
+    .lb-row {
+      display: grid; grid-template-columns: 32px 1fr auto auto; gap: 1rem; align-items: center;
+      padding: 0.8rem 0.5rem; border-bottom: 1px solid var(--line);
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-rank {
+      width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      background: var(--bg-2); border: 1px solid var(--line);
+    }
+    .lb-row[data-rank="1"] .lb-rank { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #1a1300; border-color: transparent; }
+    .lb-row[data-rank="2"] .lb-rank { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #0f172a; border-color: transparent; }
+    .lb-row[data-rank="3"] .lb-rank { background: linear-gradient(135deg, #fdba74, #c2410c); color: #1a0a00; border-color: transparent; }
+    .lb-name { display: flex; align-items: center; gap: 0.6rem; font-weight: 500; }
+    .lb-name .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .lb-stat { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .lb-wins { font-size: 0.75rem; color: var(--good); font-weight: 600; }
+
+    /* ---------- METRIC TABS ---------- */
+    .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .tab {
+      padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; -webkit-user-select: none; user-select: none;
+      background: transparent; color: var(--muted); font-size: 0.9rem; font-weight: 500;
+      transition: all 120ms ease; border: 1px solid transparent;
+    }
+    .tab:hover { color: var(--text); }
+    .tab[data-active="true"] { background: var(--accent-soft); color: var(--text); border-color: rgba(124, 92, 255, 0.4); }
+    .tab-panel { display: none; }
+    .tab-panel[data-active="true"] { display: block; }
+
+    .metric-detail { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.25rem; align-items: start; }
+    @media (max-width: 880px) { .metric-detail { grid-template-columns: 1fr; } }
+    .definition {
+      background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.15rem;
+      font-size: 0.9rem; line-height: 1.55; color: var(--muted);
+    }
+    .definition h4 { color: var(--text); font-size: 0.85rem; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.88rem; }
+    .data-table th, .data-table td { padding: 0.55rem 0.75rem; text-align: right; border-bottom: 1px solid var(--line); }
+    .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .data-table th { color: var(--muted); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .data-table td { font-family: 'JetBrains Mono', monospace; }
+    .data-table tr.best td { color: var(--good); font-weight: 600; }
+    .data-table tr.worst td { color: var(--bad); }
+
+    /* ---------- CHART SHELL ---------- */
+    .chart { width: 100%; height: 360px; }
+    .chart-tall { height: 420px; }
+
+    /* ---------- PROVENANCE ---------- */
+    details.prov {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1rem 1.25rem;
+    }
+    details.prov summary { cursor: pointer; font-weight: 600; color: var(--muted); list-style: none; display: flex; align-items: center; justify-content: space-between; }
+    details.prov summary::-webkit-details-marker { display: none; }
+    details.prov summary::after { content: '+'; font-size: 1.2rem; color: var(--muted); }
+    details.prov[open] summary::after { content: '−'; }
+    details.prov pre { margin: 1rem 0 0; background: var(--bg-0); border: 1px solid var(--line); padding: 1rem; border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); overflow-x: auto; }
+
+    .arrow-back { display: inline-flex; align-items: center; gap: 0.4rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- ===== NAV ===== -->
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        AI Code Quality Auditor
+      </div>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span class="run-id">{{ run_id }}</span>
+        <a class="arrow-back" href="{{ url_for('index') }}">← all reports</a>
+      </div>
+    </div>
+
+    {% if provenance and provenance.kind == 'pilot' %}
+    <div class="banner">
+      <div class="banner-icon">⚠️</div>
+      <div>
+        <strong>Pilot data — not a dissertation result.</strong>
+        <p>{{ provenance.warning }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+      <h1>Five-condition comparison</h1>
+      <div class="sub">
+        Spec: <strong>{{ provenance.spec if provenance and provenance.spec else 'unknown' }}</strong>
+        · {{ metrics | length }} metrics × {{ conditions | length }} conditions
+        · click a condition to filter all charts
+      </div>
+      <div class="chip-row" id="condition-chips">
+        {% for c in conditions %}
+        <div class="chip" data-condition="{{ c }}" data-active="true">
+          <span class="swatch" style="background: var(--c-{{ c }});"></span>
+          {{ c }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ===== HERO STATS ===== -->
+    <div class="hero-grid">
+      {% for s in summary %}
+      <div class="stat">
+        <div class="stat-label">{{ s.metric }}</div>
+        <div>
+          <span class="stat-value">{{ '%.2f' % s.best_value }}</span>
+          <span class="stat-unit">{{ s.unit }}</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>{{ s.best_condition }}</b><br>
+          Worst: {{ s.worst_condition }} ({{ '%.2f' % s.worst_value }})
+        </div>
+        <div class="stat-blurb">{{ s.blurb }}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- ===== RADAR + LEADERBOARD ===== -->
+    <div class="two-col">
+      <div class="section">
+        <div class="section-head">
+          <h2>Normalised comparison</h2>
+          <div class="desc">Each axis is one metric, rescaled so 1.0 is the best in this report.</div>
+        </div>
+        <div id="radar" class="chart chart-tall"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Leaderboard</h2>
+          <div class="desc">Composite of per-metric ranks (lower is better).</div>
+        </div>
+        {% for row in leaderboard %}
+        <div class="lb-row" data-rank="{{ row.overall_rank }}">
+          <div class="lb-rank">{{ row.overall_rank }}</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-{{ row.condition }});"></span>
+            {{ row.condition }}
+          </div>
+          <div class="lb-stat">avg rank {{ row.avg_rank }}</div>
+          <div class="lb-wins">{% if row.wins > 0 %}🏆 {{ row.wins }}{% endif %}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ===== HEATMAP ===== -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Heatmap</h2>
+        <div class="desc">Green = best for that metric, red = worst. Normalised per row.</div>
+      </div>
+      <div id="heatmap" class="chart chart-tall"></div>
+    </div>
+
+    <!-- ===== PER-METRIC ===== -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Per-metric drill-down</h2>
+        <div class="desc">Click a tab to inspect one metric.</div>
+      </div>
+      <div class="tabs" id="tabs">
+        {% for m in metrics %}
+        <div class="tab" data-metric="{{ m }}" data-active="{{ 'true' if loop.first else 'false' }}">{{ m }}</div>
+        {% endfor %}
+      </div>
+      {% for m in metrics %}
+      <div class="tab-panel" data-metric="{{ m }}" data-active="{{ 'true' if loop.first else 'false' }}">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-{{ m }}" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>{{ m }}</h4>
+              {{ blurbs[m] }}
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> {{ units[m] or '—' }}
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                {% for c in conditions %}
+                <tr class="{% if ranks[m][c] == 1 %}best{% elif ranks[m][c] == conditions|length %}worst{% endif %}">
+                  <td>{{ c }}</td>
+                  <td>{{ '%.3f' % pivot[m][c] }}</td>
+                  <td>{{ ranks[m][c] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- ===== PROVENANCE ===== -->
+    {% if provenance %}
+    <details class="prov">
+      <summary>Provenance metadata</summary>
+      <pre>{{ provenance | tojson(indent=2) }}</pre>
+    </details>
+    {% endif %}
+  </div>
+
+  <script>
+    // ============================================================
+    // Data passed from server
+    // ============================================================
+    const PIVOT      = {{ pivot | tojson }};
+    const NORM       = {{ norm | tojson }};
+    const RANKS      = {{ ranks | tojson }};
+    const CONDITIONS = {{ conditions | tojson }};
+    const METRICS    = {{ metrics | tojson }};
+    const UNITS      = {{ units | tojson }};
+
+    const colorFor = (c) => getComputedStyle(document.documentElement).getPropertyValue('--c-' + c).trim() || '#888';
+    const PLOT_FONT = { family: 'Inter, sans-serif', color: '#e6e8ef', size: 12 };
+    const PLOT_LAYOUT_BASE = {
+      paper_bgcolor: 'transparent',
+      plot_bgcolor:  'transparent',
+      font: PLOT_FONT,
+      margin: { t: 24, l: 56, r: 24, b: 56 },
+      xaxis: { gridcolor: 'rgba(255,255,255,0.04)', linecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#8b91a4' } },
+      yaxis: { gridcolor: 'rgba(255,255,255,0.04)', linecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#8b91a4' } },
+    };
+    const PLOT_CFG = { displayModeBar: false, responsive: true };
+
+    let activeConditions = new Set(CONDITIONS);
+
+    // ============================================================
+    // Radar chart
+    // ============================================================
+    function renderRadar() {
+      const traces = CONDITIONS.filter(c => activeConditions.has(c)).map(c => ({
+        type: 'scatterpolar',
+        r: METRICS.map(m => NORM[m][c]).concat([NORM[METRICS[0]][c]]),
+        theta: METRICS.concat([METRICS[0]]),
+        fill: 'toself',
+        name: c,
+        line: { color: colorFor(c), width: 2 },
+        fillcolor: colorFor(c) + '22',
+        hovertemplate: '<b>' + c + '</b><br>%{theta}: %{r:.2f}<extra></extra>'
+      }));
+      Plotly.newPlot('radar', traces, {
+        ...PLOT_LAYOUT_BASE,
+        polar: {
+          bgcolor: 'transparent',
+          radialaxis: { visible: true, range: [0, 1], gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#8b91a4', size: 10 } },
+          angularaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#e6e8ef', size: 11 } },
+        },
+        showlegend: false,
+        margin: { t: 20, l: 60, r: 60, b: 30 },
+      }, PLOT_CFG);
+    }
+
+    // ============================================================
+    // Heatmap
+    // ============================================================
+    function renderHeatmap() {
+      const visible = CONDITIONS.filter(c => activeConditions.has(c));
+      const z = METRICS.map(m => visible.map(c => NORM[m][c]));
+      Plotly.newPlot('heatmap', [{
+        type: 'heatmap',
+        x: visible, y: METRICS, z: z,
+        colorscale: [
+          [0, '#ef5a6f'], [0.5, '#3b3f53'], [1, '#4ade80']
+        ],
+        showscale: true,
+        colorbar: { tickfont: { color: '#8b91a4' }, outlinewidth: 0, thickness: 12 },
+        hovertemplate: '<b>%{y}</b><br>%{x}<br>score: %{z:.2f}<extra></extra>',
+        xgap: 4, ygap: 4,
+      }], {
+        ...PLOT_LAYOUT_BASE,
+        margin: { t: 10, l: 140, r: 40, b: 80 },
+        xaxis: { ...PLOT_LAYOUT_BASE.xaxis, tickangle: -25 },
+        yaxis: { ...PLOT_LAYOUT_BASE.yaxis, automargin: true },
+      }, PLOT_CFG);
+    }
+
+    // ============================================================
+    // Per-metric bar charts
+    // ============================================================
+    function renderBars() {
+      METRICS.forEach(m => {
+        const visible = CONDITIONS.filter(c => activeConditions.has(c));
+        const colors = visible.map(c => colorFor(c));
+        Plotly.newPlot('bar-' + m, [{
+          type: 'bar',
+          x: visible,
+          y: visible.map(c => PIVOT[m][c]),
+          marker: { color: colors, line: { width: 0 } },
+          text: visible.map(c => PIVOT[m][c].toFixed(2)),
+          textposition: 'outside',
+          textfont: { color: '#e6e8ef' },
+          hovertemplate: '<b>%{x}</b><br>' + m + ': %{y:.3f} ' + (UNITS[m] || '') + '<extra></extra>'
+        }], {
+          ...PLOT_LAYOUT_BASE,
+          margin: { t: 30, l: 56, r: 24, b: 70 },
+          xaxis: { ...PLOT_LAYOUT_BASE.xaxis, tickangle: -25 },
+          yaxis: { ...PLOT_LAYOUT_BASE.yaxis, title: { text: UNITS[m] || '', font: { color: '#8b91a4', size: 11 } } },
+        }, PLOT_CFG);
+      });
+    }
+
+    function renderAll() {
+      renderRadar();
+      renderHeatmap();
+      renderBars();
+    }
+
+    // ============================================================
+    // Condition chips (filter)
+    // ============================================================
+    document.querySelectorAll('#condition-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const c = chip.dataset.condition;
+        if (activeConditions.has(c)) {
+          if (activeConditions.size === 1) return;  // never go to zero
+          activeConditions.delete(c);
+          chip.dataset.active = 'false';
+        } else {
+          activeConditions.add(c);
+          chip.dataset.active = 'true';
+        }
+        renderAll();
+      });
+    });
+
+    // ============================================================
+    // Tabs
+    // ============================================================
+    document.querySelectorAll('#tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const m = tab.dataset.metric;
+        document.querySelectorAll('#tabs .tab').forEach(t => t.dataset.active = (t.dataset.metric === m) ? 'true' : 'false');
+        document.querySelectorAll('.tab-panel').forEach(p => p.dataset.active = (p.dataset.metric === m) ? 'true' : 'false');
+        // Force a relayout so the newly-visible chart sizes correctly.
+        Plotly.Plots.resize(document.getElementById('bar-' + m));
+      });
+    });
+
+    renderAll();
+    window.addEventListener('resize', () => {
+      Plotly.Plots.resize(document.getElementById('radar'));
+      Plotly.Plots.resize(document.getElementById('heatmap'));
+      METRICS.forEach(m => Plotly.Plots.resize(document.getElementById('bar-' + m)));
+    });
+  </script>
+</body>
+</html>

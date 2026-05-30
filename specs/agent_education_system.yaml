@@ -1,0 +1,32 @@
+# The fixed specification every AI workflow must implement.
+# This is the "spec box". Hallucinations are features that appear in code
+# but are NOT declared here.
+
+name: agent_education_system
+version: 1.0.0
+sonar_project_key: dominicrume_ai-code-quality-auditor
+
+features:
+  - id: auth.register
+    description: Student can create an account with email and password.
+  - id: auth.login
+    description: Student can log in and receive a session token.
+  - id: course.list
+    description: Authenticated user can list available courses.
+  - id: course.view
+    description: Authenticated user can view a course and its lessons.
+  - id: training.module.corporate
+    description: One mock corporate-training module (e.g. Tesco standards).
+  - id: training.module.academic
+    description: One mock academic module (e.g. AI fundamentals).
+
+governance:
+  - rule: no_pii
+    description: No real personally identifiable information may be stored.
+  - rule: hashed_passwords
+    description: Passwords must be hashed (bcrypt or argon2).
+  - rule: no_external_calls_without_allowlist
+    description: Generated code must not call external APIs not in the allowlist.
+
+allowlist:
+  external_apis: []

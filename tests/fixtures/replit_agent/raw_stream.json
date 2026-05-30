@@ -1,0 +1,6 @@
+[
+  {"event": "agent_started", "stage": "init"},
+  {"event": "file_write", "tool": "editor", "status": "ok"},
+  {"event": "package_install", "tool": "shell", "status": "ok"},
+  {"event": "agent_completed", "status": "success"}
+]
