@@ -144,6 +144,36 @@ def _load_report(run_id: str) -> dict:
     prov_path = REPORTS_DIR / f"{run_id}.provenance.json"
     provenance = json.loads(prov_path.read_text()) if prov_path.exists() else None
 
+    # Auto-classify pilot vs dissertation per protocol §4: dissertation
+    # threshold is N >= 5 reps per condition. Computed from the CSV itself,
+    # so a report graduates automatically once enough data lands.
+    reps_per_condition: dict[str, int] = {}
+    for cond in conditions:
+        cond_rows = [r for r in rows if r["condition"] == cond]
+        per_metric_counts = defaultdict(int)
+        for r in cond_rows:
+            per_metric_counts[r["metric"]] += 1
+        reps_per_condition[cond] = (
+            min(per_metric_counts.values()) if per_metric_counts else 0
+        )
+    min_n = min(reps_per_condition.values()) if reps_per_condition else 0
+    declared_kind = (provenance or {}).get("kind", "unknown")
+    if min_n >= 5 or declared_kind == "main_study":
+        banner_kind = "dissertation"
+        banner_text = (
+            f"Dissertation result. N = {min_n} runs per condition "
+            f"(across {len(conditions)} conditions)."
+        )
+    elif declared_kind == "pilot" or min_n < 5:
+        banner_kind = "pilot"
+        banner_text = (
+            f"Pilot data — N = {min_n} run(s) per condition. "
+            "Dissertation threshold is N ≥ 5 per protocol §4."
+        )
+    else:
+        banner_kind = "unknown"
+        banner_text = "Provenance unknown — see provenance metadata at the foot of this report."
+
     return {
         "run_id": run_id,
         "rows": rows,
@@ -157,6 +187,9 @@ def _load_report(run_id: str) -> dict:
         "conditions": conditions,
         "metrics": metrics,
         "provenance": provenance,
+        "banner_kind": banner_kind,
+        "banner_text": banner_text,
+        "reps_per_condition": reps_per_condition,
     }
 
 

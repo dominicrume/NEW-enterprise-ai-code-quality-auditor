@@ -200,12 +200,20 @@
       </div>
     </div>
 
-    {% if provenance and provenance.kind == 'pilot' %}
+    {% if banner_kind == 'dissertation' %}
+    <div class="banner" style="border-left: 4px solid #22c55e;">
+      <div class="banner-icon">✅</div>
+      <div>
+        <strong>Dissertation result.</strong>
+        <p>{{ banner_text }}</p>
+      </div>
+    </div>
+    {% elif banner_kind == 'pilot' %}
     <div class="banner">
       <div class="banner-icon">⚠️</div>
       <div>
-        <strong>Pilot data — not a dissertation result.</strong>
-        <p>{{ provenance.warning }}</p>
+        <strong>Pilot data — not yet a dissertation result.</strong>
+        <p>{{ banner_text }}</p>
       </div>
     </div>
     {% endif %}

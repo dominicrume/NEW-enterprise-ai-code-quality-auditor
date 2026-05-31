@@ -1,0 +1,31 @@
+# Pre-registered dissertation spec #3: CLI app with subcommands.
+# Tests structured-output and argument-parsing patterns across agents.
+
+name: internal_tool_cli
+version: 1.0.0
+sonar_project_key: dominicrume_NEW-enterprise-ai-code-quality-auditor
+
+features:
+  - id: cli.init
+    description: "`tool init <project-name>` creates a project directory with a default config.json."
+  - id: cli.add
+    description: "`tool add <key> <value>` appends a key/value pair to the project's config.json."
+  - id: cli.list
+    description: "`tool list` prints every key/value pair in the project's config.json."
+  - id: cli.export
+    description: "`tool export --format {json,yaml,toml}` writes the config to stdout in the chosen format."
+  - id: cli.validate
+    description: "`tool validate` checks the config against a built-in JSON schema and exits non-zero on failure."
+  - id: cli.help
+    description: "`tool --help` and `tool <subcommand> --help` print usage with all flags documented."
+
+governance:
+  - rule: no_pii
+    description: No real personally identifiable information may be stored or printed.
+  - rule: stable_exit_codes
+    description: Exit code 0 on success, 1 on validation failure, 2 on user error (unknown subcommand, missing args).
+  - rule: no_external_calls_without_allowlist
+    description: Generated code must not call external APIs not in the allowlist.
+
+allowlist:
+  external_apis: []

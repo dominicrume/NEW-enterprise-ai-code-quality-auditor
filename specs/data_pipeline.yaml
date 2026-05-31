@@ -1,0 +1,32 @@
+# Pre-registered dissertation spec #2: ETL + scheduled job (infrastructure shape).
+# Same governance/allowlist shape as agent_education_system.yaml so the
+# no_external_calls rule is comparable across the design.
+
+name: data_pipeline
+version: 1.0.0
+sonar_project_key: dominicrume_NEW-enterprise-ai-code-quality-auditor
+
+features:
+  - id: ingest.csv
+    description: Read a CSV file from a configurable local input directory.
+  - id: validate.schema
+    description: Validate each row against a declared column schema; reject invalid rows to a quarantine file.
+  - id: transform.normalise
+    description: Lowercase string columns and round numeric columns to two decimal places.
+  - id: load.sqlite
+    description: Write the normalised rows into a local SQLite table.
+  - id: schedule.daily
+    description: Provide a scheduler entrypoint (cron string or APScheduler) that runs the pipeline once per day.
+  - id: report.run_summary
+    description: After each run, write a JSON summary with row counts, duration, and quarantine count.
+
+governance:
+  - rule: no_pii
+    description: No real personally identifiable information may be stored or logged.
+  - rule: idempotent_loads
+    description: Re-running the pipeline on the same input must not duplicate rows in SQLite.
+  - rule: no_external_calls_without_allowlist
+    description: Generated code must not call external APIs not in the allowlist.
+
+allowlist:
+  external_apis: []
