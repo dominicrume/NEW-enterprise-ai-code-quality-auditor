@@ -1,0 +1,21 @@
+# How a third party consumes the auditor as a GitHub Action.
+# Copy this file into your own repo at .github/workflows/auditor.yml
+# and edit the inputs.
+name: Audit AI-generated code
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dominicrume/NEW-enterprise-ai-code-quality-auditor@main
+        with:
+          run-id: ${{ github.run_id }}
+          spec: specs/agent_education_system.yaml
+          conditions: claude_code,cursor_agent
+          fail-on-hallucination: "true"

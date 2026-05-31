@@ -1,0 +1,77 @@
+name: AI Code Quality Auditor
+description: >
+  Score AI-generated code against a fixed spec on 5 metrics (hallucinations,
+  complexity, duplication, security, keystroke correction). Runs in CI on any
+  repo with a captured session in data/raw/<run_id>/.
+
+author: Dominic Rume
+
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  run-id:
+    description: Identifier of the captured session (folder under data/raw/).
+    required: true
+  spec:
+    description: Path to the YAML spec to score against.
+    required: false
+    default: specs/agent_education_system.yaml
+  conditions:
+    description: Comma-separated list of conditions to score (default = all 5).
+    required: false
+    default: human_control,claude_code,cursor_agent,replit_agent,antigravity
+  python-version:
+    description: Python interpreter version.
+    required: false
+    default: "3.11"
+  fail-on-hallucination:
+    description: Fail the build if any condition has hallucinations > 0.
+    required: false
+    default: "false"
+
+outputs:
+  report-csv:
+    description: Path to the generated CSV report.
+    value: ${{ steps.score.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install auditor
+      shell: bash
+      run: |
+        pip install --upgrade pip
+        pip install ai-code-quality-auditor
+
+    - name: Score captured session
+      id: score
+      shell: bash
+      env:
+        AUDITOR_RUN_ID: ${{ inputs.run-id }}
+        AUDITOR_SPEC: ${{ inputs.spec }}
+        AUDITOR_CONDITIONS: ${{ inputs.conditions }}
+        AUDITOR_FAIL_ON_HALLUCINATION: ${{ inputs.fail-on-hallucination }}
+      run: |
+        auditor experiment --run-id "$AUDITOR_RUN_ID" --spec "$AUDITOR_SPEC" \
+          --conditions "$AUDITOR_CONDITIONS"
+        REPORT="data/reports/${AUDITOR_RUN_ID}_comparison.csv"
+        echo "report=$REPORT" >> "$GITHUB_OUTPUT"
+        if [ "$AUDITOR_FAIL_ON_HALLUCINATION" = "true" ]; then
+          if grep -E ',hallucinations,[1-9]' "$REPORT" >/dev/null; then
+            echo "::error::Hallucinations detected"; exit 1
+          fi
+        fi
+
+    - name: Upload CSV + dashboard screenshots
+      uses: actions/upload-artifact@v4
+      with:
+        name: auditor-report-${{ inputs.run-id }}
+        path: |
+          data/reports/${{ inputs.run-id }}_comparison.csv
+          data/reports/${{ inputs.run-id }}_comparison.provenance.json

@@ -1,24 +1,63 @@
 [project]
 name = "ai-code-quality-auditor"
 version = "0.1.0"
-description = "Empirical Safety Harness for agentic AI coding systems."
+description = "Empirical Safety Harness for agentic AI coding systems. Scores AI-generated code on 5 metrics across 5 vendor conditions against one fixed spec."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Dominic Rume", email = "dominicrume@gmail.com" }]
 requires-python = ">=3.11"
+keywords = ["ai", "code-quality", "llm", "agents", "evaluation",
+            "claude-code", "cursor", "sonarcloud", "dissertation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
   "pydantic>=2.0",
   "pyyaml>=6.0",
   "click>=8.1",
   "rich>=13.0",
   "radon>=6.0",
+  "python-dotenv>=1.0",
+  "bandit>=1.8",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.5", "build>=1.2", "twine>=5.0"]
 notebook = ["pandas>=2.0", "scipy>=1.10", "matplotlib>=3.7", "jupyter>=1.0"]
 dashboard = ["flask>=3.0"]
+recorder = ["pynput>=1.7"]
+all = ["pytest>=8.0", "pandas>=2.0", "scipy>=1.10", "matplotlib>=3.7",
+       "jupyter>=1.0", "flask>=3.0", "pynput>=1.7"]
+
+[project.urls]
+Homepage      = "https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor"
+Repository    = "https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor"
+Issues        = "https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor/issues"
+Documentation = "https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor/tree/main/docs"
 
 [project.scripts]
 auditor = "auditor.core.cli:main"
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["auditor*"]
+exclude = ["tests*", "data*", "scripts*", "docs*", "specs*"]
+
+[tool.setuptools.package-data]
+"auditor.dashboard" = ["templates/*.html", "static/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

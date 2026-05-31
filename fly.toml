@@ -1,0 +1,22 @@
+# Fly.io deployment config. After `fly launch --no-deploy` once, run `fly deploy`.
+# Free tier handles this comfortably.
+app           = "auditor-dashboard"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port  = 8080
+  force_https    = true
+  auto_stop_machines  = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus     = 1
+  memory_mb = 256
