@@ -116,7 +116,9 @@ class AntigravityAdapter(BaseAdapter):
         code_copy = dest / "code"
         if code_copy.exists():
             shutil.rmtree(code_copy)
-        shutil.copytree(self.work_dir, code_copy)
+        source = self.replay_dir if self.replay_dir is not None else self.work_dir
+        if source.exists():
+            shutil.copytree(source, code_copy)
         return dest
 
     def generate(self, spec: dict) -> tuple[dict, list[dict]]:

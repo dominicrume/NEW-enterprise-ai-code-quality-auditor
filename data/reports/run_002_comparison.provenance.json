@@ -1,0 +1,66 @@
+{
+  "kind": "pilot",
+  "spec": "specs/agent_education_system.yaml",
+  "conditions": [
+    "human_control",
+    "claude_code",
+    "cursor_agent",
+    "replit_agent",
+    "antigravity"
+  ],
+  "security_analyzer": "bandit_local",
+  "hallucination_metric": "auto-derived (manifest_deriver v2)",
+  "detection": {
+    "human_control": {
+      "implemented": [],
+      "hallucinated_endpoints": []
+    },
+    "claude_code": {
+      "implemented": [
+        "auth.register",
+        "auth.login",
+        "course.list",
+        "course.view",
+        "training.module.corporate",
+        "training.module.academic"
+      ],
+      "hallucinated_endpoints": []
+    },
+    "cursor_agent": {
+      "implemented": [
+        "auth.register",
+        "auth.login",
+        "course.list",
+        "course.view",
+        "training.module.corporate",
+        "training.module.academic"
+      ],
+      "hallucinated_endpoints": [
+        "/health"
+      ]
+    },
+    "replit_agent": {
+      "implemented": [
+        "auth.register",
+        "auth.login",
+        "course.list",
+        "course.view"
+      ],
+      "hallucinated_endpoints": []
+    },
+    "antigravity": {
+      "implemented": [
+        "auth.register",
+        "auth.login",
+        "course.list",
+        "course.view",
+        "training.module.corporate",
+        "training.module.academic"
+      ],
+      "hallucinated_endpoints": [
+        "/"
+      ]
+    }
+  },
+  "timestamp": "2026-05-31T01:21:49.859289+00:00"
+}
