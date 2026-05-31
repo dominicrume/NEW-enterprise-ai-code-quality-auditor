@@ -1,0 +1,1100 @@
+{
+  "kind": "main_study",
+  "spec_files": [
+    "specs/agent_education_system.yaml",
+    "specs/data_pipeline.yaml",
+    "specs/internal_tool_cli.yaml"
+  ],
+  "conditions": [
+    "antigravity",
+    "claude_code",
+    "cursor_agent",
+    "replit_agent"
+  ],
+  "reps_per_cell": 10,
+  "successful_runs": 60,
+  "failed_runs": 60,
+  "statuses": [
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep09",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 2,
+      "events": 25,
+      "duration_s": 62.093
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep04",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep04"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep05",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep05"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep04",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep04"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep02",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep02"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep00",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 12,
+      "events": 191,
+      "duration_s": 132.456
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep03",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep03"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep07",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep07"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep06",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep06"
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep09",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep09"
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep07",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 15,
+      "events": 122,
+      "duration_s": 105.391
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep09",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep09"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep08",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep08"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep02",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 2,
+      "events": 71,
+      "duration_s": 61.838
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep06",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 3,
+      "events": 19,
+      "duration_s": 46.328
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep02",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep02"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep02",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep02"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep07",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep07"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep01",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 6,
+      "events": 203,
+      "duration_s": 82.584
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep08",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep08"
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep08",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 3,
+      "events": 25,
+      "duration_s": 66.496
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep01",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep01"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep08",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep08"
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep08",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep08"
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep07",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 3,
+      "events": 25,
+      "duration_s": 67.136
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep01",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 2,
+      "events": 23,
+      "duration_s": 59.577
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep08",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep08"
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep00",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep00"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep06",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 1,
+      "events": 18,
+      "duration_s": 57.098
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep00",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep00"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep01",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 1,
+      "events": 17,
+      "duration_s": 50.374
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep02",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 9,
+      "events": 196,
+      "duration_s": 60.312
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep01",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 3,
+      "events": 78,
+      "duration_s": 54.977
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep00",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 9,
+      "events": 75,
+      "duration_s": 55.34
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep06",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep06"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep09",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 14,
+      "events": 268,
+      "duration_s": 86.873
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep07",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep07"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep04",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 21,
+      "events": 168,
+      "duration_s": 90.286
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep00",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep00"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep08",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 3,
+      "events": 112,
+      "duration_s": 63.176
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep09",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 6,
+      "events": 166,
+      "duration_s": 79.157
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep05",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 12,
+      "events": 212,
+      "duration_s": 81.816
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep06",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep06"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep02",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 1,
+      "events": 17,
+      "duration_s": 55.388
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep03",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep03"
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep05",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep05"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep03",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 1,
+      "events": 20,
+      "duration_s": 61.273
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep00",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 12,
+      "events": 170,
+      "duration_s": 81.475
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep09",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep09"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep02",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep02"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep04",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 1,
+      "events": 18,
+      "duration_s": 44.986
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep06",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 3,
+      "events": 26,
+      "duration_s": 79.008
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep06",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 7,
+      "events": 876,
+      "duration_s": 242.227
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep00",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep00"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep08",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 3,
+      "events": 19,
+      "duration_s": 45.401
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep09",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 13,
+      "events": 221,
+      "duration_s": 110.805
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep08",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 8,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep08"
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep02",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 14,
+      "events": 177,
+      "duration_s": 108.577
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep02",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 2,
+      "events": 19,
+      "duration_s": 48.646
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep03",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep03"
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep02",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep02"
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep03",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep03"
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep06",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 3,
+      "events": 75,
+      "duration_s": 53.918
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep06",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 6,
+      "outcome": "ok",
+      "files": 15,
+      "events": 184,
+      "duration_s": 97.706
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep07",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 9,
+      "events": 172,
+      "duration_s": 91.873
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep00",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 2,
+      "events": 21,
+      "duration_s": 56.444
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep04",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep04"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep05",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 3,
+      "events": 22,
+      "duration_s": 48.476
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep08",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 7,
+      "events": 66,
+      "duration_s": 45.353
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep05",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 2,
+      "events": 23,
+      "duration_s": 55.779
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep03",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 19,
+      "events": 120,
+      "duration_s": 77.799
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep04",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 3,
+      "events": 103,
+      "duration_s": 38.457
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep05",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 3,
+      "events": 178,
+      "duration_s": 44.17
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep02",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 2,
+      "outcome": "ok",
+      "files": 4,
+      "events": 25,
+      "duration_s": 56.144
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep08",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 3,
+      "events": 55,
+      "duration_s": 47.68
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep01",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep01"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep00",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep00"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep09",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep09"
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep00",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 0,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep00"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep09",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 4,
+      "events": 25,
+      "duration_s": 61.304
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep05",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep05"
+    },
+    {
+      "run_id": "main_001__data_pipeline__cursor_agent__rep03",
+      "condition": "cursor_agent",
+      "spec": "data_pipeline",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 4,
+      "events": 124,
+      "duration_s": 61.707
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep04",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep04"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep00",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 1,
+      "events": 18,
+      "duration_s": 49.51
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep00",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 0,
+      "outcome": "ok",
+      "files": 2,
+      "events": 24,
+      "duration_s": 61.657
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep05",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep05"
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep05",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep05"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep07",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 6,
+      "events": 198,
+      "duration_s": 81.927
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep03",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep03"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep03",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 13,
+      "events": 224,
+      "duration_s": 69.987
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep07",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep07"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep09",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep09"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep03",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 3,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep03"
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep01",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep01"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep05",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 1,
+      "events": 15,
+      "duration_s": 45.104
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep01",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep01"
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep02",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 2,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep02"
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep07",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep07"
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep04",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep04"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep09",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 9,
+      "outcome": "ok",
+      "files": 1,
+      "events": 17,
+      "duration_s": 43.982
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep07",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 1,
+      "events": 19,
+      "duration_s": 52.975
+    },
+    {
+      "run_id": "main_001__data_pipeline__antigravity__rep06",
+      "condition": "antigravity",
+      "spec": "data_pipeline",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_antigravity_rep06"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep07",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 7,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep07"
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep04",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 2,
+      "events": 23,
+      "duration_s": 52.657
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__cursor_agent__rep04",
+      "condition": "cursor_agent",
+      "spec": "internal_tool_cli",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 13,
+      "events": 127,
+      "duration_s": 51.077
+    },
+    {
+      "run_id": "main_001__data_pipeline__replit_agent__rep05",
+      "condition": "replit_agent",
+      "spec": "data_pipeline",
+      "rep": 5,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/data_pipeline_replit_agent_rep05"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep01",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 4,
+      "events": 26,
+      "duration_s": 60.12
+    },
+    {
+      "run_id": "main_001__agent_education_system__replit_agent__rep09",
+      "condition": "replit_agent",
+      "spec": "agent_education_system",
+      "rep": 9,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_replit_agent_rep09"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep01",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep01"
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep06",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep06"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep03",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 4,
+      "events": 26,
+      "duration_s": 66.557
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__antigravity__rep06",
+      "condition": "antigravity",
+      "spec": "internal_tool_cli",
+      "rep": 6,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_antigravity_rep06"
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep07",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 7,
+      "outcome": "ok",
+      "files": 4,
+      "events": 26,
+      "duration_s": 72.318
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__claude_code__rep08",
+      "condition": "claude_code",
+      "spec": "internal_tool_cli",
+      "rep": 8,
+      "outcome": "ok",
+      "files": 1,
+      "events": 17,
+      "duration_s": 48.24
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep01",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 1,
+      "outcome": "ok",
+      "files": 0,
+      "events": 2,
+      "duration_s": 4.29
+    },
+    {
+      "run_id": "main_001__agent_education_system__cursor_agent__rep05",
+      "condition": "cursor_agent",
+      "spec": "agent_education_system",
+      "rep": 5,
+      "outcome": "ok",
+      "files": 0,
+      "events": 2,
+      "duration_s": 3.901
+    },
+    {
+      "run_id": "main_001__agent_education_system__antigravity__rep04",
+      "condition": "antigravity",
+      "spec": "agent_education_system",
+      "rep": 4,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/agent_education_system_antigravity_rep04"
+    },
+    {
+      "run_id": "main_001__agent_education_system__claude_code__rep03",
+      "condition": "claude_code",
+      "spec": "agent_education_system",
+      "rep": 3,
+      "outcome": "ok",
+      "files": 2,
+      "events": 23,
+      "duration_s": 58.126
+    },
+    {
+      "run_id": "main_001__data_pipeline__claude_code__rep04",
+      "condition": "claude_code",
+      "spec": "data_pipeline",
+      "rep": 4,
+      "outcome": "ok",
+      "files": 4,
+      "events": 26,
+      "duration_s": 76.731
+    },
+    {
+      "run_id": "main_001__internal_tool_cli__replit_agent__rep01",
+      "condition": "replit_agent",
+      "spec": "internal_tool_cli",
+      "rep": 1,
+      "outcome": "missing_replay",
+      "note": "/Users/user/Downloads/ai-code-quality-auditor/replay_dirs/main_001/internal_tool_cli_replit_agent_rep01"
+    }
+  ],
+  "timestamp": "2026-05-31T12:27:27.106630+00:00"
+}
