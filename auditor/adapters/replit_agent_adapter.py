@@ -18,8 +18,7 @@ from auditor.adapters.base_adapter import BaseAdapter
 from auditor.core.config import settings
 
 
-_CODE_SUFFIXES = {".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java",
-                  ".rb", ".sql", ".yaml", ".yml", ".toml", ".md"}
+from auditor.adapters._shared import load_codebase as _load_codebase  # noqa: F401
 
 Runner = Callable[[str, Path], Iterable[dict]]
 
@@ -63,26 +62,7 @@ def _to_contract_events(raw_events: Iterable[dict]) -> list[dict]:
     return out
 
 
-def _load_codebase(work_dir: Path) -> dict:
-    work_dir = Path(work_dir)
-    if not work_dir.is_dir():
-        raise FileNotFoundError(f"work_dir not found: {work_dir}")
-    _EXCLUDE_DIRS = {".venv", "venv", "env", "__pycache__", "node_modules",
-                     ".pytest_cache", ".git", "site-packages", "dist", "build",
-                     ".mypy_cache", ".ruff_cache", "egg-info"}
-    files: dict[str, str] = {}
-    for path in sorted(work_dir.rglob("*")):
-        if not path.is_file() or path.name == "manifest.json":
-            continue
-        if path.suffix not in _CODE_SUFFIXES:
-            continue
-        if any(part in _EXCLUDE_DIRS or part.endswith(".egg-info")
-               for part in path.relative_to(work_dir).parts):
-            continue
-        files[path.relative_to(work_dir).as_posix()] = path.read_text(encoding="utf-8")
-    manifest_path = work_dir / "manifest.json"
-    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else []
-    return {"files": files, "manifest": manifest}
+# _load_codebase is re-exported from auditor.adapters._shared above.
 
 
 class ReplitAgentAdapter(BaseAdapter):
