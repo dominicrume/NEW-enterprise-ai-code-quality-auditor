@@ -39,14 +39,50 @@ def run_cmd(spec: str, workflow: str, run_id: str, captures_root: str):
 
 
 @main.command("experiment")
-@click.option("--spec", required=True, help="Path to spec YAML.")
-@click.option("--run-id", required=True, help="Run identifier (also names the CSV).")
+@click.option("--spec", default=None,
+              help="Path to one spec YAML (pilot mode only). Ignored if --reps is set.")
+@click.option("--run-id", default=None,
+              help="Pilot mode: identifier locating <captures-root>/<run-id>/.")
+@click.option("--run-label", default=None,
+              help="Main-study mode: label for the orchestrated batch.")
+@click.option("--reps", default=None, type=int,
+              help="Main-study mode: repetitions per (condition × spec). "
+                   "Triggers the full pre-registered orchestrator. "
+                   "Use --reps 10 for the default dissertation design.")
+@click.option("--seed", default=42, show_default=True, type=int,
+              help="RNG seed for the run-order shuffle (main-study mode).")
+@click.option("--skip", multiple=True,
+              help="Conditions to skip in main-study mode "
+                   "(e.g. --skip replit_agent --skip antigravity).")
 @click.option("--captures-root", default="data/raw", show_default=True,
-              help="Root holding <run-id>/<condition>/ captured artefacts.")
+              help="Pilot mode: root holding pre-captured <run-id>/<condition>/.")
 @click.option("--reports-dir", default="data/reports", show_default=True,
-              help="Directory the immutable CSV report is written to.")
-def experiment_cmd(spec: str, run_id: str, captures_root: str, reports_dir: str):
-    """Run all five adapters against one spec and emit one combined CSV."""
+              help="Pilot mode: directory the immutable CSV report is written to.")
+def experiment_cmd(spec, run_id, run_label, reps, seed, skip,
+                   captures_root, reports_dir):
+    """Run an experiment and emit a CSV.
+
+    Two modes:
+
+    \b
+    PILOT MODE — score pre-captured artefacts (legacy):
+        auditor experiment --spec specs/X.yaml --run-id pilot_001
+
+    \b
+    MAIN-STUDY MODE — orchestrate the full pre-registered design:
+        auditor experiment --reps 10 --run-label main_001
+    """
+    if reps is not None:
+        from auditor.core.study import run_study
+        if not run_label:
+            raise click.UsageError("--run-label is required with --reps")
+        out = run_study(reps=reps, run_label=run_label, seed=seed,
+                        skip=tuple(skip), log=click.echo)
+        click.echo(f"wrote {out}")
+        return
+    if not (spec and run_id):
+        raise click.UsageError(
+            "pilot mode needs --spec and --run-id; main-study mode needs --reps and --run-label")
     adapters = build_default_adapters(run_id, Path(captures_root))
     out = run_experiment(spec, run_id, adapters, reports_dir=reports_dir)
     click.echo(f"wrote {out}")
