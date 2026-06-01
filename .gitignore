@@ -24,3 +24,4 @@ dist/
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+replay_dirs/
