@@ -205,6 +205,81 @@ def report(run_id: str):
     return render_template("report.html", **_load_report(run_id))
 
 
+# ---- Pilot waitlist --------------------------------------------------------
+# Visa-safe: collects email addresses for a future commercial cohort. No
+# payment is taken; no commercial service is offered now. Submissions
+# persist to data/waitlist.jsonl, gitignored, retrievable via `fly ssh
+# console` or by emailing them to the operator on submit (best-effort).
+
+import os
+from datetime import datetime, timezone
+from flask import request
+
+WAITLIST_PATH = ROOT / "data" / "waitlist.jsonl"
+
+
+def _persist_waitlist(entry: dict) -> None:
+    WAITLIST_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with WAITLIST_PATH.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
+def _notify_operator(entry: dict) -> None:
+    """Best-effort email to the operator. Silently swallows any error so
+    the form submission still succeeds for the user."""
+    try:
+        import smtplib
+        from email.message import EmailMessage
+        host = os.environ.get("SMTP_HOST")
+        if not host:
+            return
+        msg = EmailMessage()
+        msg["Subject"] = f"[auditor waitlist] {entry.get('company','?')} — {entry.get('name','?')}"
+        msg["From"] = os.environ.get("SMTP_FROM", "noreply@auditor.local")
+        msg["To"] = os.environ.get("OPERATOR_EMAIL", "dominicrume@gmail.com")
+        msg.set_content(json.dumps(entry, indent=2))
+        with smtplib.SMTP(host, int(os.environ.get("SMTP_PORT", "587"))) as s:
+            s.starttls()
+            s.login(os.environ["SMTP_USER"], os.environ["SMTP_PASS"])
+            s.send_message(msg)
+    except Exception:
+        pass
+
+
+@app.route("/pilot", methods=["GET", "POST"])
+def pilot():
+    if request.method == "POST":
+        entry = {
+            "name":    (request.form.get("name") or "").strip()[:120],
+            "email":   (request.form.get("email") or "").strip()[:200],
+            "company": (request.form.get("company") or "").strip()[:200],
+            "role":    (request.form.get("role") or "").strip()[:200],
+            "context": (request.form.get("context") or "").strip()[:2000],
+            "ip":      request.headers.get("Fly-Client-IP") or request.remote_addr or "",
+            "ua":      (request.user_agent.string or "")[:300],
+            "ts":      datetime.now(timezone.utc).isoformat(),
+        }
+        if entry["email"] and entry["name"] and entry["company"]:
+            _persist_waitlist(entry)
+            _notify_operator(entry)
+        return render_template("pilot.html", submitted=True)
+    return render_template("pilot.html", submitted=False)
+
+
+@app.route("/pilot/admin")
+def pilot_admin():
+    """Operator-only view. Protected by a single env token so the URL alone
+    isn't enough — `?key=<WAITLIST_ADMIN_KEY>` is required."""
+    key = request.args.get("key", "")
+    expected = os.environ.get("WAITLIST_ADMIN_KEY", "")
+    if not expected or key != expected:
+        return ("unauthorised", 401)
+    if not WAITLIST_PATH.exists():
+        return jsonify({"entries": [], "count": 0})
+    entries = [json.loads(line) for line in WAITLIST_PATH.read_text().splitlines() if line.strip()]
+    return jsonify({"entries": entries, "count": len(entries)})
+
+
 # ---- JSON API --------------------------------------------------------------
 
 @app.route("/api/reports")

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Coding Vendor Audit — Pilot Waitlist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #0b0d12;
+      --bg-1: #11141c;
+      --bg-2: #181d28;
+      --txt-0: #f3f5fa;
+      --txt-1: #9aa3b8;
+      --txt-2: #5b6478;
+      --accent: #7c5cff;
+      --accent-2: #9b8aff;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --border: #232a3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-0);
+      color: var(--txt-0);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 64px 24px; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(124, 92, 255, 0.15);
+      border: 1px solid rgba(124, 92, 255, 0.4);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-2);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+    h1 {
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    h1 .accent { color: var(--accent); }
+    .sub {
+      font-size: 19px;
+      color: var(--txt-1);
+      max-width: 720px;
+      margin-bottom: 48px;
+    }
+    .findings {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-bottom: 48px;
+    }
+    .card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .card .vendor {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--txt-2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .card .number {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .card.bad .number { color: var(--bad); }
+    .card.good .number { color: var(--good); }
+    .card.warn .number { color: var(--warn); }
+    .card .label {
+      font-size: 14px;
+      color: var(--txt-1);
+    }
+    .section { margin-bottom: 56px; }
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    p { color: var(--txt-1); margin-bottom: 14px; }
+    p strong { color: var(--txt-0); font-weight: 600; }
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .method-grid .item {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .method-grid .item .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-2);
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .method-grid .item .what {
+      font-size: 14px;
+      color: var(--txt-0);
+      font-weight: 500;
+    }
+    .timeline {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 48px;
+    }
+    .timeline .row {
+      display: flex;
+      gap: 20px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .timeline .row:last-child { border-bottom: none; }
+    .timeline .when {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent-2);
+      min-width: 100px;
+      font-weight: 600;
+    }
+    .timeline .what {
+      flex: 1;
+      color: var(--txt-1);
+      font-size: 15px;
+    }
+    .form-card {
+      background: linear-gradient(135deg, rgba(124, 92, 255, 0.08), rgba(124, 92, 255, 0.02));
+      border: 1px solid rgba(124, 92, 255, 0.3);
+      border-radius: 18px;
+      padding: 40px;
+      margin-top: 32px;
+    }
+    .form-card h2 { margin-bottom: 8px; }
+    .form-card .helper {
+      color: var(--txt-1);
+      font-size: 15px;
+      margin-bottom: 24px;
+    }
+    form {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+    form .full { grid-column: 1 / -1; }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--txt-1);
+      margin-bottom: 6px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--txt-0);
+      font-family: inherit;
+      font-size: 15px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      width: 100%;
+    }
+    button:hover { background: var(--accent-2); }
+    .fineprint {
+      color: var(--txt-2);
+      font-size: 12px;
+      margin-top: 18px;
+      line-height: 1.5;
+    }
+    .notice {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 18px 22px;
+      color: var(--txt-1);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+    .notice strong { color: var(--warn); }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .links a {
+      color: var(--accent-2);
+      text-decoration: none;
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .links a:hover { color: var(--accent); text-decoration: underline; }
+    .success {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      border-radius: 14px;
+      padding: 32px;
+      text-align: center;
+      color: var(--good);
+    }
+    .success h2 { color: var(--good); margin-bottom: 8px; }
+    .success p { color: var(--txt-1); }
+    @media (max-width: 600px) {
+      form { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="badge">PILOT WAITLIST · COHORT 1 · Q1 2027</div>
+
+  <h1>Get your AI coding tool <span class="accent">scored on real metrics</span> — before your CFO asks how you justified the spend.</h1>
+
+  <p class="sub">
+    An independent, pre-registered audit of how Claude Code, Cursor Agent, Replit Agent and Google Antigravity perform against <em>your team's actual spec</em> — across five quality dimensions, ten replications, with statistical confidence intervals.
+  </p>
+
+  <div class="section">
+    <h2>The headline from the public benchmark</h2>
+    <p>The auditor's main study scored four AI coding agents against three task specifications. 600 measurements. Pre-registered protocol. Live dashboard. Some findings:</p>
+    <div class="findings">
+      <div class="card good">
+        <div class="vendor">CLAUDE CODE</div>
+        <div class="number">0.00</div>
+        <div class="label">off-spec features per run (30 runs). Tightest discipline.</div>
+      </div>
+      <div class="card bad">
+        <div class="vendor">REPLIT AGENT</div>
+        <div class="number">1.00</div>
+        <div class="label">hallucinated CLI commands per run. Ships its own architectural defaults regardless of spec.</div>
+      </div>
+      <div class="card warn">
+        <div class="vendor">CURSOR AGENT</div>
+        <div class="number">0.17</div>
+        <div class="label">off-spec endpoints per run. Occasional helpful overreach (<code>/health</code>, <code>/metrics</code>).</div>
+      </div>
+      <div class="card warn">
+        <div class="vendor">ANTIGRAVITY (GEMINI)</div>
+        <div class="number">0.33</div>
+        <div class="label">off-spec endpoints per run. Concentrated in web-app specs.</div>
+      </div>
+    </div>
+    <p style="margin-top:14px"><a href="https://auditor-dashboard-rume.fly.dev/report/main_001" style="color:var(--accent-2);font-family:'JetBrains Mono',monospace;font-size:14px">→ Browse the live dashboard</a></p>
+  </div>
+
+  <div class="section">
+    <h2>What the pilot audit gives you</h2>
+    <div class="method-grid">
+      <div class="item"><div class="num">01</div><div class="what">Five-dimension score (security, complexity, duplication, hallucinations, effort)</div></div>
+      <div class="item"><div class="num">02</div><div class="what">Four-vendor comparison on YOUR spec, not a generic benchmark</div></div>
+      <div class="item"><div class="num">03</div><div class="what">Statistical tests (ANOVA + Tukey) with 95% confidence intervals</div></div>
+      <div class="item"><div class="num">04</div><div class="what">Per-spec breakdown so you see condition × task interactions</div></div>
+      <div class="item"><div class="num">05</div><div class="what">Written PDF report (~10 pages) + private dashboard URL (12 months)</div></div>
+      <div class="item"><div class="num">06</div><div class="what">Raw CSV + provenance JSON for your own analysis</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>How a pilot engagement runs</h2>
+    <div class="timeline">
+      <div class="row"><div class="when">Day 0</div><div class="what">You hand me a YAML or Markdown spec of the feature set your team is asking AI tools to build.</div></div>
+      <div class="row"><div class="when">Day 0–3</div><div class="what">Spec ingestion + a 30-min clarification call.</div></div>
+      <div class="row"><div class="when">Day 3–7</div><div class="what">Capture runs: 10 replications × 4 vendors × your spec, scored under the pre-registered protocol.</div></div>
+      <div class="row"><div class="when">Day 7–9</div><div class="what">Statistical analysis + report drafting.</div></div>
+      <div class="row"><div class="when">Day 10</div><div class="what">Delivery — PDF report, private dashboard, CSV. 30-min walkthrough call included.</div></div>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Important — pilot timing.</strong>
+    I am the sole operator of this instrument, currently completing my MSc dissertation at Aston University under student visa. Commercial pilot engagements begin <strong>Q1 2027</strong>, once the relevant work-rights transition completes. Joining the waitlist now reserves your slot at the cohort-1 launch price (£2,000 per pilot, no payment until delivery).
+  </div>
+
+  <div class="form-card">
+    {% if submitted %}
+      <div class="success">
+        <h2>You're on the list. ✅</h2>
+        <p>I'll be in touch personally before Cohort 1 opens in Q1 2027. In the meantime, the public dashboard is live at <a href="https://auditor-dashboard-rume.fly.dev/report/main_001" style="color:var(--accent-2)">auditor-dashboard-rume.fly.dev/report/main_001</a>.</p>
+      </div>
+    {% else %}
+      <h2>Join the Cohort 1 waitlist</h2>
+      <p class="helper">No payment. No commitment beyond a 20-min discovery call when slots open. I'll prioritise teams whose spec interests me most for the cohort.</p>
+      <form method="POST" action="/pilot">
+        <div>
+          <label for="name">Your name</label>
+          <input id="name" name="name" type="text" required>
+        </div>
+        <div>
+          <label for="email">Work email</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+        <div>
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" required>
+        </div>
+        <div>
+          <label for="role">Role / title</label>
+          <input id="role" name="role" type="text" required>
+        </div>
+        <div class="full">
+          <label for="context">What AI coding tool(s) is your team using today, and what would you want scored?</label>
+          <textarea id="context" name="context" placeholder="e.g. We're standardised on Cursor + Claude, evaluating Replit for a new internal-tools squad. Spec is an event-driven payments microservice."></textarea>
+        </div>
+        <div class="full">
+          <button type="submit">Reserve my Cohort 1 slot</button>
+        </div>
+      </form>
+      <p class="fineprint">
+        Submissions are held privately by Dominic Rume. No marketing list, no third-party sharing. You can opt out at any time by replying to my outreach email. By submitting you confirm you have authority to engage a vendor on behalf of your organisation for an exploratory call.
+      </p>
+    {% endif %}
+  </div>
+
+  <div class="links">
+    <a href="https://auditor-dashboard-rume.fly.dev/report/main_001">Live dashboard</a>
+    <a href="https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor">Open-source repo</a>
+    <a href="https://pypi.org/project/ai-code-quality-auditor/">PyPI package</a>
+    <a href="https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor/blob/main/docs/EXPERIMENT_PROTOCOL.md">Pre-registered protocol</a>
+  </div>
+
+</div>
+</body>
+</html>

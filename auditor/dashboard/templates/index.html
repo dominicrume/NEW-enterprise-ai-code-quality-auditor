@@ -99,7 +99,10 @@
         <div class="brand-logo"></div>
         AI Code Quality Auditor
       </div>
-      <div class="nav-meta">{{ reports | length }} report{{ '' if reports|length == 1 else 's' }}</div>
+      <div class="nav-meta">
+        <a href="/pilot" style="color: var(--pilot); text-decoration: none; margin-right: 16px; font-weight: 600;">Pilot waitlist →</a>
+        {{ reports | length }} report{{ '' if reports|length == 1 else 's' }}
+      </div>
     </div>
 
     <h1>Experiment reports</h1>

@@ -25,3 +25,4 @@ dist/
 .vscode/*
 !.vscode/extensions.json
 replay_dirs/
+data/waitlist.jsonl
