@@ -1,0 +1,14 @@
+{
+  "run_id": "ca1fa2dc-fc14-4907-b01e-8c37f92c67cd",
+  "start_time": "2026-05-31T23:12:39.994340Z",
+  "end_time": "2026-05-31T23:12:40.000801Z",
+  "duration_seconds": 0.0065,
+  "files_processed": [
+    "transactions.csv"
+  ],
+  "total_rows_read": 5,
+  "valid_rows_processed": 3,
+  "quarantined_rows_count": 2,
+  "inserted_rows_count": 3,
+  "status": "SUCCESS"
+}

@@ -1,0 +1,6 @@
+transaction_id,product_id,price,quantity,category
+TXN_101,PROD_001,49.991,2,ELECTRONICS
+TXN_102,PROD_002,12.3,4,Clothing
+,PROD_003,1.99,10,Books
+TXN_104,PROD_004,free,1,Toys
+TXN_105,PROD_005,100.00,1,

@@ -1,0 +1,3 @@
+transaction_id,product_id,price,quantity,category,quarantine_reason
+,PROD_003,1.99,10,Books,Missing required field 'transaction_id'
+TXN_104,PROD_004,free,1,Toys,Invalid type for field 'price' (expected float)

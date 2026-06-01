@@ -34,4 +34,39 @@ def test_flags_off_spec_endpoint_as_hallucinated():
 
 
 def test_empty_codebase_yields_nothing():
-    assert derive(SPEC, {"files": {}}) == {"implemented": [], "hallucinated_endpoints": []}
+    assert derive(SPEC, {"files": {}}) == {
+        "implemented": [],
+        "hallucinated_endpoints": [],
+        "hallucinated_commands": [],
+    }
+
+
+def test_detects_argparse_subcommands():
+    spec = {"features": [{"id": "cli.init"}, {"id": "cli.add"}, {"id": "cli.list"}]}
+    code = {"files": {"main.py": (
+        "import argparse\n"
+        "p = argparse.ArgumentParser()\n"
+        "sub = p.add_subparsers()\n"
+        "sub.add_parser('init')\n"
+        "sub.add_parser('add')\n"
+        "sub.add_parser('list')\n"
+        "sub.add_parser('schedule')\n"   # off-spec — should be flagged
+    )}}
+    result = derive(spec, code)
+    assert "cli.init" in result["implemented"]
+    assert "cli.add" in result["implemented"]
+    assert "cli.list" in result["implemented"]
+    assert "schedule" in result["hallucinated_commands"]
+
+
+def test_detects_click_named_commands():
+    spec = {"features": [{"id": "cli.add"}]}
+    code = {"files": {"main.py": (
+        "import click\n"
+        "@click.group()\ndef cli(): pass\n"
+        "@cli.command('add')\ndef _add(): pass\n"
+        "@cli.command('run')\ndef _run(): pass\n"   # off-spec
+    )}}
+    result = derive(spec, code)
+    assert "cli.add" in result["implemented"]
+    assert "run" in result["hallucinated_commands"]

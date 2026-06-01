@@ -18,6 +18,7 @@ def analyze(codebase: dict, interaction_log: list[dict], spec: dict) -> MetricSc
     if manifest:
         count = len(manifest - spec_ids)
     else:
-        count = len(derive(spec, codebase)["hallucinated_endpoints"])
+        d = derive(spec, codebase)
+        count = len(d["hallucinated_endpoints"]) + len(d.get("hallucinated_commands", []))
 
     return MetricScore(name="hallucinations", value=float(count), unit="count")

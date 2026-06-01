@@ -1,0 +1,12 @@
+{
+  "run_id": "9357908f-2081-471d-b111-1c53d537cf5f",
+  "start_time": "2026-06-01T07:45:19.456829Z",
+  "end_time": "2026-06-01T07:45:19.459493Z",
+  "duration_seconds": 0.0027,
+  "files_processed": [],
+  "total_rows_read": 0,
+  "valid_rows_processed": 0,
+  "quarantined_rows_count": 0,
+  "inserted_rows_count": 0,
+  "status": "SUCCESS"
+}

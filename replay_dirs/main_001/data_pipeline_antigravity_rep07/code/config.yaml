@@ -1,0 +1,9 @@
+pipeline:
+  input_dir: "input"
+  db_path: "pipeline.db"
+  quarantine_dir: "quarantine"
+  summary_dir: "summaries"
+
+schedule:
+  time: "00:00"
+  cron: null
