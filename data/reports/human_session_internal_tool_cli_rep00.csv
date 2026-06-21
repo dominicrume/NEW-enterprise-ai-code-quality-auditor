@@ -1,0 +1,6 @@
+run_label,spec_name,spec_version,condition,rep,metric,value,unit,timestamp
+main_001,internal_tool_cli,1.0.0,human_control,00,security_density,0.0,per_kloc,2026-06-21T12:20:16.335626+00:00
+main_001,internal_tool_cli,1.0.0,human_control,00,complexity_mean,0.0,cc,2026-06-21T12:20:16.335626+00:00
+main_001,internal_tool_cli,1.0.0,human_control,00,duplication_pct,0.0,%,2026-06-21T12:20:16.335626+00:00
+main_001,internal_tool_cli,1.0.0,human_control,00,hallucinations,0.0,count,2026-06-21T12:20:16.335626+00:00
+main_001,internal_tool_cli,1.0.0,human_control,00,correction_freq,122.27074235807859,per_kkey,2026-06-21T12:20:16.335626+00:00

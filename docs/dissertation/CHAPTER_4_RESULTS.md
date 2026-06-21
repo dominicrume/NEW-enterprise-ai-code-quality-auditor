@@ -146,81 +146,190 @@ than one. A single-spec study would have missed it.
 ## 4.5 Statistical tests
 
 Per the pre-registered analysis plan (§3.6 of the Methods chapter),
-each metric is tested with a one-way ANOVA across the four AI
-conditions, falling back to Kruskal-Wallis if Shapiro-Wilk or Levene's
-preconditions fail. The Bonferroni-corrected significance threshold is
-α = 0.01 per metric. The results are summarised in Table 4.3
-(metrics whose preconditions failed are tested by Kruskal-Wallis;
-the test used is shown in column 2).
+each metric is tested across the four AI conditions with a one-way
+ANOVA, falling back to Kruskal-Wallis when the Shapiro-Wilk or Levene
+preconditions fail. The Bonferroni-corrected threshold is α = 0.01 per
+metric (0.05 / 5). Every metric fell to **Kruskal-Wallis**: the
+deterministic-replay conditions (`replit_agent`, `antigravity`) have
+zero within-cell variance by construction (Deviation 001), which fails
+both the normality and equal-variance preconditions. The `human_control`
+condition is excluded from these tests (Deviation 003); the analysis is
+four-condition, AI-only, with N = 30 per condition per metric. Values
+are computed by `notebooks/statistical_analysis.ipynb` against
+`data/reports/main_001.csv` and reproduced in Table 4.3.
 
-| Metric | Test | Statistic | p | η² | Significant @ α=0.01 |
+| Metric | Test | H | p | η² | Sig @ α=0.01 |
 |---|---|---:|---:|---:|:---:|
-| Hallucinations | Kruskal-Wallis | (computed by notebook) | (computed) | (computed) | yes (expected) |
-| Complexity_mean | ANOVA | (computed) | (computed) | (computed) | (computed) |
-| Duplication_pct | Kruskal-Wallis | (computed) | (computed) | (computed) | yes (expected) |
-| Security_density | Kruskal-Wallis | (computed) | (computed) | (computed) | yes (expected) |
+| Duplication_pct | Kruskal-Wallis | 62.41 | 1.8 × 10⁻¹³ | 0.497 | **yes** |
+| Security_density | Kruskal-Wallis | 39.35 | 1.5 × 10⁻⁸ | 0.346 | **yes** |
+| Hallucinations | Kruskal-Wallis | 15.76 | 1.3 × 10⁻³ | 0.192 | **yes** |
+| Complexity_mean | Kruskal-Wallis | 12.03 | 7.3 × 10⁻³ | 0.097 | **yes** |
+| Correction_freq | — | — | — | — | n/a (all-zero across AI conditions) |
 
-The notebook (`notebooks/statistical_analysis.ipynb`) renders these
-tests against the live CSV; the literal numeric values are inserted
-here at the time of submission. **The dissertation's structural
-finding is independent of the precise p-values**: the absolute gaps
-between conditions (1.00 vs 0.00 vs 0.17 hallucinations; 9.56 % vs
-0.00 % duplication) are large relative to the within-cell variance
-observed in the live conditions, and the deterministic-replay cells
-have zero within-cell variance by construction (deviation 001).
+Four of the five metrics show a significant omnibus difference across
+the AI conditions at α = 0.01, with effect sizes spanning medium
+(complexity, η² = 0.10) to very large (duplication, η² = 0.50).
+`correction_freq` is structurally zero for every AI condition (no
+keystrokes), so its omnibus is undefined; it is reported only against
+the human baseline (§4.6).
 
-Tukey HSD post-hoc on the omnibus-significant metrics is reported in
-the notebook with confidence intervals; the dissertation cites the
-specific pairwise comparisons in §5 (Discussion) where they bear on a
-governance claim.
+**Post-hoc (Dunn's test, Bonferroni-adjusted).** Because the omnibus is
+Kruskal-Wallis, the pre-registered post-hoc is Dunn's, not Tukey. The
+pairwise comparisons significant at α = 0.01 are:
+
+- **Duplication:** `replit_agent` differs from both `claude_code` and
+  `cursor_agent` (both p < 10⁻⁴), and `antigravity` differs from both
+  `claude_code` and `cursor_agent` (p < 10⁻⁴, p < 10⁻³). The two
+  scaffolding-heavy vendors separate cleanly from the two lean ones;
+  replit vs antigravity is not distinguishable, nor is claude vs cursor.
+- **Security_density:** `claude_code` and `cursor_agent` each differ
+  from `replit_agent` (both p < 10⁻⁴), and `cursor_agent` differs from
+  `antigravity` (p < 10⁻³) — the Python-dense vendors separating from
+  the scaffolding-diluted ones, consistent with the per-language-density
+  reading in §4.3.4.
+- **Hallucinations:** only `claude_code` vs `replit_agent` reaches
+  α = 0.01 (p = 0.0022) — the 0.00-vs-1.00 contrast driven by Replit's
+  CLI architectural-prior behaviour (analytical note 001).
+- **Complexity:** the omnibus is significant but **no pairwise
+  comparison survives Bonferroni at α = 0.01** (closest:
+  antigravity vs claude_code, p = 0.010). The effect is diffuse across
+  conditions rather than localised to one pair, and is reported as an
+  omnibus-level result only.
+
+**Condition × spec interaction (two-way ANOVA).** A significant
+interaction is itself a finding — agent quality depends on task domain.
+The interaction term is significant for every testable metric:
+duplication (F = 283.8, p < 10⁻⁶³), hallucinations (F = 228.3,
+p < 10⁻⁵⁸), complexity (F = 27.9, p < 10⁻¹⁹), and security_density
+(F = 20.6, p < 10⁻¹⁵). This is the quantitative basis for the study's
+central external-validity claim (§4.4, §4.8): condition effects are
+**not** stable across specifications, so the defensible statement is
+"agent X outperforms agent Y *for this task type*", not in general.
+
+The reported gaps are large relative to within-cell variance, and the
+replay cells contribute zero variance by construction (Deviation 001),
+so the structural findings do not hinge on the exact p-values.
 
 ## 4.6 Human-control baseline (follow-up window)
 
-The `human_control` condition is reported here from a follow-up
-collection window because its sample size is intentionally smaller
-than the AI conditions (N = 6 sessions across the three specs, two
-per spec, each session 60 minutes with all in-IDE AI assistance
-disabled). The relevant numbers are reported here and discussed in
-detail in Chapter 5.
+The `human_control` condition was collected in a follow-up window and,
+per **Deviation 003**, comprises one completed hand-coded session per
+specification (N = 1 per spec, three sessions total) rather than the
+pre-registered 30 sessions. Each session was run to feature-completion
+with all in-IDE AI assistance disabled; the researcher implemented and
+**verified all six features of every specification** (each feature was
+executed and confirmed working before scoring). The condition is a
+single-rep reference point against the AI distribution — reported
+descriptively here, excluded from the inferential tests of §4.5.
 
-The headline value is the **keystroke correction frequency: 52.84
-corrections per 1,000 keystrokes** (mean across sessions). Translated:
-the human researcher backspaced 5.3 % of the time while implementing
-the spec by hand. This is the empirical floor against which the AI
-conditions' structural zero is interpreted: agents do not backspace
-because they do not type; humans do, at a measurable rate that is
-itself a quality signal for "this is a real human-effort baseline,
-not a synthesis".
+Table 4.4 sets the human baseline against the four-AI-condition means
+(N = 10 per AI cell), per spec, on all five metrics. Lower is better.
 
-The human baseline also produced **the lowest hallucination count
-(0.00)** and **the lowest mean complexity (1.4 cc)** of any condition
-in the table. This is expected: the human researcher implemented only
-the features that the 60-minute timer allowed, leaving the spec
-genuinely incomplete rather than over-engineering. The instrument
-detects this difference — the human's *implemented_features* count is
-roughly half of the AI conditions' — but the dissertation does not
-report it as a quality win for the human; it is an artefact of the
-time-bounded session design, documented as such.
+| Spec | Metric | **human** (n=1) | claude_code | cursor_agent | antigravity | replit_agent |
+|---|---|---:|---:|---:|---:|---:|
+| agent_education | security_density | 0.00 | 101.90 | 58.90 | 4.42 | 0.00 |
+| agent_education | complexity_mean | 1.71 | 2.73 | 1.91 | 1.59 | 0.00 |
+| agent_education | duplication_pct | 0.00 | 0.00 | 1.10 | 1.68 | 11.59 |
+| agent_education | hallucinations | 0.00 | 0.00 | 0.50 | 1.00 | 0.00 |
+| agent_education | correction_freq | 829.27\* | 0.00 | 0.00 | 0.00 | 0.00 |
+| data_pipeline | security_density | 0.00 | 24.24 | 21.76 | 0.00 | 0.00 |
+| data_pipeline | complexity_mean | 5.00 | 3.24 | 3.12 | 2.74 | 3.69 |
+| data_pipeline | duplication_pct | 0.00 | 0.00 | 0.96 | 5.45 | 17.08 |
+| data_pipeline | hallucinations | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| data_pipeline | correction_freq | 51.80 | 0.00 | 0.00 | 0.00 | 0.00 |
+| internal_tool_cli | security_density | 0.00 | 0.00 | 50.36 | 0.00 | 0.00 |
+| internal_tool_cli | complexity_mean | 0.00 | 4.10 | 3.14 | 3.47 | 3.47 |
+| internal_tool_cli | duplication_pct | 0.00 | 0.00 | 0.65 | 5.64 | 0.00 |
+| internal_tool_cli | hallucinations | 0.00 | 0.00 | 0.00 | 0.00 | 3.00 |
+| internal_tool_cli | correction_freq | 122.27 | 0.00 | 0.00 | 0.00 | 0.00 |
 
-## 4.7 Inter-rater reliability for the hallucination heuristic
+\* partial-capture outlier — see observation (3). Source CSVs:
+`data/reports/human_session_<spec>_rep00.csv`; comparison view:
+`data/reports/human_vs_ai_comparison.csv`.
 
-Per pre-registration §9, a 30-run random sample of the AI conditions
-was hand-labelled by the researcher for "any-hallucination presence"
-(0/1) and compared against the `manifest_deriver` output via Cohen's
-κ. The result is **κ = 0.73** (95 % CI [0.58, 0.88]), placing the
-heuristic in the "good agreement" band of the conventional Landis-Koch
-interpretation. The dissertation therefore treats the hallucination
-metric as inferential rather than exploratory.
+Four observations follow.
 
-Disagreement was concentrated in the boundary case where Replit Agent
-shipped a CLI containing the spec's required *namespace* prefix
-(`cli.add` → an `add_parser('add')` call) but in the context of a
-data-pipeline file rather than a CLI module. The human labeller
-recorded "hallucination" because the structural shape was wrong; the
-deriver recorded "implemented" because the token was present. Both
-positions are defensible. The dissertation's recommended extension —
-*structural-shape detection*, not just *token detection* — would
-close this gap and is logged in the Discussion chapter.
+**(1) Zero hallucinations, zero duplication, zero security density across
+all three specs.** The human baseline implemented exactly the declared
+features and nothing more — the manifest matched the code in every spec —
+so the hallucination count is 0.00 throughout, against an AI range of
+0.00–3.00. There is no scaffolding redundancy (duplication 0.00 % versus
+up to 17.1 % for `replit_agent` on `data_pipeline`) and no Bandit-tagged
+Python findings (security_density 0.00 versus up to 101.9/kloc for
+`claude_code` on `agent_education_system`). This discipline is partly an
+artefact of writing only what the spec asked, but the instrument records
+it faithfully.
+
+**(2) Complexity is low and, for the CLI, structurally zero.** Mean
+McCabe complexity was 1.71 (`agent_education_system`) and 5.00
+(`data_pipeline`), bracketing the AI means. For `internal_tool_cli` the
+human value is 0.00 — not an error but a structural property of the
+implementation: the CLI was written as top-level script code (module-
+level statements dispatched by `argparse`) with no function definitions,
+and the complexity analyser measures per-function McCabe, so a
+function-free module scores zero. The AI conditions, which wrapped the
+same CLI logic in functions, score 3.1–4.1. This is a genuine stylistic
+contrast the metric exposes, and is noted as a limitation of
+per-function complexity as a cross-style comparator (Chapter 5).
+
+**(3) Keystroke correction is the one metric where the human baseline is
+the point of the comparison.** The AI conditions are structurally zero
+(agents do not type). The human rates were 51.8/1k (`data_pipeline`),
+122.3/1k (`internal_tool_cli`) and 829.3/1k (`agent_education_system`).
+The last is a **partial-capture outlier**: for that rep an early
+~2,133-event coding segment was overwritten before the segment-archiving
+procedure was in place (Deviation 003), so its correction frequency is
+computed from a 75-event fixing-only segment dominated by backspaces and
+is not a representative authoring rate. The representative human
+correction rate is therefore taken from the `data_pipeline` session — a
+complete 6,619-event capture — at **51.8 corrections per 1,000
+keystrokes**: the researcher backspaced roughly 5 % of the time while
+implementing the spec by hand. This is the empirical floor against which
+the agentic conditions' structural zero is read: the AI zero means "no
+keystroke rework was observable", not "no rework occurred".
+
+**(4) The human baseline does not 'win'.** Lower is better on every
+metric and the human scores at or near best on four of five, but this is
+not a quality victory. The zeros reflect a minimal, exactly-on-spec
+implementation produced without the over-delivery (extra endpoints,
+enterprise scaffolding) that drives the AI conditions' non-zero
+hallucination, duplication and security figures. The interpretive value
+of the human baseline is as a reference floor, and as a validity check
+that the instrument behaves sensibly on genuinely human-authored code —
+not as evidence that hand-coding is superior to agentic coding.
+
+## 4.7 Inter-rater reliability for the hallucination heuristic (planned validation)
+
+The hallucination metric is the study's most consequential dependent
+variable (§4.3.1, §4.8), so its heuristic basis requires validation
+against human judgement before it can be treated as inferential rather
+than exploratory. Pre-registration §9 specifies the procedure: a 30-run
+random sample of the AI conditions is hand-labelled by the researcher
+for "any-hallucination presence" (0/1) and compared against the
+`manifest_deriver` output via Cohen's κ, with κ ≥ 0.6 ("good agreement"
+on the Landis and Koch (1977) scale) as the threshold for inferential
+treatment.
+
+**This validation is reported here as a planned step rather than a
+completed result.** At the time of writing the hand-labelled sample had
+not been collected, so no κ value is asserted; the
+`statistical_analysis.ipynb` cell that computes κ is wired to a labels
+file (`data/labels/hallucination_handlabels.csv`) that must be populated
+before the figure can be reported. Until then the hallucination metric
+is treated as **exploratory**, and the study's claims that rest on it —
+chiefly the Replit Agent architectural-prior finding (§4.3.1, analytical
+note 001) — are additionally supported by direct inspection of the
+captured code, which does not depend on the heuristic.
+
+The anticipated locus of human–deriver disagreement is the boundary
+case where Replit Agent shipped a CLI containing the spec's required
+*namespace* token (`cli.add` → an `add_parser('add')` call) but inside a
+data-pipeline file rather than a CLI module: a human labeller would
+record "hallucination" on structural grounds while a token-matching
+deriver records "implemented". This motivates the recommended extension
+— *structural-shape detection* rather than *token detection* — logged in
+the Discussion chapter, and is the reason the metric is reported
+conservatively here.
 
 ## 4.8 Summary of findings
 

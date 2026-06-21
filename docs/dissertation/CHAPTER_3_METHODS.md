@@ -117,18 +117,39 @@ within-cell variance constraint discussed in §3.6 below.
 
 ### 3.3.3 Human-control condition
 
-The researcher hand-codes the specification in VS Code for a
-pre-registered 60-minute session per replication, with all AI extensions
-(GitHub Copilot, Cursor tab-complete, Claude in-IDE) disabled and the
-disabled state verified before each session. The `pynput`-backed
-recorder runs in a parallel terminal and captures every key press at the
-OS level, including modifier keys, backspaces, and deletes.
+The pre-registered design (EXPERIMENT_PROTOCOL.md §6.2) specified 30
+hand-coded sessions (3 specs × 10 reps) of 60 minutes each. The executed
+human-control collection deviated from this plan and is documented as
+**Deviation 003**: a single completed session per specification was
+captured (N = 1 per spec, three sessions total), each run to
+feature-completion rather than capped at 60 minutes. The reduction
+reflects the labour cost of hand-coding relative to the agentic
+conditions and the single-researcher constraint; the human baseline is
+therefore framed throughout as a **single-rep reference point** against
+the AI distribution, not as a variance-bearing condition, and does not
+enter the inferential tests of §3.6 (which remain four-condition,
+AI-only).
 
-The session ends when the 60-minute timer expires or the researcher
-finishes the spec, whichever comes first. The codebase is captured by
-the same loader used for the AI conditions; the keystroke log is
-captured by the recorder. Both are persisted under
-`~/sessions/<run_id>/`.
+In each session the researcher hand-codes the specification in VS Code
+with all in-IDE AI assistance (GitHub Copilot, Cursor tab-complete,
+Claude) disabled and the disabled state verified before coding. A
+`pynput`-backed recorder runs in a parallel terminal and captures every
+key press at the OS level, classifying each as `keystroke`, `backspace`,
+or `delete`. Because the recorder overwrites its output on each
+invocation, multi-attempt sessions are preserved by archiving each
+capture segment and concatenating them at scoring time; the
+human-control interaction log for a rep is therefore the **union of all
+capture segments** for that spec — total typing effort including
+debugging — rather than a single uninterrupted take. The codebase is
+captured by the same loader and scored through the identical
+five-analyser pipeline used for the AI conditions; artefacts are
+persisted under `data/raw/main_001__<spec>__human_control__rep00/`.
+
+One data-integrity event is recorded: for `agent_education_system`, an
+early ~2,133-event coding segment was overwritten before the
+segment-archiving procedure was in place and is unrecoverable. That
+rep's correction-frequency value is computed from the 75-event surviving
+segment and is flagged as a partial-capture outlier in §4.6.
 
 ## 3.4 Analyser pipeline
 

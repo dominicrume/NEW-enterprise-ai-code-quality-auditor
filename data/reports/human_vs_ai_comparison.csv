@@ -1,0 +1,16 @@
+spec,metric,human_control(n=1),claude_code(mean),cursor_agent(mean),antigravity(mean),replit_agent(mean)
+agent_education_system,security_density,0.0,101.899,58.896,4.425,0.0
+agent_education_system,complexity_mean,1.714,2.728,1.911,1.588,0.0
+agent_education_system,duplication_pct,0.0,0.0,1.099,1.678,11.586
+agent_education_system,hallucinations,0.0,0.0,0.5,1.0,0.0
+agent_education_system,correction_freq,829.268,0.0,0.0,0.0,0.0
+data_pipeline,security_density,0.0,24.243,21.76,0.0,0.0
+data_pipeline,complexity_mean,5.0,3.236,3.121,2.743,3.692
+data_pipeline,duplication_pct,0.0,0.0,0.959,5.452,17.083
+data_pipeline,hallucinations,0.0,0.0,0.0,0.0,0.0
+data_pipeline,correction_freq,51.804,0.0,0.0,0.0,0.0
+internal_tool_cli,security_density,0.0,0.0,50.356,0.0,0.0
+internal_tool_cli,complexity_mean,0.0,4.099,3.136,3.471,3.471
+internal_tool_cli,duplication_pct,0.0,0.0,0.654,5.643,0.0
+internal_tool_cli,hallucinations,0.0,0.0,0.0,0.0,3.0
+internal_tool_cli,correction_freq,122.271,0.0,0.0,0.0,0.0

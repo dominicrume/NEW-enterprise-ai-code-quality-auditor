@@ -51,3 +51,33 @@ concern for enterprise adoption.
 
 **Treatment in analysis:** The cell is retained at full weight. The
 hallucination metric is the canonical measure of this behaviour.
+
+## Deviation 003 — 2026-06-21
+
+**What changed:** The `human_control` condition was executed as **N = 1 per
+spec** — three completed hand-coded sessions (`agent_education_system`,
+`data_pipeline`, `internal_tool_cli`) — rather than the pre-registered 30
+sessions (3 specs × 10 reps) of 60 minutes each (EXPERIMENT_PROTOCOL.md §6.2).
+Sessions were run **to feature-completion** rather than capped at 60 minutes;
+all six features of each spec were implemented and verified to execute before
+scoring.
+
+**Why:** Hand-coding three specifications is labour-intensive for a single
+researcher within the collection window; the agentic conditions parallelise
+where the human baseline cannot. The human condition is reframed as a
+**single-rep reference point** against the AI distribution, consistent with
+Deviation 001's treatment of replay cells as effective singletons.
+
+**Analytical consequence:** `human_control` contributes one observation per
+(spec × metric). It is excluded from within-condition variance estimates and
+from the ANOVA/Kruskal-Wallis omnibus tests (which remain four-condition,
+AI-only), and is reported descriptively in §4.6 as an interpretive floor —
+chiefly for `correction_freq`. Keystroke logs are the **concatenation of all
+capture segments** per rep (total typing effort including debugging), because
+the recorder overwrites its log per invocation. For `agent_education_system`
+rep00, an early ~2,133-event coding segment was overwritten before the
+segment-archiving procedure existed and is **unrecoverable**; that cell's
+`correction_freq` (829/1k) is computed from the 75-event surviving fixing
+segment and is reported as a **partial-capture outlier**, not a representative
+human authoring rate. The representative human correction rate is taken from
+`data_pipeline` (a complete 6,619-event session: 51.8/1k).

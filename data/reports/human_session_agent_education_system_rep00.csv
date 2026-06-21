@@ -1,0 +1,6 @@
+run_label,spec_name,spec_version,condition,rep,metric,value,unit,timestamp
+main_001,agent_education_system,1.0.0,human_control,00,security_density,0.0,per_kloc,2026-06-21T12:22:38.531692+00:00
+main_001,agent_education_system,1.0.0,human_control,00,complexity_mean,1.7142857142857142,cc,2026-06-21T12:22:38.531692+00:00
+main_001,agent_education_system,1.0.0,human_control,00,duplication_pct,0.0,%,2026-06-21T12:22:38.531692+00:00
+main_001,agent_education_system,1.0.0,human_control,00,hallucinations,0.0,count,2026-06-21T12:22:38.531692+00:00
+main_001,agent_education_system,1.0.0,human_control,00,correction_freq,829.2682926829268,per_kkey,2026-06-21T12:22:38.531692+00:00
