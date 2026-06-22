@@ -5,7 +5,10 @@ authoritative published artefact; this is a visual inspection layer.
 
 Run:
     PYTHONPATH=. python -m auditor.dashboard.app
-    # open http://127.0.0.1:5000
+    # open http://127.0.0.1:5050
+
+(Port 5000 is avoided because macOS AirPlay Receiver hijacks it and
+returns HTTP 403; AUDITOR_PORT overrides the default if needed.)
 """
 from __future__ import annotations
 
@@ -63,17 +66,44 @@ def _load_report(run_id: str) -> dict:
     csv_path = REPORTS_DIR / f"{run_id}.csv"
     if not csv_path.exists():
         abort(404)
-    rows = []
     with open(csv_path, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            r["value"] = float(r["value"])
+        reader = csv.DictReader(f)
+        header = set(reader.fieldnames or [])
+        required = {"metric", "condition", "value"}
+        missing = required - header
+        if missing:
+            # Not a long-format experiment CSV (e.g. the wide human_vs_ai
+            # comparison view). Fail with a clear 400 instead of a 500.
+            abort(
+                400,
+                description=(
+                    f"'{run_id}.csv' is not a long-format report — it is missing "
+                    f"column(s): {', '.join(sorted(missing))}. The dashboard renders "
+                    "long-format CSVs (one row per metric × condition × rep, with a "
+                    "'value' column). Wide comparison tables like "
+                    "'human_vs_ai_comparison.csv' should be opened as a file, not via "
+                    "/report/."
+                ),
+            )
+        rows = []
+        for r in reader:
+            try:
+                r["value"] = float(r["value"])
+            except (TypeError, ValueError):
+                continue
             rows.append(r)
 
-    pivot: dict[str, dict[str, float]] = defaultdict(dict)
+    # Aggregate by (metric, condition) as the MEAN across specs/reps, not the
+    # last value seen (the previous behaviour silently dropped all but one row).
+    agg: dict[str, dict[str, list]] = defaultdict(lambda: defaultdict(list))
     units: dict[str, str] = {}
     for r in rows:
-        pivot[r["metric"]][r["condition"]] = r["value"]
+        agg[r["metric"]][r["condition"]].append(r["value"])
         units[r["metric"]] = r.get("unit", "")
+    pivot: dict[str, dict[str, float]] = {
+        m: {c: sum(v) / len(v) for c, v in conds.items()}
+        for m, conds in agg.items()
+    }
 
     conditions = sorted({r["condition"] for r in rows})
     metrics = sorted(pivot)
@@ -296,4 +326,6 @@ def api_report(run_id: str):
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=False)
+    # Avoid macOS AirPlay's port 5000 (HTTP 403 hijack). Override via env.
+    port = int(os.environ.get("AUDITOR_PORT", "5050"))
+    app.run(host="127.0.0.1", port=port, debug=False)

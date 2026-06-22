@@ -1,0 +1,16 @@
+{
+  "kind": "main_study",
+  "note": "main_001 AI matrix (4 conditions x 3 specs x 10 reps) plus the human_control baseline (1 rep per spec). Dashboard shows per-(metric,condition) MEANS across specs/reps. Human is a single-rep reference point (see docs/PROTOCOL_DEVIATIONS.md, Deviation 003).",
+  "conditions": [
+    "human_control",
+    "claude_code",
+    "cursor_agent",
+    "replit_agent",
+    "antigravity"
+  ],
+  "spec_files": [
+    "specs/agent_education_system.yaml",
+    "specs/data_pipeline.yaml",
+    "specs/internal_tool_cli.yaml"
+  ]
+}
