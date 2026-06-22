@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>main_001_plus_human · AI Code Quality Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <style>
+    :root {
+      --bg-0: #0b0d12;
+      --bg-1: #11141c;
+      --bg-2: #181c27;
+      --bg-3: #1f2433;
+      --line: #232838;
+      --line-strong: #2e3447;
+      --text: #e6e8ef;
+      --muted: #8b91a4;
+      --dim: #5a6076;
+      --accent: #7c5cff;
+      --accent-soft: rgba(124, 92, 255, 0.15);
+      --good: #4ade80;
+      --bad:  #ef5a6f;
+      --warn: #f0a14a;
+      --pilot-soft: rgba(240, 161, 74, 0.12);
+      --pilot-border: rgba(240, 161, 74, 0.4);
+
+      --c-human_control: #94a3b8;
+      --c-claude_code:   #d97757;
+      --c-cursor_agent:  #7c5cff;
+      --c-antigravity:   #4ade80;
+      --c-replit_agent:  #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(124, 92, 255, 0.10), transparent 60%),
+        radial-gradient(700px 400px at 110% 0%, rgba(74, 222, 128, 0.06), transparent 60%),
+        var(--bg-0);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ---------- NAV ---------- */
+    .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.75rem; font-weight: 700; }
+    .brand-logo { width: 28px; height: 28px; border-radius: 7px;
+      background: conic-gradient(from 220deg, #7c5cff, #4ade80, #f0a14a, #7c5cff);
+      box-shadow: 0 4px 14px -4px rgba(124, 92, 255, 0.6); }
+    .nav a { color: var(--muted); text-decoration: none; transition: color 120ms ease; font-size: 0.9rem; }
+    .nav a:hover { color: var(--text); }
+    .run-id { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 0.85rem;
+      background: var(--bg-2); padding: 0.35rem 0.7rem; border-radius: 6px; border: 1px solid var(--line); }
+
+    /* ---------- PILOT BANNER ---------- */
+    .banner {
+      display: flex; align-items: flex-start; gap: 0.85rem;
+      background: var(--pilot-soft); border: 1px solid var(--pilot-border);
+      padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 2rem;
+    }
+    .banner-icon { font-size: 1.25rem; line-height: 1; }
+    .banner strong { color: var(--warn); }
+    .banner p { margin: 0.25rem 0 0; color: var(--text); font-size: 0.92rem; line-height: 1.5; }
+
+    /* ---------- HEADER ---------- */
+    .header { margin-bottom: 2.5rem; }
+    .header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+    .header .sub { color: var(--muted); font-size: 1rem; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .chip {
+      cursor: pointer; -webkit-user-select: none; user-select: none;
+      padding: 0.4rem 0.85rem; border-radius: 999px;
+      background: var(--bg-2); border: 1px solid var(--line);
+      font-size: 0.85rem; font-weight: 500;
+      transition: all 120ms ease;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .chip:hover { border-color: var(--line-strong); }
+    .chip[data-active="false"] { opacity: 0.35; }
+    .chip .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ---------- HERO STATS ---------- */
+    .hero-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-bottom: 2.5rem;
+    }
+    .stat {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1.25rem; position: relative; overflow: hidden;
+      transition: border-color 160ms ease;
+    }
+    .stat:hover { border-color: var(--line-strong); }
+    .stat::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      opacity: 0.6;
+    }
+    .stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+    .stat-value { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    .stat-unit { color: var(--muted); font-size: 0.85rem; margin-left: 0.25rem; font-family: 'Inter', sans-serif; font-weight: 500; }
+    .stat-sub { color: var(--muted); font-size: 0.8rem; margin-top: 0.5rem; line-height: 1.4; }
+    .stat-sub b { color: var(--good); font-weight: 600; }
+    .stat-blurb { color: var(--dim); font-size: 0.75rem; margin-top: 0.85rem; line-height: 1.4; min-height: 2.6em; }
+
+    /* ---------- SECTION CARDS ---------- */
+    .section {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 16px;
+      padding: 1.75rem; margin-bottom: 1.25rem;
+    }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+    .section h2 { font-size: 1.15rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+    .section .desc { color: var(--muted); font-size: 0.85rem; max-width: 50ch; }
+
+    .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem; }
+    @media (max-width: 880px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ---------- LEADERBOARD ---------- */
+    .lb-row {
+      display: grid; grid-template-columns: 32px 1fr auto auto; gap: 1rem; align-items: center;
+      padding: 0.8rem 0.5rem; border-bottom: 1px solid var(--line);
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-rank {
+      width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      background: var(--bg-2); border: 1px solid var(--line);
+    }
+    .lb-row[data-rank="1"] .lb-rank { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #1a1300; border-color: transparent; }
+    .lb-row[data-rank="2"] .lb-rank { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #0f172a; border-color: transparent; }
+    .lb-row[data-rank="3"] .lb-rank { background: linear-gradient(135deg, #fdba74, #c2410c); color: #1a0a00; border-color: transparent; }
+    .lb-name { display: flex; align-items: center; gap: 0.6rem; font-weight: 500; }
+    .lb-name .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .lb-stat { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .lb-wins { font-size: 0.75rem; color: var(--good); font-weight: 600; }
+
+    /* ---------- METRIC TABS ---------- */
+    .tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .tab {
+      padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; -webkit-user-select: none; user-select: none;
+      background: transparent; color: var(--muted); font-size: 0.9rem; font-weight: 500;
+      transition: all 120ms ease; border: 1px solid transparent;
+    }
+    .tab:hover { color: var(--text); }
+    .tab[data-active="true"] { background: var(--accent-soft); color: var(--text); border-color: rgba(124, 92, 255, 0.4); }
+    .tab-panel { display: none; }
+    .tab-panel[data-active="true"] { display: block; }
+
+    .metric-detail { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1.25rem; align-items: start; }
+    @media (max-width: 880px) { .metric-detail { grid-template-columns: 1fr; } }
+    .definition {
+      background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.15rem;
+      font-size: 0.9rem; line-height: 1.55; color: var(--muted);
+    }
+    .definition h4 { color: var(--text); font-size: 0.85rem; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.88rem; }
+    .data-table th, .data-table td { padding: 0.55rem 0.75rem; text-align: right; border-bottom: 1px solid var(--line); }
+    .data-table th:first-child, .data-table td:first-child { text-align: left; }
+    .data-table th { color: var(--muted); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .data-table td { font-family: 'JetBrains Mono', monospace; }
+    .data-table tr.best td { color: var(--good); font-weight: 600; }
+    .data-table tr.worst td { color: var(--bad); }
+
+    /* ---------- CHART SHELL ---------- */
+    .chart { width: 100%; height: 360px; }
+    .chart-tall { height: 420px; }
+
+    /* ---------- PROVENANCE ---------- */
+    details.prov {
+      background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px;
+      padding: 1rem 1.25rem;
+    }
+    details.prov summary { cursor: pointer; font-weight: 600; color: var(--muted); list-style: none; display: flex; align-items: center; justify-content: space-between; }
+    details.prov summary::-webkit-details-marker { display: none; }
+    details.prov summary::after { content: '+'; font-size: 1.2rem; color: var(--muted); }
+    details.prov[open] summary::after { content: '−'; }
+    details.prov pre { margin: 1rem 0 0; background: var(--bg-0); border: 1px solid var(--line); padding: 1rem; border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--muted); overflow-x: auto; }
+
+    .arrow-back { display: inline-flex; align-items: center; gap: 0.4rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- ===== NAV ===== -->
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        AI Code Quality Auditor
+      </div>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span class="run-id">main_001_plus_human</span>
+        <a class="arrow-back" href="#">← all reports</a>
+      </div>
+    </div>
+
+    
+    <div class="banner" style="border-left: 4px solid #22c55e;">
+      <div class="banner-icon">✅</div>
+      <div>
+        <strong>Dissertation result.</strong>
+        <p>Dissertation result. N = 3 runs per condition (across 5 conditions).</p>
+      </div>
+    </div>
+    
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+      <h1>Five-condition comparison</h1>
+      <div class="sub">
+        Spec: <strong>unknown</strong>
+        · 5 metrics × 5 conditions
+        · click a condition to filter all charts
+      </div>
+      <div class="chip-row" id="condition-chips">
+        
+        <div class="chip" data-condition="antigravity" data-active="true">
+          <span class="swatch" style="background: var(--c-antigravity);"></span>
+          antigravity
+        </div>
+        
+        <div class="chip" data-condition="claude_code" data-active="true">
+          <span class="swatch" style="background: var(--c-claude_code);"></span>
+          claude_code
+        </div>
+        
+        <div class="chip" data-condition="cursor_agent" data-active="true">
+          <span class="swatch" style="background: var(--c-cursor_agent);"></span>
+          cursor_agent
+        </div>
+        
+        <div class="chip" data-condition="human_control" data-active="true">
+          <span class="swatch" style="background: var(--c-human_control);"></span>
+          human_control
+        </div>
+        
+        <div class="chip" data-condition="replit_agent" data-active="true">
+          <span class="swatch" style="background: var(--c-replit_agent);"></span>
+          replit_agent
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- ===== HERO STATS ===== -->
+    <div class="hero-grid">
+      
+      <div class="stat">
+        <div class="stat-label">complexity_mean</div>
+        <div>
+          <span class="stat-value">2.24</span>
+          <span class="stat-unit">cc</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>human_control</b><br>
+          Worst: claude_code (3.35)
+        </div>
+        <div class="stat-blurb">Mean McCabe cyclomatic complexity per function (radon)</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-label">correction_freq</div>
+        <div>
+          <span class="stat-value">0.00</span>
+          <span class="stat-unit">per_kkey</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>antigravity</b><br>
+          Worst: human_control (334.45)
+        </div>
+        <div class="stat-blurb">Backspace + delete events per 1000 keystrokes</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-label">duplication_pct</div>
+        <div>
+          <span class="stat-value">0.00</span>
+          <span class="stat-unit">%</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>claude_code</b><br>
+          Worst: replit_agent (9.56)
+        </div>
+        <div class="stat-blurb">% of source lines inside a duplicated 6-line shingle</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-label">hallucinations</div>
+        <div>
+          <span class="stat-value">0.00</span>
+          <span class="stat-unit">count</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>claude_code</b><br>
+          Worst: replit_agent (1.00)
+        </div>
+        <div class="stat-blurb">Features shipped that were NOT in the spec</div>
+      </div>
+      
+      <div class="stat">
+        <div class="stat-label">security_density</div>
+        <div>
+          <span class="stat-value">0.00</span>
+          <span class="stat-unit">per_kloc</span>
+        </div>
+        <div class="stat-sub">
+          Best: <b>human_control</b><br>
+          Worst: cursor_agent (43.67)
+        </div>
+        <div class="stat-blurb">OWASP/CWE-tagged SonarQube issues per 1000 LOC</div>
+      </div>
+      
+    </div>
+
+    <!-- ===== RADAR + LEADERBOARD ===== -->
+    <div class="two-col">
+      <div class="section">
+        <div class="section-head">
+          <h2>Normalised comparison</h2>
+          <div class="desc">Each axis is one metric, rescaled so 1.0 is the best in this report.</div>
+        </div>
+        <div id="radar" class="chart chart-tall"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Leaderboard</h2>
+          <div class="desc">Composite of per-metric ranks (lower is better).</div>
+        </div>
+        
+        <div class="lb-row" data-rank="1">
+          <div class="lb-rank">1</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-human_control);"></span>
+            human_control
+          </div>
+          <div class="lb-stat">avg rank 1.8</div>
+          <div class="lb-wins">🏆 4</div>
+        </div>
+        
+        <div class="lb-row" data-rank="2">
+          <div class="lb-rank">2</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-claude_code);"></span>
+            claude_code
+          </div>
+          <div class="lb-stat">avg rank 2.4</div>
+          <div class="lb-wins">🏆 3</div>
+        </div>
+        
+        <div class="lb-row" data-rank="3">
+          <div class="lb-rank">3</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-replit_agent);"></span>
+            replit_agent
+          </div>
+          <div class="lb-stat">avg rank 2.8</div>
+          <div class="lb-wins">🏆 2</div>
+        </div>
+        
+        <div class="lb-row" data-rank="4">
+          <div class="lb-rank">4</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-antigravity);"></span>
+            antigravity
+          </div>
+          <div class="lb-stat">avg rank 3.0</div>
+          <div class="lb-wins">🏆 1</div>
+        </div>
+        
+        <div class="lb-row" data-rank="5">
+          <div class="lb-rank">5</div>
+          <div class="lb-name">
+            <span class="dot" style="background: var(--c-cursor_agent);"></span>
+            cursor_agent
+          </div>
+          <div class="lb-stat">avg rank 3.2</div>
+          <div class="lb-wins">🏆 1</div>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- ===== HEATMAP ===== -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Heatmap</h2>
+        <div class="desc">Green = best for that metric, red = worst. Normalised per row.</div>
+      </div>
+      <div id="heatmap" class="chart chart-tall"></div>
+    </div>
+
+    <!-- ===== PER-METRIC ===== -->
+    <div class="section">
+      <div class="section-head">
+        <h2>Per-metric drill-down</h2>
+        <div class="desc">Click a tab to inspect one metric.</div>
+      </div>
+      <div class="tabs" id="tabs">
+        
+        <div class="tab" data-metric="complexity_mean" data-active="true">complexity_mean</div>
+        
+        <div class="tab" data-metric="correction_freq" data-active="false">correction_freq</div>
+        
+        <div class="tab" data-metric="duplication_pct" data-active="false">duplication_pct</div>
+        
+        <div class="tab" data-metric="hallucinations" data-active="false">hallucinations</div>
+        
+        <div class="tab" data-metric="security_density" data-active="false">security_density</div>
+        
+      </div>
+      
+      <div class="tab-panel" data-metric="complexity_mean" data-active="true">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-complexity_mean" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>complexity_mean</h4>
+              Mean McCabe cyclomatic complexity per function (radon)
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> cc
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                
+                <tr class="">
+                  <td>antigravity</td>
+                  <td>2.601</td>
+                  <td>3</td>
+                </tr>
+                
+                <tr class="worst">
+                  <td>claude_code</td>
+                  <td>3.354</td>
+                  <td>5</td>
+                </tr>
+                
+                <tr class="">
+                  <td>cursor_agent</td>
+                  <td>2.723</td>
+                  <td>4</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>human_control</td>
+                  <td>2.238</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="">
+                  <td>replit_agent</td>
+                  <td>2.388</td>
+                  <td>2</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-panel" data-metric="correction_freq" data-active="false">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-correction_freq" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>correction_freq</h4>
+              Backspace + delete events per 1000 keystrokes
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> per_kkey
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                
+                <tr class="best">
+                  <td>antigravity</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>claude_code</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>cursor_agent</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="worst">
+                  <td>human_control</td>
+                  <td>334.448</td>
+                  <td>5</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>replit_agent</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-panel" data-metric="duplication_pct" data-active="false">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-duplication_pct" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>duplication_pct</h4>
+              % of source lines inside a duplicated 6-line shingle
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> %
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                
+                <tr class="">
+                  <td>antigravity</td>
+                  <td>4.258</td>
+                  <td>4</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>claude_code</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="">
+                  <td>cursor_agent</td>
+                  <td>0.904</td>
+                  <td>3</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>human_control</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="worst">
+                  <td>replit_agent</td>
+                  <td>9.556</td>
+                  <td>5</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-panel" data-metric="hallucinations" data-active="false">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-hallucinations" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>hallucinations</h4>
+              Features shipped that were NOT in the spec
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> count
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                
+                <tr class="">
+                  <td>antigravity</td>
+                  <td>0.333</td>
+                  <td>4</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>claude_code</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="">
+                  <td>cursor_agent</td>
+                  <td>0.167</td>
+                  <td>3</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>human_control</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="worst">
+                  <td>replit_agent</td>
+                  <td>1.000</td>
+                  <td>5</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-panel" data-metric="security_density" data-active="false">
+        <div class="metric-detail">
+          <div>
+            <div id="bar-security_density" class="chart"></div>
+          </div>
+          <div>
+            <div class="definition">
+              <h4>security_density</h4>
+              OWASP/CWE-tagged SonarQube issues per 1000 LOC
+              <br><br>
+              <span style="color: var(--dim);">Unit:</span> per_kloc
+              · <span style="color: var(--dim);">Lower is better</span>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
+              <tbody>
+                
+                <tr class="">
+                  <td>antigravity</td>
+                  <td>1.475</td>
+                  <td>3</td>
+                </tr>
+                
+                <tr class="">
+                  <td>claude_code</td>
+                  <td>42.047</td>
+                  <td>4</td>
+                </tr>
+                
+                <tr class="worst">
+                  <td>cursor_agent</td>
+                  <td>43.670</td>
+                  <td>5</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>human_control</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+                <tr class="best">
+                  <td>replit_agent</td>
+                  <td>0.000</td>
+                  <td>1</td>
+                </tr>
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- ===== PROVENANCE ===== -->
+    
+    <details class="prov">
+      <summary>Provenance metadata</summary>
+      <pre>{
+  "conditions": [
+    "human_control",
+    "claude_code",
+    "cursor_agent",
+    "replit_agent",
+    "antigravity"
+  ],
+  "kind": "main_study",
+  "note": "main_001 AI matrix (4 conditions x 3 specs x 10 reps) plus the human_control baseline (1 rep per spec). Dashboard shows per-(metric,condition) MEANS across specs/reps. Human is a single-rep reference point (see docs/PROTOCOL_DEVIATIONS.md, Deviation 003).",
+  "spec_files": [
+    "specs/agent_education_system.yaml",
+    "specs/data_pipeline.yaml",
+    "specs/internal_tool_cli.yaml"
+  ]
+}</pre>
+    </details>
+    
+  </div>
+
+  <script>
+    // ============================================================
+    // Data passed from server
+    // ============================================================
+    const PIVOT      = {"complexity_mean": {"antigravity": 2.60056, "claude_code": 3.3543852333333333, "cursor_agent": 2.7229012333333333, "human_control": 2.238095238095238, "replit_agent": 2.3876320000000004}, "correction_freq": {"antigravity": 0.0, "claude_code": 0.0, "cursor_agent": 0.0, "human_control": 334.44754211097234, "replit_agent": 0.0}, "duplication_pct": {"antigravity": 4.257640333333333, "claude_code": 0.0, "cursor_agent": 0.9038636666666666, "human_control": 0.0, "replit_agent": 9.556194999999999}, "hallucinations": {"antigravity": 0.3333333333333333, "claude_code": 0.0, "cursor_agent": 0.16666666666666666, "human_control": 0.0, "replit_agent": 1.0}, "security_density": {"antigravity": 1.4749263333333333, "claude_code": 42.047460466666664, "cursor_agent": 43.6704102, "human_control": 0.0, "replit_agent": 0.0}};
+    const NORM       = {"complexity_mean": {"antigravity": 0.6753, "claude_code": 0.0, "cursor_agent": 0.5657, "human_control": 1.0, "replit_agent": 0.866}, "correction_freq": {"antigravity": 1.0, "claude_code": 1.0, "cursor_agent": 1.0, "human_control": 0.0, "replit_agent": 1.0}, "duplication_pct": {"antigravity": 0.5545, "claude_code": 1.0, "cursor_agent": 0.9054, "human_control": 1.0, "replit_agent": 0.0}, "hallucinations": {"antigravity": 0.6667, "claude_code": 1.0, "cursor_agent": 0.8333, "human_control": 1.0, "replit_agent": 0.0}, "security_density": {"antigravity": 0.9662, "claude_code": 0.0372, "cursor_agent": 0.0, "human_control": 1.0, "replit_agent": 1.0}};
+    const RANKS      = {"complexity_mean": {"antigravity": 3, "claude_code": 5, "cursor_agent": 4, "human_control": 1, "replit_agent": 2}, "correction_freq": {"antigravity": 1, "claude_code": 1, "cursor_agent": 1, "human_control": 5, "replit_agent": 1}, "duplication_pct": {"antigravity": 4, "claude_code": 1, "cursor_agent": 3, "human_control": 1, "replit_agent": 5}, "hallucinations": {"antigravity": 4, "claude_code": 1, "cursor_agent": 3, "human_control": 1, "replit_agent": 5}, "security_density": {"antigravity": 3, "claude_code": 4, "cursor_agent": 5, "human_control": 1, "replit_agent": 1}};
+    const CONDITIONS = ["antigravity", "claude_code", "cursor_agent", "human_control", "replit_agent"];
+    const METRICS    = ["complexity_mean", "correction_freq", "duplication_pct", "hallucinations", "security_density"];
+    const UNITS      = {"complexity_mean": "cc", "correction_freq": "per_kkey", "duplication_pct": "%", "hallucinations": "count", "security_density": "per_kloc"};
+
+    const colorFor = (c) => getComputedStyle(document.documentElement).getPropertyValue('--c-' + c).trim() || '#888';
+    const PLOT_FONT = { family: 'Inter, sans-serif', color: '#e6e8ef', size: 12 };
+    const PLOT_LAYOUT_BASE = {
+      paper_bgcolor: 'transparent',
+      plot_bgcolor:  'transparent',
+      font: PLOT_FONT,
+      margin: { t: 24, l: 56, r: 24, b: 56 },
+      xaxis: { gridcolor: 'rgba(255,255,255,0.04)', linecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#8b91a4' } },
+      yaxis: { gridcolor: 'rgba(255,255,255,0.04)', linecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#8b91a4' } },
+    };
+    const PLOT_CFG = { displayModeBar: false, responsive: true };
+
+    let activeConditions = new Set(CONDITIONS);
+
+    // ============================================================
+    // Radar chart
+    // ============================================================
+    function renderRadar() {
+      const traces = CONDITIONS.filter(c => activeConditions.has(c)).map(c => ({
+        type: 'scatterpolar',
+        r: METRICS.map(m => NORM[m][c]).concat([NORM[METRICS[0]][c]]),
+        theta: METRICS.concat([METRICS[0]]),
+        fill: 'toself',
+        name: c,
+        line: { color: colorFor(c), width: 2 },
+        fillcolor: colorFor(c) + '22',
+        hovertemplate: '<b>' + c + '</b><br>%{theta}: %{r:.2f}<extra></extra>'
+      }));
+      Plotly.newPlot('radar', traces, {
+        ...PLOT_LAYOUT_BASE,
+        polar: {
+          bgcolor: 'transparent',
+          radialaxis: { visible: true, range: [0, 1], gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#8b91a4', size: 10 } },
+          angularaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#e6e8ef', size: 11 } },
+        },
+        showlegend: false,
+        margin: { t: 20, l: 60, r: 60, b: 30 },
+      }, PLOT_CFG);
+    }
+
+    // ============================================================
+    // Heatmap
+    // ============================================================
+    function renderHeatmap() {
+      const visible = CONDITIONS.filter(c => activeConditions.has(c));
+      const z = METRICS.map(m => visible.map(c => NORM[m][c]));
+      Plotly.newPlot('heatmap', [{
+        type: 'heatmap',
+        x: visible, y: METRICS, z: z,
+        colorscale: [
+          [0, '#ef5a6f'], [0.5, '#3b3f53'], [1, '#4ade80']
+        ],
+        showscale: true,
+        colorbar: { tickfont: { color: '#8b91a4' }, outlinewidth: 0, thickness: 12 },
+        hovertemplate: '<b>%{y}</b><br>%{x}<br>score: %{z:.2f}<extra></extra>',
+        xgap: 4, ygap: 4,
+      }], {
+        ...PLOT_LAYOUT_BASE,
+        margin: { t: 10, l: 140, r: 40, b: 80 },
+        xaxis: { ...PLOT_LAYOUT_BASE.xaxis, tickangle: -25 },
+        yaxis: { ...PLOT_LAYOUT_BASE.yaxis, automargin: true },
+      }, PLOT_CFG);
+    }
+
+    // ============================================================
+    // Per-metric bar charts
+    // ============================================================
+    function renderBars() {
+      METRICS.forEach(m => {
+        const visible = CONDITIONS.filter(c => activeConditions.has(c));
+        const colors = visible.map(c => colorFor(c));
+        Plotly.newPlot('bar-' + m, [{
+          type: 'bar',
+          x: visible,
+          y: visible.map(c => PIVOT[m][c]),
+          marker: { color: colors, line: { width: 0 } },
+          text: visible.map(c => PIVOT[m][c].toFixed(2)),
+          textposition: 'outside',
+          textfont: { color: '#e6e8ef' },
+          hovertemplate: '<b>%{x}</b><br>' + m + ': %{y:.3f} ' + (UNITS[m] || '') + '<extra></extra>'
+        }], {
+          ...PLOT_LAYOUT_BASE,
+          margin: { t: 30, l: 56, r: 24, b: 70 },
+          xaxis: { ...PLOT_LAYOUT_BASE.xaxis, tickangle: -25 },
+          yaxis: { ...PLOT_LAYOUT_BASE.yaxis, title: { text: UNITS[m] || '', font: { color: '#8b91a4', size: 11 } } },
+        }, PLOT_CFG);
+      });
+    }
+
+    function renderAll() {
+      renderRadar();
+      renderHeatmap();
+      renderBars();
+    }
+
+    // ============================================================
+    // Condition chips (filter)
+    // ============================================================
+    document.querySelectorAll('#condition-chips .chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const c = chip.dataset.condition;
+        if (activeConditions.has(c)) {
+          if (activeConditions.size === 1) return;  // never go to zero
+          activeConditions.delete(c);
+          chip.dataset.active = 'false';
+        } else {
+          activeConditions.add(c);
+          chip.dataset.active = 'true';
+        }
+        renderAll();
+      });
+    });
+
+    // ============================================================
+    // Tabs
+    // ============================================================
+    document.querySelectorAll('#tabs .tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const m = tab.dataset.metric;
+        document.querySelectorAll('#tabs .tab').forEach(t => t.dataset.active = (t.dataset.metric === m) ? 'true' : 'false');
+        document.querySelectorAll('.tab-panel').forEach(p => p.dataset.active = (p.dataset.metric === m) ? 'true' : 'false');
+        // Force a relayout so the newly-visible chart sizes correctly.
+        Plotly.Plots.resize(document.getElementById('bar-' + m));
+      });
+    });
+
+    renderAll();
+    window.addEventListener('resize', () => {
+      Plotly.Plots.resize(document.getElementById('radar'));
+      Plotly.Plots.resize(document.getElementById('heatmap'));
+      METRICS.forEach(m => Plotly.Plots.resize(document.getElementById('bar-' + m)));
+    });
+  </script>
+</body>
+</html>
