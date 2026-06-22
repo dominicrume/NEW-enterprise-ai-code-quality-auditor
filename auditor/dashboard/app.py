@@ -33,7 +33,7 @@ METRIC_LOWER_BETTER = {
 
 # Short human descriptions surfaced in the UI.
 METRIC_BLURB = {
-    "security_density": "OWASP/CWE-tagged SonarQube issues per 1000 LOC",
+    "security_density": "OWASP/CWE-tagged Bandit findings per 1000 lines of Python (per-language density)",
     "complexity_mean":  "Mean McCabe cyclomatic complexity per function (radon)",
     "duplication_pct":  "% of source lines inside a duplicated 6-line shingle",
     "hallucinations":   "Features shipped that were NOT in the spec",
