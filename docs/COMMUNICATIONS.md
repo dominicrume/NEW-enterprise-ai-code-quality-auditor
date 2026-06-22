@@ -35,10 +35,25 @@ all six features implemented and verified to run).
   a measured "architectural-prior dominance" that I frame as a governance
   (scope-containment) failure.
 
+**Live results dashboard (you can click this now):**
+https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human
+— the five-condition comparison (4 AI tools + the human baseline) across all
+three specs and five metrics. (It sleeps when idle, so the first load takes a few
+seconds; the leaderboard there is illustrative only — the authoritative analysis
+is Chapter 4.)
+
 **Write-up status.** Chapters 3 (Methods) and 4 (Results) are updated with the
 real numbers; the statistical notebook reproduces all of them end-to-end. I have
-assembled a full draft dissertation (~10.7k words, Harvard referencing) that I
-will continue to refine toward the final word count.
+assembled a full draft dissertation (~12k words, Harvard referencing) that I am
+finalising.
+
+**Attached for your review:**
+1. `results_report_main_001_plus_human.html` — a self-contained snapshot of the
+   dashboard (open in any browser; works offline except for the charts).
+2. `CHAPTER_4_RESULTS.md` — the Results chapter with the full statistical
+   analysis and the human-baseline section.
+(The full repository is on GitHub:
+https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor)
 
 **Two points I'd value your steer on:**
 1. The human baseline was executed as N = 1 per spec (not the pre-registered
