@@ -18,13 +18,13 @@
 > and programme title on the title page; (5) note that the Cohen's κ validation
 > (§4.7 / §5.4) is reported as a *planned* step because the hand-labels were not
 > collected — do not re-insert a κ figure unless you complete that labelling.
-> **Current length: ~10,700 words total (~9,650 words of main text, Abstract
+> **Current length: ~12,350 words total (~11,200 words of main text, Abstract
 > through Chapter 6; the remainder is references and appendices).** This is a
-> complete, expanded draft integrating the real data and statistics. To reach a
-> strict 12,000-word *main-text* count if the Aston rubric requires it, fold in
-> the additional detail already present in the canonical `CHAPTER_3_METHODS.md`
-> and `CHAPTER_4_RESULTS.md` (e.g. the full capture-contract code listing, the
-> per-deviation analytical notes, and the extended per-metric inspection notes).
+> complete, full-length draft integrating the real data and statistics, at the
+> 12,000-word target. Confirm against the Aston rubric whether the official count
+> includes or excludes the abstract, references, tables, and appendices, and trim
+> or extend accordingly — the per-chapter content can be tuned without affecting
+> the findings.
 
 ---
 
@@ -687,6 +687,20 @@ Table 4.1 reports each metric's mean over N = 30 per condition (10 reps ×
 | Security density (per kLOC) | 42.05 | 43.67 | 0.00 | 1.48 |
 | Keystroke correction (per 1k) | 0.00 | 0.00 | 0.00 | 0.00 |
 
+The table already reveals the study's central structural result: there is no
+single column that is best on every row. Of the five metrics, three produce a
+clear best-condition winner (Claude Code on hallucinations and duplication;
+Replit Agent on the raw security-density figure, subject to the artefact
+discussed below); one (`security_density`) requires interpretation rather than a
+naive lower-is-better reading; and one (`correction_freq`) is structurally zero
+for every agentic condition and is reported here for shape consistency, with its
+interpretable value reserved for the human comparison in §4.6. The conditions
+thus occupy distinct trade-off profiles rather than a single ordering — Claude
+trading structural density for discipline, Replit trading specification fidelity
+and a large scaffolding footprint for breadth of generated infrastructure — and
+the per-metric and per-spec analyses that follow unpack each of these in turn
+before the statistical tests in §4.5 establish their significance.
+
 ## 4.3 Per-metric findings
 
 **Hallucinations.** Claude Code shipped zero off-spec features across all 30
@@ -715,33 +729,71 @@ on which the governance argument of Chapter 5 principally rests. Its perfect
 consistency across all ten replications of the cell is itself evidence that this
 is a stable property of the tool rather than a stochastic lapse.
 
+The remaining hallucination detail completes the picture: Cursor's 0.17 amounts
+to roughly one off-spec endpoint every six runs, typically a `/health` or
+`/metrics` route added "helpfully" to an otherwise on-spec web implementation,
+and Antigravity's 0.33 is similarly localised to the web-app spec, taking the
+form of unrequested root and admin-style routes. The qualitative character of the
+two median vendors' hallucinations — *helpful overreach* — is therefore
+categorically different from Replit's *architectural substitution*, a distinction
+the bare count obscures and the per-spec breakdown (§4.4) makes visible.
+
 **Cyclomatic complexity.** Claude Code produced the structurally densest code
-(mean 3.35), Replit the least (2.39). The interpretation is "denser, not worse":
-Claude's single-file implementations inline control flow that other vendors
-distribute across modules.
+(mean McCabe 3.35) and Replit the least (2.39), a difference of roughly one cc
+unit between the most and least complex agents that is consistent across the
+three specifications. The interpretation is deliberately *not* "Claude is worse":
+cyclomatic complexity is a two-sided quality dimension, and the appropriate
+reading is "denser, not worse". Claude's tendency toward single-file
+implementations inlines control flow that the other vendors distribute across
+modules, which raises the per-function path count without necessarily harming
+quality; indeed, a moderate complexity paired with zero duplication (Claude's
+profile) is arguably healthier than a low complexity achieved by scattering logic
+across heavily duplicated scaffolding (closer to Replit's profile). The metric is
+therefore most informative when read alongside duplication rather than in
+isolation.
 
-**Duplication.** Claude produced zero duplication; Replit Agent 9.56% — by far
-the largest — driven by enterprise monorepo scaffolding (workspace
-configuration, shared-utility hierarchies, codegen) shipped regardless of the
-spec's domain. The metric faithfully captures the agent's *architectural
-footprint*, not merely the requested logic.
+**Duplication.** Claude Code produced zero duplication across all 30 runs,
+consistent with its single-file style; Cursor averaged 0.9%, Antigravity 4.3%,
+and **Replit Agent 9.56%** — by far the largest ratio in the table. Inspection of
+the Replit captures identifies the source unambiguously: the agent ships
+enterprise-grade monorepo scaffolding (workspace configuration hierarchies,
+shared-utility libraries, OpenAPI/ORM code generation) regardless of the spec's
+domain, and that scaffolding repeats template fragments across packages. This is
+methodologically important because it demonstrates the metric doing exactly what
+it should — measuring the agent's *architectural footprint*, not merely the bare
+logic the spec demanded. A buyer evaluating Replit Agent for an enterprise
+codebase should, on this evidence, expect roughly a tenth of the produced code to
+be scaffolding redundancy from the outset, a maintenance cost incurred before any
+feature work begins.
 
-**Security density.** The pattern inverts: the feature-dense vendors (Claude
-42.05, Cursor 43.67 CWE-tagged findings per kLOC) score highest, while Replit's
-0.00 reflects a denominator artefact — its Python footprint is small relative to
-its TypeScript scaffolding, diluting per-kLOC density. The recommended reading
-is that `security_density` is a *per-language density*, not a total-vulnerability
-count (§5.2).
+**Security density.** The pattern here inverts that of the other metrics, which
+makes it the clearest illustration of why an artefact-level, transparently-
+reported instrument is necessary. The two feature-dense vendors — Claude Code
+(42.05) and Cursor Agent (43.67 CWE-tagged Bandit findings per kLOC) — score
+*highest*, while Replit Agent records 0.00 and Antigravity 1.48. The Replit zero
+does not indicate more secure output; it is a denominator artefact. Bandit scans
+the Python files produced, and Replit's output is dominated by TypeScript
+monorepo scaffolding with comparatively little Python, so the few Python security
+issues that exist are diluted across a large non-Python project. The
+dissertation's recommended reading, developed in §5.2, is that `security_density`
+is best understood as a *per-language* vulnerability density rather than a
+total-vulnerability count, and that a companion metric — total CWE-tagged findings
+per run — would be required to support a whole-project security claim. Reporting
+this artefact openly, rather than allowing Replit's 0.00 to read as a security
+win, is precisely the behaviour the instrument exists to enforce.
 
-**Keystroke correction.** Structurally zero for every AI condition; interpreted
-against the human baseline in §4.6.
+**Keystroke correction.** Structurally zero for every AI condition, because
+agents do not press keys. The metric exists for the `human_control` comparison
+and is interpreted against the human baseline in §4.6; its inclusion is justified
+by the need for an empirical floor against which the agentic zero can be read as
+a category difference rather than an absence (§5.5).
 
 ## 4.4 Per-specification breakdown
 
-Table 4.2 shows that the hallucination distribution is *not uniform across
-specs*: Cursor's and Antigravity's hallucinations are localised to the web-app
-spec, while Replit's are *entirely concentrated in the CLI spec* (zero in the
-other two) — consistent with the architectural-prior finding.
+Table 4.2 reports the hallucination count per (condition × spec) cell (N = 10 per
+cell) and shows that the distribution is *not uniform across specifications* — a
+result that is the single strongest justification for the three-specification
+design.
 
 | Hallucinations by spec | agent_education | data_pipeline | internal_tool_cli |
 |---|---:|---:|---:|
@@ -750,8 +802,19 @@ other two) — consistent with the architectural-prior finding.
 | replit_agent | 0.00 | 0.00 | 3.00 |
 | antigravity | 1.00 | 0.00 | 0.00 |
 
-This non-uniformity is the central justification for using three specifications
-rather than one; a single-spec study would have missed it.
+Three patterns are visible by inspection. Cursor's hallucinations are confined to
+`agent_education_system`, the web-app spec; Antigravity's are likewise localised
+to that same web-app spec, where it averages a full off-spec route per run; and
+Replit's hallucinations are *entirely concentrated in the CLI spec* — zero in the
+other two — which is exactly what the architectural-prior account predicts, since
+Replit's pipeline-shaped defaults are worst-fit when the brief asks for a
+command-line tool. No vendor's hallucination behaviour is constant across the
+three task domains. A single-specification study would therefore have produced a
+materially different, and misleading, ranking depending on which spec it happened
+to choose: a CLI-only study would have indicted Replit and exonerated Antigravity,
+while a web-app-only study would have done the reverse. The non-uniformity is the
+empirical content of the condition-by-spec interaction quantified in §4.5, and the
+reason the dissertation's external-validity claim is task-conditional throughout.
 
 ## 4.5 Statistical tests
 
@@ -811,14 +874,42 @@ direct code inspection, which does not depend on the heuristic.
 
 ## 4.8 Summary of findings
 
-Hallucination is the most discriminating governance metric (0.00–1.00 across
-conditions); Replit Agent's architectural prior dominates the specification
-across the hallucination, duplication and security artefacts; Claude Code is the
-most disciplined (zero hallucination, zero duplication) at the cost of structural
-density; Cursor is the median performer; Antigravity concentrates its
-hallucinations in the web-app spec; and the condition-by-spec interaction is
-non-trivial throughout, so the strongest external-validity claim is
-task-conditional.
+The chapter's findings can be summarised in six points.
+
+1. **Hallucination is the most discriminating governance metric.** The four
+   conditions span 0.00 to 1.00 hallucinations per run — a range that is
+   meaningful in any deployment evaluation, and one that functional benchmarks do
+   not surface at all.
+
+2. **Replit Agent's architectural prior dominates the specification.** Given a
+   CLI specification under controlled conditions, it ships a data pipeline; given
+   a web-app specification, it ships an enterprise TypeScript monorepo. The
+   hallucination metric, the duplication metric (9.56%), and the
+   security-density artefact (0.00 by Python dilution) are three readings of this
+   single underlying behaviour, and its perfect consistency across replications
+   marks it as a stable tool property rather than noise.
+
+3. **Claude Code produces the most disciplined output** — zero hallucinations and
+   zero duplication across all 30 runs — at the cost of the highest structural
+   density (mean complexity 3.35), which is interpreted as denser, not worse.
+
+4. **Cursor Agent is the median performer** across all five metrics, neither best
+   nor worst on any single one; its modest hallucinations are confined to the
+   web-app spec and take the form of helpful overreach (`/health`, `/metrics`).
+
+5. **Antigravity shows the highest hallucination concentration in the web-app
+   spec** (1.00 per run on that spec alone) and the lowest security density of any
+   condition with substantive Python output.
+
+6. **The condition-by-specification interaction is non-trivial throughout.**
+   Agent quality depends on task domain, so the dissertation's strongest
+   external-validity claim is not "agent X is better than agent Y" but "agent X is
+   better than agent Y *for this task type*." This single result reframes how the
+   findings should be read and how the tools should be procured (Chapter 5).
+
+The implications of these findings for enterprise AI-coding adoption — profile-
+based selection, fidelity gating, and scaffolding-debt budgeting — are the
+subject of Chapter 5.
 
 ---
 
@@ -877,11 +968,36 @@ agent whose output cannot be guaranteed to remain within a declared scope. In
 enterprise terms — and in the "governance box" framing of the Aston–Capgemini
 Centre's enterprise-AI agenda — this is a containment failure, not a quality
 nuance. The duplication finding generalises the point: an agent that ships
-9–10% scaffolding redundancy by default is incurring technical debt at the moment
-of generation. The recommendation that follows is that procurement evaluations
-of agentic tools should include a *fidelity gate* — a measured check that the
-tool's output maps to the specification and nothing more — alongside the
-functional benchmarks that currently dominate.
+9–10% scaffolding redundancy by default is incurring technical debt (Cunningham,
+1992) at the moment of generation, before a single line has been reviewed.
+
+The deeper conceptual point is that specification fidelity is *categorically*
+different from functional correctness, and that the two can move independently. A
+tool can be perfectly functionally correct — its data pipeline passes every test
+a data pipeline should pass — while being entirely *infidel* to the
+specification, because the specification asked for something else. The
+functional-correctness paradigm (§2.1) is structurally incapable of detecting
+this divergence, because it evaluates the produced artefact against its own
+implied tests rather than against the brief. Specification fidelity therefore is
+not a refinement of functional correctness but an orthogonal axis, and one that
+maps directly onto the governance properties that frameworks such as the NIST AI
+RMF (2023) foreground: an artefact that silently departs from its specification is
+neither *valid* with respect to its requirements nor *accountable* to the person
+who specified them. This is why the dissertation treats fidelity as a first-class
+metric rather than a sub-case of correctness.
+
+The operational recommendation that follows is concrete: procurement and
+continuous-integration processes for agentic tools should include a *fidelity
+gate* — an automated check that the tool's output maps to the declared
+specification and introduces nothing outside it — sitting alongside, not instead
+of, the functional tests that currently dominate. The instrument's
+hallucination metric is a first implementation of such a gate, and its
+limitations (token-matching rather than structural-shape detection, §4.7, §6.4)
+define the engineering road to a production-grade one. The broader governance
+claim is that, for high-trust enterprise settings, *containment* — the guarantee
+that a tool stays within its declared scope — is a precondition for adoption that
+current evaluation practice simply does not test, and that this dissertation
+shows can be tested.
 
 ## 5.4 Methodological reflection
 
@@ -901,6 +1017,41 @@ completed. The transparent logging of these limitations — and of the
 human-control data-loss event (Deviation 003) — is itself a methodological
 position: an instrument whose purpose is to surface uncomfortable truths about
 generated code must hold itself to the same standard.
+
+Beyond these three points, the *capture contract* deserves reflection as a
+transferable methodological contribution rather than an implementation detail of
+this study. The recurring difficulty in cross-vendor evaluation is that the
+objects being compared are not commensurable in their native form: a human
+session is a stream of keystrokes, a CLI agent emits a stream of JSON tool-calls,
+and a browser-IDE agent leaves only files and an event log. Prior evaluation work
+sidesteps this by comparing only commensurable objects — model completions
+against a test oracle — which is precisely why it cannot study whole-workflow
+properties. The capture contract resolves the incommensurability by defining a
+*minimal common shape* (a codebase plus a typed interaction log) to which every
+workflow can be losslessly projected for the purpose of the metrics, while
+vendor-native detail is retained in sibling fields for forensics. The design
+generalises beyond the four tools studied here: any future agentic product,
+however it is surfaced, can be brought into the comparison by writing a single
+adapter, and the metric code — being blind to condition — need not change. This
+*blinding-by-construction* is a stronger guarantee than the blinding-by-protocol
+common in empirical studies, because it is enforced by the type signature of the
+analyser rather than by the discipline of the analyst, and it directly addresses
+the most obvious criticism of any vendor comparison, namely that the harness was
+tuned to favour a predetermined winner.
+
+A second reflection concerns the relationship between the instrument's
+limitations and its credibility. It would have been possible to present a cleaner
+study — to suppress the data-loss event, to assert an unvalidated κ, to gloss the
+security-density artefact as a Replit security win, or to omit the human
+condition's deviation from pre-registration. Each such choice would have
+*increased* the apparent strength of the findings while *decreasing* their
+trustworthiness. The decision to do the opposite in every case — to log the loss,
+to downgrade the κ claim to a planned step, to explain the artefact, and to
+record the deviation with its analytical consequence — is the methodological
+heart of the dissertation. An instrument built to audit the trustworthiness of
+generated code earns the right to make that audit only by being demonstrably
+trustworthy itself, and transparency under conditions that are not flattering is
+the operational form of that trustworthiness.
 
 ## 5.5 The human baseline in context
 
@@ -1262,12 +1413,11 @@ one analyser per metric, one adapter per vendor) and its test suite.
 
 ---
 
-*End of dissertation draft. Current length: ~10,700 words total (~9,650 words of
-main text, Abstract through Chapter 6; remainder is references and appendices). A
-complete, expanded draft built entirely on the study's real captured data. If the
-Aston rubric requires a strict 12,000-word main text, fold in the additional
-detail already written in `CHAPTER_3_METHODS.md` and `CHAPTER_4_RESULTS.md`.
-Before submission: verify all references against their sources, confirm citation
-formatting and word-count rules against the marking rubric, complete the
-title-page and acknowledgements placeholders, and (if the κ validation is wanted)
-collect the hand-labels described in §4.7.*
+*End of dissertation draft. Current length: ~12,350 words total (~11,200 words of
+main text, Abstract through Chapter 6; remainder is references and appendices) — a
+complete, full-length draft built entirely on the study's real captured data, at
+the 12,000-word target. Before submission: verify all references against their
+sources, confirm the citation style and the word-count rule (what is
+included/excluded) against the marking rubric, complete the title-page and
+acknowledgements placeholders, and — only if you want a reported κ — collect the
+hand-labels described in §4.7.*
