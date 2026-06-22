@@ -267,7 +267,10 @@
       <div class="section">
         <div class="section-head">
           <h2>Leaderboard</h2>
-          <div class="desc">Composite of per-metric ranks (lower is better).</div>
+          <div class="desc">Composite of per-metric ranks (lower is better).
+          <strong>Illustrative only</strong> — a naïve rank-sum that does not
+          weight metrics or account for the human baseline's spec-minimal style;
+          the authoritative analysis is in the dissertation, Chapter 4.</div>
         </div>
         {% for row in leaderboard %}
         <div class="lb-row" data-rank="{{ row.overall_rank }}">

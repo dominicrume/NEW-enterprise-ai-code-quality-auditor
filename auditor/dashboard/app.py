@@ -43,11 +43,27 @@ METRIC_BLURB = {
 app = Flask(__name__)
 
 
+def _is_multi_condition_report(csv_path: Path) -> bool:
+    """True only for long-format CSVs with >= 2 conditions. Hides single-spec
+    human captures and wide comparison tables from the index for a clean view."""
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            if not {"metric", "condition", "value"} <= set(reader.fieldnames or []):
+                return False
+            conditions = {r["condition"] for r in reader if r.get("condition")}
+        return len(conditions) >= 2
+    except Exception:
+        return False
+
+
 def _list_reports() -> list[dict]:
     if not REPORTS_DIR.exists():
         return []
     out = []
     for csv_path in sorted(REPORTS_DIR.glob("*.csv")):
+        if not _is_multi_condition_report(csv_path):
+            continue
         prov_path = REPORTS_DIR / f"{csv_path.stem}.provenance.json"
         prov = json.loads(prov_path.read_text()) if prov_path.exists() else {}
         out.append({

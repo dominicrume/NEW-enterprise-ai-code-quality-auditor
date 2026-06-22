@@ -12,9 +12,8 @@ except ImportError:
 @dataclass
 class Settings:
     anthropic_api_key: str = os.environ.get("ANTHROPIC_API_KEY", "")
-    sonarqube_url: str = os.environ.get("SONARQUBE_URL", "")
-    sonarqube_token: str = os.environ.get("SONARQUBE_TOKEN", "")
-    sonarqube_organization: str = os.environ.get("SONARQUBE_ORGANIZATION", "")
+    # NB: security scanning uses local Bandit (see security_analyzer.py); the
+    # original SonarCloud settings were retired during the pilot (Deviation 002).
     run_id: str = os.environ.get("EXPERIMENT_RUN_ID", "run_001")
 
 
