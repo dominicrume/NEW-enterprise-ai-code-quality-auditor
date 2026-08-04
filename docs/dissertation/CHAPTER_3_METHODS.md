@@ -1,6 +1,8 @@
 # Chapter 3 — Methods
 
-> Draft for MSc dissertation, Aston University, AI & Business Strategy. ~2,500 words.
+> **SUPERSEDED working draft.** The submission artifact is
+> `DISSERTATION_FULL.md`, which contains the current Chapter 3.
+> Kept for drafting history only.
 
 ## 3.1 Research design
 

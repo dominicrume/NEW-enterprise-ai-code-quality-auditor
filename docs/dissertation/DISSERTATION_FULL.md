@@ -4,27 +4,23 @@
 **Aston University · Project JBKS1**
 **Supervisors: Julien Barney and Kate Sugden**
 **Author: Dominic Rume**
-**Submission: June 2026**
+**Submission: August 2026**
 
-> ⚠️ **PRE-SUBMISSION VERIFICATION NOTICE (delete before submission).** This is
-> an assembled full draft generated from the project's real captured data
+> ⚠️ **PRE-SUBMISSION NOTICE (delete before submission).** This is a complete
+> full draft generated from the project's real captured data
 > (`data/reports/main_001.csv`, the three `human_session_*` CSVs, and
-> `notebooks/statistical_analysis.ipynb`). Before submitting you **must**: (1)
-> verify every entry in the References section against the original sources —
-> citations are to real, well-known works but bibliographic details (year,
-> page, venue) require checking; (2) confirm the citation style and formatting
-> match the Aston marking rubric; (3) replace the Acknowledgements and any
-> bracketed personal/administrative placeholders; (4) confirm supervisor names
-> and programme title on the title page; (5) note that the Cohen's κ validation
-> (§4.7 / §5.4) is reported as a *planned* step because the hand-labels were not
-> collected — do not re-insert a κ figure unless you complete that labelling.
-> **Current length: ~12,350 words total (~11,200 words of main text, Abstract
-> through Chapter 6; the remainder is references and appendices).** This is a
-> complete, full-length draft integrating the real data and statistics, at the
-> 12,000-word target. Confirm against the Aston rubric whether the official count
-> includes or excludes the abstract, references, tables, and appendices, and trim
-> or extend accordingly — the per-chapter content can be tuned without affecting
-> the findings.
+> `notebooks/statistical_analysis.ipynb`). **Status as of 4 August 2026:**
+> ✅ (1) All 26 references verified against original sources (arXiv, ACM DL,
+> publisher/DOI records); one author-order correction applied (Ziegler et al.
+> 2022) and minor completeness details added. ✅ (2) Acknowledgements written.
+> ✅ (3) Title page confirmed (supervisors Julien Barney and Kate Sugden;
+> submission date August 2026). **Remaining — requires you:** (a) confirm the
+> Harvard citation variant and formatting against the Aston marking rubric;
+> (b) confirm the word-count rule (whether abstract, references, tables and
+> appendices count toward the ~12,000-word target — main text is ~11,200 words)
+> and trim or extend accordingly; (c) the Cohen's κ validation (§4.7 / §5.4)
+> is reported as *planned* because hand-labels were not collected — do not
+> re-insert a κ figure unless you complete that labelling.
 
 ---
 
@@ -56,17 +52,22 @@ into one comparable shape, and metric analysers are prohibited from seeing
 condition labels.
 
 Across 600 metric observations from the four agentic conditions
-(four conditions × three specifications × ten replications × five metrics),
+(four conditions × three specifications × ten replications × five metrics;
+the two IDE-bound conditions were captured once per cell and replayed,
+so their cells are effective singletons — Deviation 001),
 four of five metrics differ significantly between tools (Kruskal–Wallis,
 α = 0.01 Bonferroni), with effect sizes ranging from medium (complexity,
-η² = 0.10) to very large (duplication, η² = 0.50). Crucially, every metric
+η² = 0.10) to very large (duplication, η² = 0.50); given the replay design,
+these tests are read as supporting the large descriptive gaps rather than as
+fully independent inference. Every testable metric
 shows a significant condition-by-specification interaction, establishing that
 tool quality is **task-dependent**: the defensible claim is not "tool *X* is
 better than tool *Y*" but "tool *X* is better than tool *Y* *for this task
 type*". The single most consequential finding is a measured
 **architectural-prior dominance**: given a CLI specification under a clean,
-isolated workspace with an explicit instruction prohibiting pipeline output,
-Replit Agent shipped a data-pipeline application in every replication —
+contamination-checked workspace with an explicit instruction prohibiting
+pipeline output, Replit Agent shipped a data-pipeline application rather than
+the specified CLI — behaviour confirmed by direct code inspection —
 evidence that a pretrained scaffolding bias can override an unambiguous,
 contradictory specification, a direct governance concern for enterprise
 adoption. A hand-coded human baseline provides an interpretive floor for the
@@ -89,9 +90,15 @@ engineering.
 
 ## Acknowledgements
 
-[Placeholder — replace before submission. Acknowledge supervisors Julien Barney
-and Kate Sugden, the Aston–Capgemini Centre of Excellence for Enterprise AI,
-and any others as appropriate.]
+I am grateful to my supervisors, Julien Barney and Kate Sugden, whose guidance
+shaped this work from a research question into a working instrument, and whose
+insistence on methodological honesty — particularly around the mid-study
+analyser corrections documented in Chapter 5 — made the dissertation stronger
+than a cleaner-looking draft would have been. I thank the Aston–Capgemini
+Centre of Excellence for Enterprise AI for the enterprise framing that gives
+this instrument its purpose beyond the laboratory, and the mentors and industry
+partners whose questions about credibility, differentiation, and evidence
+sharpened every chapter. Any errors that remain are my own.
 
 ---
 
@@ -574,7 +581,8 @@ a temporary directory and invokes the Bandit static analyser, counting only
 findings carrying a non-null CWE identifier (preserving the OWASP/MITRE framing
 of §2.2–2.3) and dividing by the codebase's line count, scaled to one thousand
 lines. An earlier instrument design queried the SonarCloud REST API; it was
-abandoned during the pilot (Deviation 002) because SonarCloud's per-project
+abandoned during the pilot (documented in the pilot report, §4.1 of
+docs/PILOT_RESULTS.md) because SonarCloud's per-project
 scoping shared a single numerator across conditions while the denominator
 varied, producing artefactually large per-kLOC figures for small codebases.
 Local, per-condition Bandit scoping restores soundness by scoping numerator and
@@ -677,7 +685,9 @@ comparison is the primary analysis.
 ## 4.2 Headline cross-vendor comparison
 
 Table 4.1 reports each metric's mean over N = 30 per condition (10 reps ×
-3 specs). Lower is better; the best per row is shown in bold in the discussion.
+3 specs; nominal N — the two IDE-bound conditions contribute three effective
+sessions each under the replay design, Deviation 001). Lower is better; the
+best per row is shown in bold in the discussion.
 
 | Metric | claude_code | cursor_agent | replit_agent | antigravity |
 |---|---:|---:|---:|---:|
@@ -713,7 +723,7 @@ the study's most consequential finding (§4.3.1, below).
 specification — a CLI with six declared subcommands (`init`, `add`, `list`,
 `export`, `validate`, `help`) — under a fresh, isolated workspace and an explicit
 instruction stem prohibiting pipeline output, Replit Agent shipped a *data-pipeline
-CLI* in every replication of that cell, defining `cmd_run` and `cmd_schedule`
+CLI* in its captured session for that cell, defining `cmd_run` and `cmd_schedule`
 invoking a `run_pipeline` routine rather than the spec's structure. The
 behaviour is significant precisely because of the controls placed around it: the
 workspace was confirmed clean before capture and the prompt explicitly forbade
@@ -725,9 +735,14 @@ contradictory specification. This is the single result that most sharply
 illustrates the dissertation's thesis — that functional benchmarks, which would
 simply record whether the produced pipeline's tests passed, are structurally
 incapable of detecting that the wrong artefact was built — and it is the result
-on which the governance argument of Chapter 5 principally rests. Its perfect
-consistency across all ten replications of the cell is itself evidence that this
-is a stable property of the tool rather than a stochastic lapse.
+on which the governance argument of Chapter 5 principally rests. One caveat is
+carried explicitly: because this cell is an effective singleton under the replay
+design (Deviation 001), its ten listed replications are mechanical copies of one
+captured session and contribute no independent evidence of stability. The
+finding rests on the controlled conditions of the capture and on direct code
+inspection; a live multi-session re-capture (§5.7) is the stated next step to
+establish whether the behaviour is a stable property of the tool rather than a
+single-session occurrence.
 
 The remaining hallucination detail completes the picture: Cursor's 0.17 amounts
 to roughly one off-spec endpoint every six runs, typically a `/health` or
@@ -886,8 +901,9 @@ The chapter's findings can be summarised in six points.
    a web-app specification, it ships an enterprise TypeScript monorepo. The
    hallucination metric, the duplication metric (9.56%), and the
    security-density artefact (0.00 by Python dilution) are three readings of this
-   single underlying behaviour, and its perfect consistency across replications
-   marks it as a stable tool property rather than noise.
+   single underlying behaviour, triangulated by direct code inspection;
+   establishing its stability across independent sessions awaits the live
+   re-capture (§5.7).
 
 3. **Claude Code produces the most disciplined output** — zero hallucinations and
    zero duplication across all 30 runs — at the cost of the highest structural
@@ -1008,8 +1024,9 @@ vendor-favouring bias by construction. Second, the *replay-mode constraint*
 (Deviation 001) is a genuine limitation: the IDE-bound vendors contribute zero
 within-cell variance, so their cells are effective singletons and the omnibus
 tests rest on the two CLI-driven conditions' variance plus the between-condition
-gaps; the large effect sizes and the consistency of the architectural-prior
-finding across all ten replications mitigate but do not eliminate this. Third,
+gaps; the large descriptive gaps mitigate but do not eliminate this — the
+replayed cells' internal consistency is a property of the replay mechanism and
+adds no independent evidence. Third,
 the *hallucination heuristic* is token-based and was not validated against human
 labels in this submission (§4.7); the recommended extension is structural-shape
 detection, and the metric is reported conservatively until that validation is
@@ -1102,9 +1119,10 @@ confound rather than hiding it, and the appropriate response — recommended in
 whether logic is placed inside functions.
 
 *Fourth, the single-replication design of the human condition is a genuine
-threat to validity that is carried openly rather than disguised.* Where each
-agentic condition contributes ten replications per specification, the human
-baseline contributes one (Deviation 003), so it cannot support variance
+threat to validity that is carried openly rather than disguised.* Where the
+CLI-driven agentic conditions contribute ten live replications per specification
+(and the IDE-bound conditions one captured session each — Deviation 001), the
+human baseline likewise contributes one (Deviation 003), so it cannot support variance
 estimation and is excluded from all inferential tests. It is reported purely
 descriptively, as a single-rep reference point. This is a deliberate,
 transparently-logged trade-off between the labour cost of hand-coding three
@@ -1161,10 +1179,11 @@ triangulating the central finding against direct code inspection, which does not
 depend on any single metric. *Internal validity*: the deterministic-replay
 constraint (Deviation 001) means two conditions contribute no within-cell
 variance, so the omnibus tests rest on the two CLI-driven conditions' variance
-plus the between-condition gaps; the very large effect sizes (η² up to 0.50) and
-the perfect consistency of the architectural-prior behaviour across all ten
-Replit replications mitigate this, but a fully live re-capture is required to
-close it. *External validity*: three specifications across three domains, while
+plus the between-condition gaps; the very large effect sizes (η² up to 0.50)
+are accordingly read as descriptive of the captured sessions rather than fully
+inferential — the replayed cells' internal consistency is a property of the
+replay mechanism, not corroboration — and a fully live re-capture is required to
+close this gap. *External validity*: three specifications across three domains, while
 broader than the single-task norm, do not span the full space of software tasks,
 and the significant condition-by-spec interaction warns explicitly against
 over-generalisation — the appropriate inference is task-conditional. *Conclusion
@@ -1282,10 +1301,12 @@ assume.
 
 # References
 
-> ⚠️ **Verify every entry against the original source before submission.** These
-> are real, well-established works cited in the text, but year/venue/page details
-> must be confirmed and formatted to the exact Harvard variant required by Aston.
-> Expand with programme-specific and additional sources as needed.
+> ✅ **Verified 4 August 2026.** All 26 entries checked against authoritative
+> sources (arXiv, ACM Digital Library, publisher and DOI records). One
+> correction applied (Ziegler et al. 2022 author order, per the published MAPS
+> '22 record); optional completeness details added to Barke, Hou and NIST
+> entries. Remaining before submission: confirm the exact Harvard variant
+> required by Aston, and expand with programme-specific sources if needed.
 
 Austin, J., Odena, A., Nye, M., Bosma, M., Michalewski, H., Dohan, D. et al.
 (2021) 'Program synthesis with large language models', *arXiv preprint*
@@ -1293,7 +1314,7 @@ arXiv:2108.07732.
 
 Barke, S., James, M.B. and Polikarpova, N. (2023) 'Grounded Copilot: how
 programmers interact with code-generating models', *Proceedings of the ACM on
-Programming Languages*, 7(OOPSLA1).
+Programming Languages*, 7(OOPSLA1), Article 78, pp. 85–111.
 
 Chen, M., Tworek, J., Jun, H., Yuan, Q., Pinto, H.P. de O., Kaplan, J. et al.
 (2021) 'Evaluating large language models trained on code', *arXiv preprint*
@@ -1321,7 +1342,7 @@ of Statistics*, 7(1), pp. 1–26.
 
 Hou, X., Zhao, Y., Liu, Y., Yang, Z., Wang, K., Li, L. et al. (2024) 'Large
 language models for software engineering: a systematic literature review', *ACM
-Transactions on Software Engineering and Methodology*, 33(8).
+Transactions on Software Engineering and Methodology*, 33(8), Article 220.
 
 Jimenez, C.E., Yang, J., Wettig, A., Yao, S., Pei, K., Press, O. and Narasimhan,
 K. (2024) 'SWE-bench: can language models resolve real-world GitHub issues?',
@@ -1347,17 +1368,18 @@ McCabe, T.J. (1976) 'A complexity measure', *IEEE Transactions on Software
 Engineering*, SE-2(4), pp. 308–320.
 
 MITRE (2023) *Common Weakness Enumeration (CWE)*. Available at:
-https://cwe.mitre.org/ (Accessed: [date]).
+https://cwe.mitre.org/ (Accessed: 4 August 2026).
 
-NIST (2023) *Artificial Intelligence Risk Management Framework (AI RMF 1.0)*.
-Gaithersburg, MD: National Institute of Standards and Technology.
+NIST (2023) *Artificial Intelligence Risk Management Framework (AI RMF 1.0)*
+(NIST AI 100-1). Gaithersburg, MD: National Institute of Standards and
+Technology.
 
 Nosek, B.A., Ebersole, C.R., DeHaven, A.C. and Mellor, D.T. (2018) 'The
 preregistration revolution', *Proceedings of the National Academy of Sciences*,
 115(11), pp. 2600–2606.
 
 OWASP (2021) *OWASP Top 10:2021*. Open Worldwide Application Security Project.
-Available at: https://owasp.org/Top10/ (Accessed: [date]).
+Available at: https://owasp.org/Top10/ (Accessed: 4 August 2026).
 
 Pearce, H., Ahmad, B., Tan, B., Dolan-Gavitt, B. and Karri, R. (2022) 'Asleep at
 the keyboard? Assessing the security of GitHub Copilot's code contributions',
@@ -1371,18 +1393,18 @@ Sadowski, C., Aftandilian, E., Eagle, A., Miller-Cushon, L. and Jaspan, C. (2018
 'Lessons from building static analysis tools at Google', *Communications of the
 ACM*, 61(4), pp. 58–66.
 
-Sarkar, A., Gordon, A.D., Negreanu, C., Poelitz, C., Ragavan, S.S. and Zorn, B.
-(2022) 'What is it like to program with artificial intelligence?', *Proceedings
-of the 33rd Annual Workshop of the Psychology of Programming Interest Group
-(PPIG)*.
+Sarkar, A., Gordon, A.D., Negreanu, C., Poelitz, C., Srinivasa Ragavan, S. and
+Zorn, B. (2022) 'What is it like to program with artificial intelligence?',
+*Proceedings of the 33rd Annual Workshop of the Psychology of Programming
+Interest Group (PPIG)*.
 
 Vaithilingam, P., Zhang, T. and Glassman, E.L. (2022) 'Expectation vs.
 experience: evaluating the usability of code generation tools powered by large
 language models', *CHI Conference on Human Factors in Computing Systems Extended
 Abstracts*.
 
-Ziegler, A., Kalliamvakou, E., Li, X.A., Rice, A., Rifkin, D., Simister, S.,
-Sittampalam, G. and Aftandilian, E. (2022) 'Productivity assessment of neural
+Ziegler, A., Kalliamvakou, E., Simister, S., Sittampalam, G., Li, A., Rice, A.,
+Rifkin, D. and Aftandilian, E. (2022) 'Productivity assessment of neural
 code completion', *Proceedings of the 6th ACM SIGPLAN International Symposium on
 Machine Programming (MAPS)*, pp. 21–29.
 
@@ -1416,8 +1438,8 @@ one analyser per metric, one adapter per vendor) and its test suite.
 *End of dissertation draft. Current length: ~12,350 words total (~11,200 words of
 main text, Abstract through Chapter 6; remainder is references and appendices) — a
 complete, full-length draft built entirely on the study's real captured data, at
-the 12,000-word target. Before submission: verify all references against their
-sources, confirm the citation style and the word-count rule (what is
-included/excluded) against the marking rubric, complete the title-page and
-acknowledgements placeholders, and — only if you want a reported κ — collect the
-hand-labels described in §4.7.*
+the 12,000-word target. References verified and corrected, acknowledgements and
+title page completed (4 August 2026). Remaining before submission: confirm the
+citation style and the word-count rule (what is included/excluded) against the
+marking rubric, and — only if you want a reported κ — collect the hand-labels
+described in §4.7.*

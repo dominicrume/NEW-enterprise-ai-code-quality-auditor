@@ -1,6 +1,8 @@
 # Chapter 4 — Results
 
-> Draft for MSc dissertation, Aston University, AI & Business Strategy. ~2,000 words.
+> **SUPERSEDED working draft.** The submission artifact is
+> `DISSERTATION_FULL.md`, which contains the current Chapter 4.
+> Kept for drafting history only.
 
 ## 4.1 Overview
 
