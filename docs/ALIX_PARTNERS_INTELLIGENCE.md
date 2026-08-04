@@ -31,7 +31,7 @@
 
 | What they are selling | What we hand them |
 |---|---|
-| "Invest in trust infrastructure" (their own prescription, 10–30% of budgets) | A working, deployable piece of **trust infrastructure for AI-assisted engineering** — evidence for the advice they already give |
+| "Invest in trust infrastructure" (their own prescription: 10–15% of budgets, rising to 20–30% by 2027) | A working, deployable piece of **trust infrastructure for AI-assisted engineering** — evidence for the advice they already give |
 | "The AI Productivity Paradox" — 20–30% speedup that doesn't convert to ROI | The mechanism: unassured adoption leaks the gains into rework, security debt, and scope drift. **Assurance is how the speedup converts.** |
 | "The great divider" — 14% laggards need a defensible adoption path | A **repeatable, billable evaluation offering** their consultants can run for clients stuck at the adoption decision |
 | "Lack of clarity or consensus" (39% of clients) blocks transformation | Five explainable credibility checks that give a board **clarity it can act on** |

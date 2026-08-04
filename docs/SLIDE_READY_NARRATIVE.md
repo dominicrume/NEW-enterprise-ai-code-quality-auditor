@@ -1,107 +1,64 @@
 # Slide-Ready Narrative — Alix Partners Briefing
 
 ## Title
-AI Code Quality Auditor: From Research Instrument to Executive AI Assurance Platform
+AI Code Quality Auditor: Due Diligence for AI Coding Tools
 
-*Audience: Alix Partners — Paul (technical consulting) and Ollie (management consulting). Ollie will view this through a management lens; Paul through a technical one — every slide carries both.
-Timing: 5–7 minutes total, then Q&A. Storyline per supervisor guidance: what problem → how we solve it → credibility of the solution → outcome → demo → differentiation.
-Logistics: trial run with Anusha next week; live demo with a screen-recorded backup; format may move to the Alix Partners DFP Design Factory template (pending confirmation).*
+*Audience: Alix Partners — Paul (technical consulting) and Ollie (management consulting). Slide numbers match docs/ONE_PAGE_DECK_OUTLINE.md 1:1.
+Timing: ~6:15 spoken against a 7-minute maximum — the slack is deliberate; transitions and demo page-loads eat it. Word budgets assume ~145 words/minute spoken.
+Logistics: trial run with Anusha next week; live demo with a screen-recorded backup; format may move to the Alix Partners DFP Design Factory template (pending confirmation). Audience research: docs/ALIX_PARTNERS_INTELLIGENCE.md.*
 
 ---
 
-## Slide 1 — The problem (≈45 sec)
+## Slide 1 — Title (15 sec, ~30 words)
+Say: "I'm Dominic. What I'm going to show you is due diligence for AI coding tools — before an organization adopts one, we test it against their own specification and show where it breaks their rules."
+
+## Slide 2 — The problem (40 sec, ~90 words)
 Title: Adoption is outpacing assurance
-Key message: Organizations are rolling out AI coding tools faster than they can answer whether those tools should be trusted.
-Points:
-- AI coding tools are spreading fast, but there is no dependable way to evaluate trustworthiness before rollout
-- Functional success is not enough — working code can still be insecure, out of scope, or unmaintainable
-- Every adopting organization faces the same question: "How do we know it's safe to deploy?"
-Speaker note: Open with *their* research, not our product — a consultant trusts their firm's numbers above all others. "AlixPartners' own 2026 predictions report found that AI accelerates software development by 20 to 30 percent — and that most enterprises fail to convert those gains. You called it the AI Productivity Paradox, and your prescription was trust infrastructure. Your Disruption Index calls agentic AI adoption the great divider. My work sits exactly in that gap: how does an organization know an AI coding tool is safe to deploy?" How I stumbled on it: dissertation research at Aston showed benchmarks measure whether AI *can* code — nothing measures whether a specific tool is *safe to adopt*. (Audience intelligence: docs/ALIX_PARTNERS_INTELLIGENCE.md.)
+Say: "Your firm's 2026 predictions report found AI accelerates software development twenty to thirty percent — and that most enterprises fail to convert the gains. Your prescription was trust infrastructure. My dissertation research at Aston found the missing piece: benchmarks measure whether AI *can* code. Nothing measures whether a specific tool is *safe to adopt* — whether working code is also secure, in scope, and maintainable. Every adopting organization faces the same question: how do we know it's safe to deploy? That's the problem I built for."
+Speaker note: This is the single AlixPartners citation in the talk — once is insight, four times is pandering. Let the slide bullets sit silently; don't read them.
 
-## Slide 2 — How we solve it (≈60 sec)
-Title: Same spec. Multiple tools. Human baseline. Five credibility checks.
-Key message: A controlled evaluation platform that tests AI coding tools against a fixed specification before adoption.
-Points:
-- One fixed, versioned YAML specification given identically to each AI tool — and to a human control baseline
-- An evaluation engine scores every output on five independent metrics
-- An executive dashboard turns technical evidence into an adoption decision
-- Three layers: evaluation engine → executive dashboard → deployment layer
-Speaker note: Stress the design, because the design *is* the answer to "why believe your numbers": nothing is compared unless it was produced under identical conditions. The human baseline is what turns tool scores into meaning — it is the comparator no benchmark has.
+## Slide 3 — How we solve it (55 sec, ~125 words)
+Title: Same spec. Multiple tools. Human reference. Five checks.
+Say: "The design is the answer to 'why believe your numbers.' One fixed specification — versioned, never modified mid-experiment — is given identically to each AI tool, and to a human reference who builds the same thing by hand. Nothing is compared unless it was produced under identical conditions. An evaluation engine then scores every output on five separately measured checks, and an executive dashboard turns that into an adoption decision. Three layers: the evaluation engine, the dashboard you'll see in a moment, and a deployment layer — command line, reproducible runs, exportable reports. The human reference is what turns tool scores into meaning: it's the comparator benchmarks don't have."
+Speaker note: For Paul: one analyzer file per metric, deterministic, version-pinnable. For Ollie: the five checks map onto governance criteria a client can adopt. Deliver these only if asked.
 
-## Slide 3 — The five levels of credibility check (≈60 sec)
-Title: Five independent gates for every output
-Key message: Credibility is not one score; it is five separate, independently measured checks.
-Points:
-1. Security — CWE-tagged vulnerability density per 1,000 lines (Bandit static analysis)
-2. Complexity — McCabe cyclomatic complexity (is the code maintainable?)
-3. Duplication — percentage of lines in repeated blocks
-4. Hallucination — features shipped that the specification never asked for (scope drift)
-5. Interaction dynamics — correction behaviour captured during the session
-Speaker note: This is the slide to slow down on — it is the direct answer to "what factors did you use to determine the credibility of your output, and how was it considered." Add the method-level layer verbally: every result ships with a provenance file tracing it to spec and analyzer versions, specs are versioned and never modified mid-experiment, and hallucination labels were validated with blind hand-labelling and Cohen's kappa. For Paul: each metric is one analyzer file, deterministic and version-pinnable. For Ollie: five gates translate directly into governance criteria a client can adopt.
+## Slide 4 — The five levels of credibility check (55 sec, ~125 words)
+Title: Five checks; each one flags risk
+Say: "Check one: security — industry-standard weakness categories per thousand lines, a raw finding density, deliberately not severity-weighted. Two: structural complexity — read alongside duplication, because denser isn't automatically worse. Three: duplication — how much of the output is repeated boilerplate, in any language. Four — the one nobody else measures — hallucination: features the tool shipped that the specification never asked for. And five: rework — the correction behaviour that separates human effort from agent output. Thresholds aren't hard-coded verdicts; they're client-configurable policy, and the dashboard ships sensible defaults. Every result carries provenance back to the exact spec and analyzer versions that produced it."
+Speaker note: This answers "what factors did you use to determine credibility of your output." Say "checks," never "gates" — there are no pass/fail constants in the instrument. Don't mention kappa here; it lives in Q&A with the honest "prepared, not collected" status.
 
-## Slide 4 — Outcome: I started with this, I have come to this (≈60 sec)
+## Slide 5 — The finding (50 sec, ~115 words — the beat of the talk)
+Title: "Do not build a pipeline." It built a pipeline.
+Say: "Here's the moment this stopped being an academic exercise. We gave a leading agent a command-line-tool specification. Six subcommands. A clean, contamination-checked workspace. And one explicit instruction: do not build a data pipeline. [pause] It built a data pipeline. We confirmed it by reading the code — the spec's subcommands aren't there; a pipeline runner is. And here is the part that matters to your clients: every functional test would have passed it. The wrong product, built well. Now picture that repo at a client: it passes CI, it ships, and six months later a security review asks who commissioned the streaming pipeline inside their command-line tool — and who signed it off."
+Speaker note: Slow down. The pause after "do not build a data pipeline" is the whole talk. Do NOT say "ten times out of ten" — the replications of that cell are replays of one captured session (Deviation 001); if asked about reproduction, use the prepared Q&A answer honestly. The contrast line if time allows: "The most disciplined tool shipped zero off-spec features across thirty live runs."
+
+## Slide 6 — Outcome: I started with this, I have come to this (45 sec, ~100 words)
 Title: From a YAML file to live evidence
-Key message: The journey itself is the proof the instrument works.
-Points:
-- Started with: a research question and one fixed specification
-- Now: a full working pipeline — spec → adapter per vendor → capture → five analyzers → CSV → live dashboard
-- Pilot: 3 of 5 conditions captured end-to-end on the identical task
-- Real findings: one tool shipped an off-spec `/health` endpoint and an unrequested test suite; a competitor stayed strictly in scope; a CWE-tagged security finding surfaced that functional tests would never catch
-- Human baseline captured: 52.8 corrections per 1,000 keystrokes
-Speaker note: Tell it as "I started here and I ended here." Include the honest middle: pilot data exposed two structurally biased analyzers, and I rewrote them — security moved from SonarCloud to local Bandit, hallucination detection gained an auto-derived manifest. Finding and fixing my own measurement flaws, and documenting them, is what makes the instrument credible rather than merely impressive.
+Say: "I started with a research question and one YAML file. Today: a completed, pre-registered study — the analysis plan was locked before any data existed — sixty-six captured tool sessions across four leading agents and three task domains, plus human reference sessions, each scored on all five checks. Two results carry the story. First, the finding you just saw. Second: no tool won on every check. Which tool to trust depends on the task — and the instrument shows which. Along the way it even caught its own blind spot: one tool scored a perfect zero on security, and the instrument flagged that zero as an artefact — the tool simply wrote almost none of the code our scanner reads — not a win."
+Speaker note: The self-audit beat in plain words — never say "denominator artefact" out loud. The honest-middle (analyzer rewrites) lives in Q&A, not here; it was cut for time.
 
-## Slide 5 — Demo (≈90 sec — live, screen-recorded backup ready)
+## Slide 7 — Demo (75 sec — live, screen-recorded backup ready)
 Title: Input → evaluation → evidence
-Key message: This is not a mock-up; the platform runs today.
-Demo script (matches supervisor guidance: land on the page, show the inputs, explain the flow, show the output):
-1. **Land on the dashboard** — "This is the platform."
-2. **Show the input** — the fixed YAML specification: six features, three governance rules, four guardrails.
-3. **Explain the flow** — "This spec goes in; each AI tool builds against it; the five analyzers score what comes out."
-4. **Show the output** — the comparison report: where each tool passed and failed the five credibility checks; point at the off-spec endpoint the instrument caught.
+Demo script (mentor's shape: land on page → inputs → flow → output):
+1. **Land on the dashboard** — "This is the platform, live."
+2. **Show the input** — "This is the specification: six features, three governance rules. This is everything every tool was told."
+3. **Explain the flow** — "The spec goes in, each tool builds against it, five analyzers score what comes out."
+4. **Show the output** — "And this is the evidence. Here's the hallucination check catching the pipeline nobody asked for. Here's duplication exposing one tool's copy-pasted boilerplate. And every number links back to the exact spec and analyzer version that produced it — that's the provenance."
 Live URL: https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human
-Speaker note: Rehearse to 90 seconds flat. If the live site misbehaves, switch to the recording without comment. Weave the five checks into the walkthrough rather than listing them again — "and here is where the hallucination gate caught the endpoint nobody asked for."
+Speaker note: Rehearse to 75 seconds flat. If the live site misbehaves, switch to the recording without comment.
 
-## Slide 6 — How this differs from what is already in the market (≈45 sec)
-Title: Why not just use what exists?
-Key message: Everything on the market scores code or measures productivity; nothing evaluates the tool itself, pre-adoption, against your own specification.
-Points:
-- SonarQube / static analysis: scores a codebase, not a tool; no controlled conditions, no spec alignment, no human baseline — we use static analyzers as instruments *inside* the experiment
-- Benchmarks (SWE-bench, HumanEval): public tasks and functional pass rates; blind to scope drift and governance, and never run on *your* spec
-- Post-adoption analytics (productivity dashboards, DORA metrics): measure impact after the risk has already been taken
-- Only this platform: pre-adoption, spec-anchored, human-baselined evaluation — and nothing else on the market measures hallucination as scope drift against a fixed specification
-Speaker note: This slide answers the supervisor's direct challenge: "if something is already available in the market, why would your product be used?" Keep it respectful — SonarQube is excellent at what it does; it simply answers a different question.
-
-## Slide 7 — Closing message (≈30 sec)
-Title: The trust layer for AI-assisted engineering
-Key message (deliver verbatim):
-"This is not another AI benchmark. It is a practical assurance platform for trusted AI-assisted engineering that helps organizations decide whether an AI coding tool is safe, governable, and worthy of adoption."
-Speaker note: Before the verbatim message, land the self-interest bridge in one sentence: "Your firm told the market that the winners will invest in trust infrastructure — this is what trust infrastructure for AI-assisted engineering looks like, when it really matters." Then deliver the message verbatim and stop talking. Leave the room in the Q&A.
+## Slide 8 — Differentiation + the ask (60 sec, ~135 words)
+Title: Why not just use what exists — and what I'm asking for
+Say: "Fair question: doesn't this exist? SonarQube scores a codebase — it can't compare tools under controlled conditions; we use static analyzers as instruments inside the experiment. Benchmarks like SWE-bench test public tasks for functional success — never your specification, and blind to scope drift. Post-adoption analytics measure impact after the risk is already taken. In our market scan we found no tool that measures scope drift against a fixed specification with a human reference. So my ask is one pilot: one engagement team, one specification written to a client's governance rules, four tools evaluated, results in six weeks. [pause] This is not another AI benchmark. It is a practical assurance platform for trusted AI-assisted engineering that helps organizations decide whether an AI coding tool is safe, governable, and worthy of adoption."
+Speaker note: The closing message is delivered verbatim, once, then stop talking. If a partner wants the hallway version afterwards: "Benchmarks measure whether AI can code. This measures whether you can trust it."
 
 ---
 
 ## Anticipated Q&A
-*Preparation principle from the supervisor: "When you see those outputs, what questions do you ask yourself? Those similar questions they will ask."*
+*Preparation principle from the mentor: "When you see those outputs, what questions do you ask yourself? Those similar questions they will ask." The full prepared answers live in docs/ONE_PAGE_DECK_OUTLINE.md §Anticipated Q&A — rehearse from there. The five that matter most:*
 
-**"Your sample size is one run per condition — how is that credible?"**
-It is a pilot, and I present it as one: it proves the instrument end-to-end, not the study. The main study runs K ≥ 5 sessions per condition under a power calculation derived from the pilot variances.
-
-**"Hallucination detection sounds like a heuristic — how do you trust it?"**
-The auto-derived manifest is a heuristic, and I validated it: blind hand-labelling with Cohen's kappa inter-rater reliability, and the pilot's flagged hallucination was manually confirmed as genuine scope drift. The production path forces each adapter to emit an explicit manifest.
-
-**"Why Bandit rather than SonarQube for security?"**
-A documented mid-pilot decision: the SonarCloud approach shared one numerator across conditions — structurally broken. Local Bandit gives per-condition isolation, determinism, and version-pinning. Narrower rule set, but reproducible — the right trade-off for an evidential instrument. SonarQube still runs in CI on the platform's own code.
-
-**"Two of your five conditions are missing."**
-A vendor-access constraint, not an instrument limitation: those tools have no public CLI. Replay adapters are built and unit-tested; both conditions will be captured from in-IDE sessions.
-
-**"Only Python is scored for complexity?"**
-A documented scope limitation of the MSc phase; the duplication metric is already language-agnostic, and the architecture (one analyzer per metric) makes language extension additive, not structural.
-
-**"How does this become a business?"**
-Three routes: partner-led evaluation programs (the Alix Partners opportunity — a repeatable offering consultants run for clients), enterprise pilots with client-specific specs, and self-serve CLI + dashboard for internal audit teams.
-
-**"What's in it for AlixPartners specifically?"**
-Three things. First, your own predictions report tells clients to invest 10–30% of budgets in trust infrastructure — this is that infrastructure made concrete, so it turns advice you already give into an engagement you can deliver. Second, your Disruption Index says lack of clarity blocks 39% of transformations — five explainable credibility checks are clarity a board can act on. Third, AlixPartners builds AI solutions for clients itself; this platform can gate the quality of your own AI-assisted delivery before a client ever sees it.
-
-**"What would it take to run this on our client's stack?"**
-A spec written against the client's governance rules, an adapter session per candidate tool, and the analyzers run unchanged. The spec is externalised by design — no code changes needed to evaluate a new task.
+1. **"Was the pipeline behaviour reproduced?"** — One controlled, contamination-checked session, confirmed by code inspection; the listed replications are replays (disclosed as Deviation 001). Live multi-session re-capture is the immediate next step. Never bluff this one — the honest answer is strong.
+2. **"Which agent?"** — Replit Agent, on the CLI task; the study is pre-registered and the dashboard public. The vendor isn't the point — any tool's priors can override a spec; the instrument catches when.
+3. **"Who was the human?"** — Me, disclosed as a single-developer reference point, not a comparison. Independent blinded participants are the stated next step.
+4. **"42 security findings per 1,000 lines?"** — Severity-unweighted Bandit finding density on Python only — not "42 exploitable vulnerabilities." Severity-weighted companion metric is the documented next step.
+5. **"Which tool should we buy?"** — Wrong question: no tool wins everywhere and the winner flips with the task. "Which tool for which task, under which governance gates" is what the instrument answers.
