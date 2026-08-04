@@ -31,6 +31,17 @@ METRIC_LOWER_BETTER = {
     "correction_freq": True,
 }
 
+# Calibrated interpretation for partner-facing charts.
+# These values are not arbitrary; they reflect the metric semantics in
+# docs/METRICS.md and the practical decision thresholds for enterprise use.
+METRIC_CALIBRATION = {
+    "security_density": {"ideal": 0.0, "warning": 50.0, "critical": 100.0},
+    "complexity_mean": {"ideal": 0.0, "warning": 3.0, "critical": 6.0},
+    "duplication_pct": {"ideal": 0.0, "warning": 5.0, "critical": 10.0},
+    "hallucinations": {"ideal": 0.0, "warning": 1.0, "critical": 3.0},
+    "correction_freq": {"ideal": 0.0, "warning": 10.0, "critical": 25.0},
+}
+
 # Short human descriptions surfaced in the UI.
 METRIC_BLURB = {
     "security_density": "OWASP/CWE-tagged Bandit findings per 1000 lines of Python (per-language density)",
@@ -38,6 +49,30 @@ METRIC_BLURB = {
     "duplication_pct":  "% of source lines inside a duplicated 6-line shingle",
     "hallucinations":   "Features shipped that were NOT in the spec",
     "correction_freq":  "Backspace + delete events per 1000 keystrokes",
+}
+
+# Explicit interpretation guidance for the charts and the adoption story.
+METRIC_GUIDANCE = {
+    "security_density": {
+        "axis": "Axis guidance: lower is better. Values at or below 50 are manageable; 50 to 100 is a warning band; above 100 is a clear governance concern.",
+        "adoption": "What this means for adoption: tools that produce frequent security issues should not be rolled out broadly without remediation and review.",
+    },
+    "complexity_mean": {
+        "axis": "Axis guidance: lower is better. Values at or below 3 are broadly sustainable; 3 to 6 signals rising maintainability risk; above 6 is likely to become brittle in production.",
+        "adoption": "What this means for adoption: code that is structurally complex is harder to maintain, review, and govern at scale.",
+    },
+    "duplication_pct": {
+        "axis": "Axis guidance: lower is better. Values at or below 5 are healthy; 5 to 10 suggests avoidable copy-and-paste debt; above 10 is a strong sign of maintainability problems.",
+        "adoption": "What this means for adoption: high duplication increases the chance of inconsistent fixes and makes long-term stewardship harder.",
+    },
+    "hallucinations": {
+        "axis": "Axis guidance: lower is better. Zero is ideal; 1 to 3 indicates scope drift and trust risk; above 3 is a serious control failure.",
+        "adoption": "What this means for adoption: a tool that ships features outside the spec creates procedural and compliance risk, even when it appears productive.",
+    },
+    "correction_freq": {
+        "axis": "Axis guidance: lower is better. Values at or below 10 are efficient; 10 to 25 indicates repeated editing effort; above 25 suggests a poor interaction loop for real-world use.",
+        "adoption": "What this means for adoption: high correction frequency points to friction that can erode developer trust and slow delivery.",
+    },
 }
 
 app = Flask(__name__)
@@ -124,17 +159,31 @@ def _load_report(run_id: str) -> dict:
     conditions = sorted({r["condition"] for r in rows})
     metrics = sorted(pivot)
 
-    # Per-metric normalization to [0, 1] where 1 = best.
+    # Calibrated scores from [0, 1] where 1 = best, based on metric-specific
+    # decision thresholds rather than a pure within-report min-max rescale.
     norm: dict[str, dict[str, float]] = {}
     for metric in metrics:
-        values = [pivot[metric].get(c, 0.0) for c in conditions]
-        vmin, vmax = min(values), max(values)
-        spread = (vmax - vmin) or 1.0
+        cfg = METRIC_CALIBRATION.get(metric, {"ideal": 0.0, "warning": 1.0, "critical": 2.0})
+        ideal = cfg["ideal"]
+        warning = cfg["warning"]
+        critical = cfg["critical"]
         norm[metric] = {}
         for c in conditions:
             v = pivot[metric].get(c, 0.0)
-            score = 1 - ((v - vmin) / spread) if METRIC_LOWER_BETTER.get(metric, True) \
-                else ((v - vmin) / spread)
+            if not METRIC_LOWER_BETTER.get(metric, True):
+                if v <= ideal:
+                    score = 1.0
+                elif v >= critical:
+                    score = 0.0
+                else:
+                    score = 1.0 - ((v - ideal) / (critical - ideal))
+            else:
+                if v <= ideal:
+                    score = 1.0
+                elif v >= critical:
+                    score = 0.0
+                else:
+                    score = max(0.0, 1.0 - ((v - ideal) / max(critical - ideal, 1e-6)))
             norm[metric][c] = round(score, 4)
 
     # Per-metric ranking (1 = best). Ties share a rank.
@@ -230,6 +279,7 @@ def _load_report(run_id: str) -> dict:
         "leaderboard": leaderboard,
         "units": units,
         "blurbs": METRIC_BLURB,
+        "metric_guidance": METRIC_GUIDANCE,
         "conditions": conditions,
         "metrics": metrics,
         "provenance": provenance,

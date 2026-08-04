@@ -47,5 +47,21 @@ def test_report_page_renders_table(client):
     assert "synthetic data" in body
 
 
+def test_report_page_exposes_view_mode_controls(client):
+    resp = client.get("/report/test_001")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Calibrated scores" in body
+    assert "Raw values" in body
+
+
+def test_report_page_shows_metric_guidance_and_adoption_summary(client):
+    resp = client.get("/report/test_001")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Axis guidance" in body
+    assert "What this means for adoption" in body
+
+
 def test_unknown_report_is_404(client):
     assert client.get("/report/does_not_exist").status_code == 404

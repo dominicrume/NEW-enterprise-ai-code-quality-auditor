@@ -46,6 +46,12 @@
       min-height: 100vh;
     }
     .wrap { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    .view-switch { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .view-switch button {
+      border: 1px solid var(--line); background: var(--bg-2); color: var(--text); padding: 0.5rem 0.8rem;
+      border-radius: 999px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+    }
+    .view-switch button.active { background: var(--accent-soft); border-color: rgba(124, 92, 255, 0.4); }
 
     /* ---------- NAV ---------- */
     .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
@@ -114,11 +120,22 @@
       padding: 1.75rem; margin-bottom: 1.25rem;
     }
     .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+    .summary-note { color: var(--muted); font-size: 0.82rem; line-height: 1.5; margin-top: 0.4rem; }
     .section h2 { font-size: 1.15rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
     .section .desc { color: var(--muted); font-size: 0.85rem; max-width: 50ch; }
 
     .two-col { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem; }
-    @media (max-width: 880px) { .two-col { grid-template-columns: 1fr; } }
+    @media (max-width: 980px) { .two-col { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) {
+      .wrap { padding: 1rem 0.9rem 2.5rem; }
+      .nav { align-items: flex-start; }
+      .header h1 { font-size: 1.65rem; }
+      .section { padding: 1.2rem; }
+      .hero-grid { grid-template-columns: 1fr; }
+      .stat-value { font-size: 1.3rem; }
+      .lb-row { grid-template-columns: 28px 1fr; gap: 0.65rem; }
+      .lb-stat, .lb-wins { grid-column: 2; }
+    }
 
     /* ---------- LEADERBOARD ---------- */
     .lb-row {
@@ -158,6 +175,9 @@
       font-size: 0.9rem; line-height: 1.55; color: var(--muted);
     }
     .definition h4 { color: var(--text); font-size: 0.85rem; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+    .guidance-block { margin-top: 0.7rem; padding: 0.8rem 0.9rem; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,0.02); }
+    .guidance-title { color: var(--text); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .guidance-copy { color: var(--muted); font-size: 0.84rem; line-height: 1.45; }
     .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.88rem; }
     .data-table th, .data-table td { padding: 0.55rem 0.75rem; text-align: right; border-bottom: 1px solid var(--line); }
     .data-table th:first-child, .data-table td:first-child { text-align: left; }
@@ -234,6 +254,10 @@
         </div>
         {% endfor %}
       </div>
+      <div class="view-switch" aria-label="comparison view switch">
+        <button type="button" class="active" data-view="normalized">Calibrated scores</button>
+        <button type="button" data-view="raw">Raw values</button>
+      </div>
     </div>
 
     <!-- ===== HERO STATS ===== -->
@@ -258,9 +282,10 @@
     <div class="two-col">
       <div class="section">
         <div class="section-head">
-          <h2>Normalised comparison</h2>
-          <div class="desc">Each axis is one metric, rescaled so 1.0 is the best in this report.</div>
+          <h2>Comparison view</h2>
+          <div class="desc">Use the toggle to switch between calibrated scores and raw metric values. Calibrated scores are anchored to practical thresholds for each metric; raw values preserve the underlying measurement scale.</div>
         </div>
+        <div class="summary-note">Interpretation note: calibrated scores make the chart more useful for partners because they reflect the metric semantics and risk bands, rather than rescaling the results only within this report.</div>
         <div id="radar" class="chart chart-tall"></div>
       </div>
 
@@ -290,7 +315,7 @@
     <div class="section">
       <div class="section-head">
         <h2>Heatmap</h2>
-        <div class="desc">Green = best for that metric, red = worst. Normalised per row.</div>
+        <div class="desc">Green = best for that metric, red = worst. Calibrated per row.</div>
       </div>
       <div id="heatmap" class="chart chart-tall"></div>
     </div>
@@ -319,6 +344,14 @@
               <br><br>
               <span style="color: var(--dim);">Unit:</span> {{ units[m] or '—' }}
               · <span style="color: var(--dim);">Lower is better</span>
+              <div class="guidance-block">
+                <div class="guidance-title">Axis guidance</div>
+                <div class="guidance-copy">{{ metric_guidance[m].axis }}</div>
+              </div>
+              <div class="guidance-block">
+                <div class="guidance-title">What this means for adoption</div>
+                <div class="guidance-copy">{{ metric_guidance[m].adoption }}</div>
+              </div>
             </div>
             <table class="data-table">
               <thead><tr><th>Condition</th><th>Value</th><th>Rank</th></tr></thead>
@@ -357,6 +390,7 @@
     const CONDITIONS = {{ conditions | tojson }};
     const METRICS    = {{ metrics | tojson }};
     const UNITS      = {{ units | tojson }};
+    let currentView = 'normalized';
 
     const colorFor = (c) => getComputedStyle(document.documentElement).getPropertyValue('--c-' + c).trim() || '#888';
     const PLOT_FONT = { family: 'Inter, sans-serif', color: '#e6e8ef', size: 12 };
@@ -376,9 +410,10 @@
     // Radar chart
     // ============================================================
     function renderRadar() {
+      const values = currentView === 'normalized' ? NORM : PIVOT;
       const traces = CONDITIONS.filter(c => activeConditions.has(c)).map(c => ({
         type: 'scatterpolar',
-        r: METRICS.map(m => NORM[m][c]).concat([NORM[METRICS[0]][c]]),
+        r: METRICS.map(m => values[m][c]).concat([values[METRICS[0]][c]]),
         theta: METRICS.concat([METRICS[0]]),
         fill: 'toself',
         name: c,
@@ -386,11 +421,12 @@
         fillcolor: colorFor(c) + '22',
         hovertemplate: '<b>' + c + '</b><br>%{theta}: %{r:.2f}<extra></extra>'
       }));
+      const radialRange = currentView === 'normalized' ? [0, 1] : undefined;
       Plotly.newPlot('radar', traces, {
         ...PLOT_LAYOUT_BASE,
         polar: {
           bgcolor: 'transparent',
-          radialaxis: { visible: true, range: [0, 1], gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#8b91a4', size: 10 } },
+          radialaxis: { visible: true, range: radialRange, gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#8b91a4', size: 10 } },
           angularaxis: { gridcolor: 'rgba(255,255,255,0.07)', linecolor: 'rgba(255,255,255,0.15)', tickfont: { color: '#e6e8ef', size: 11 } },
         },
         showlegend: false,
@@ -403,7 +439,8 @@
     // ============================================================
     function renderHeatmap() {
       const visible = CONDITIONS.filter(c => activeConditions.has(c));
-      const z = METRICS.map(m => visible.map(c => NORM[m][c]));
+      const values = currentView === 'normalized' ? NORM : PIVOT;
+      const z = METRICS.map(m => visible.map(c => values[m][c]));
       Plotly.newPlot('heatmap', [{
         type: 'heatmap',
         x: visible, y: METRICS, z: z,
@@ -428,13 +465,14 @@
     function renderBars() {
       METRICS.forEach(m => {
         const visible = CONDITIONS.filter(c => activeConditions.has(c));
+        const values = currentView === 'normalized' ? NORM : PIVOT;
         const colors = visible.map(c => colorFor(c));
         Plotly.newPlot('bar-' + m, [{
           type: 'bar',
           x: visible,
-          y: visible.map(c => PIVOT[m][c]),
+          y: visible.map(c => values[m][c]),
           marker: { color: colors, line: { width: 0 } },
-          text: visible.map(c => PIVOT[m][c].toFixed(2)),
+          text: visible.map(c => values[m][c].toFixed(2)),
           textposition: 'outside',
           textfont: { color: '#e6e8ef' },
           hovertemplate: '<b>%{x}</b><br>' + m + ': %{y:.3f} ' + (UNITS[m] || '') + '<extra></extra>'
@@ -467,6 +505,17 @@
           activeConditions.add(c);
           chip.dataset.active = 'true';
         }
+        renderAll();
+      });
+    });
+
+    // ============================================================
+    // View toggles
+    // ============================================================
+    document.querySelectorAll('.view-switch button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentView = btn.dataset.view;
+        document.querySelectorAll('.view-switch button').forEach(b => b.classList.toggle('active', b === btn));
         renderAll();
       });
     });
