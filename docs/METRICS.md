@@ -3,29 +3,23 @@
 Each metric lives in its own analyzer file. This document is the contract.
 
 ## 1. Security vulnerability density
-- **Definition:** count of OWASP/CWE-flagged issues normalised per 1000 LOC.
-- **Tool:** SonarQube (server URL and token from `.env` —
-  `SONARQUBE_URL`, `SONARQUBE_TOKEN`). Wired in
-  `analyzers/security_analyzer.py`.
-- **Rule sets counted:** issues returned by SonarQube's
-  `/api/issues/search` for the audited project where:
-  - `type ∈ {VULNERABILITY, SECURITY_HOTSPOT}` — these are the two
-    SonarQube issue types that map to OWASP/CWE-relevant findings;
-    `BUG` and `CODE_SMELL` are intentionally excluded as they belong
-    to the complexity / duplication metrics.
-  - All severities are counted equally (BLOCKER, CRITICAL, MAJOR,
-    MINOR, INFO each contribute 1). The metric is a count, not a
-    severity-weighted score; severity weighting would conflate the
-    independent variable with the dependent variable.
-  - Only issues with at least one OWASP/CWE tag (any tag matching
-    `cwe`, `cwe-*`, `owasp-a*`, `owasp-top10-*`) are included. This
-    is what makes the count an *OWASP/CWE density*, not a generic
-    SonarQube issue density.
-  - Status `OPEN`, `CONFIRMED`, or `REOPENED` only — `RESOLVED` and
-    `CLOSED` issues are excluded.
-- **Project key:** `spec["sonar_project_key"]` if present, else
-  `spec["name"]`. This is what lets the same analyzer score five
-  different uploads of the same spec.
+- **Definition:** count of CWE-tagged Bandit findings normalised per 1000
+  lines of Python. This is a **per-language density** (Bandit scans Python
+  only), and it is **severity-unweighted** — every finding contributes 1
+  regardless of severity, because severity weighting would conflate the
+  independent variable with the dependent variable. It is not a
+  whole-project security score; a total-CWE companion metric is the
+  documented extension (dissertation §6.4).
+- **Tool:** local `bandit -r -f json` over the captured codebase, wired in
+  `analyzers/security_analyzer.py`. Only findings with a non-null
+  `issue_cwe.id` are counted (preserving the OWASP/CWE framing).
+- **History:** the original design queried SonarQube/SonarCloud
+  (`SONARQUBE_URL`/`SONARQUBE_TOKEN` in `.env`). It was abandoned during
+  the pilot because per-project scoping shared one numerator across
+  conditions while denominators varied, producing artefactually large
+  per-kLOC figures — see PILOT_RESULTS.md §4.1. Local Bandit scoping
+  restores per-condition isolation, determinism, and version-pinning.
+  SonarQube remains in CI for the host repo's own quality signal only.
 - **Output:** `MetricScore(name="security_density", value=float, unit="per_kloc")`.
 
 ## 2. Cyclomatic complexity
@@ -64,7 +58,15 @@ Each metric lives in its own analyzer file. This document is the contract.
 - **Method:** parse the spec features (`spec["features"][*]["id"]`), parse
   the codebase manifest (`codebase["manifest"]`), compute set-difference
   `manifest \ spec`. Each adapter is responsible for producing an accurate
-  manifest (see docs/METHODOLOGY.md capture contract).
+  manifest (see docs/METHODOLOGY.md capture contract). When an adapter emits
+  no manifest (the agentic conditions), the analyzer falls back to an
+  auto-derived manifest from `analyzers/manifest_deriver.py`, which scans the
+  produced code for token evidence of each spec feature plus off-spec web
+  routes and CLI subcommands (the CLI-subcommand detector was added in
+  response to the main-study Replit observation and is logged as analytical
+  note 001 in PROTOCOL_DEVIATIONS.md). The heuristic is exploratory pending
+  blind hand-label validation (Cohen's κ, dissertation §4.7); headline
+  findings are additionally confirmed by direct code inspection.
 - **Output:** `MetricScore(name="hallucinations", value=float, unit="count")`.
 
 ## 5. Keystroke dynamics (correction frequency)
