@@ -240,11 +240,11 @@
 
     <!-- ===== HEADER ===== -->
     <div class="header">
-      <h1>Five-condition comparison</h1>
+      <h1>Assurance overview</h1>
       <div class="sub">
-        Spec: <strong>{{ provenance.spec if provenance and provenance.spec else 'unknown' }}</strong>
+        Spec set: <strong>{{ spec_summary }}</strong>
         · {{ metrics | length }} metrics × {{ conditions | length }} conditions
-        · click a condition to filter all charts
+        · A concise view of assurance posture for governance and rollout decisions
       </div>
       <div class="chip-row" id="condition-chips">
         {% for c in conditions %}
@@ -270,8 +270,8 @@
           <span class="stat-unit">{{ s.unit }}</span>
         </div>
         <div class="stat-sub">
-          Best: <b>{{ s.best_condition }}</b><br>
-          Worst: {{ s.worst_condition }} ({{ '%.2f' % s.worst_value }})
+          Best observed posture: <b>{{ s.best_condition }}</b><br>
+          Most challenging posture: {{ s.worst_condition }} ({{ '%.2f' % s.worst_value }})
         </div>
         <div class="stat-blurb">{{ s.blurb }}</div>
       </div>
@@ -282,20 +282,18 @@
     <div class="two-col">
       <div class="section">
         <div class="section-head">
-          <h2>Comparison view</h2>
-          <div class="desc">Use the toggle to switch between calibrated scores and raw metric values. Calibrated scores are anchored to practical thresholds for each metric; raw values preserve the underlying measurement scale.</div>
+          <h2>Assurance view</h2>
+          <div class="desc">Use the toggle to move between calibrated assurance scores and raw values. Calibrated scores are framed around practical decision thresholds; raw values preserve the underlying measurement scale.</div>
         </div>
-        <div class="summary-note">Interpretation note: calibrated scores make the chart more useful for partners because they reflect the metric semantics and risk bands, rather than rescaling the results only within this report.</div>
+        <div class="summary-note">This view is designed to support adoption decisions and governance conversations, not to replace expert judgment.</div>
         <div id="radar" class="chart chart-tall"></div>
       </div>
 
       <div class="section">
         <div class="section-head">
-          <h2>Leaderboard</h2>
-          <div class="desc">Composite of per-metric ranks (lower is better).
-          <strong>Illustrative only</strong> — a naïve rank-sum that does not
-          weight metrics or account for the human baseline's spec-minimal style;
-          the authoritative analysis is in the dissertation, Chapter 4.</div>
+          <h2>Adoption ranking</h2>
+          <div class="desc">A directional view of relative assurance posture.
+          <strong>Illustrative only</strong> — this is not a weighted procurement score and should be read alongside the metric guidance below.</div>
         </div>
         {% for row in leaderboard %}
         <div class="lb-row" data-rank="{{ row.overall_rank }}">
@@ -314,8 +312,8 @@
     <!-- ===== HEATMAP ===== -->
     <div class="section">
       <div class="section-head">
-        <h2>Heatmap</h2>
-        <div class="desc">Green = best for that metric, red = worst. Calibrated per row.</div>
+        <h2>Assurance heatmap</h2>
+        <div class="desc">Green indicates stronger assurance posture; red highlights areas that warrant attention.</div>
       </div>
       <div id="heatmap" class="chart chart-tall"></div>
     </div>
@@ -323,8 +321,8 @@
     <!-- ===== PER-METRIC ===== -->
     <div class="section">
       <div class="section-head">
-        <h2>Per-metric drill-down</h2>
-        <div class="desc">Click a tab to inspect one metric.</div>
+        <h2>Metric assurance review</h2>
+        <div class="desc">Select a metric to review the signal, the threshold guidance, and the implication for rollout.</div>
       </div>
       <div class="tabs" id="tabs">
         {% for m in metrics %}
@@ -345,11 +343,11 @@
               <span style="color: var(--dim);">Unit:</span> {{ units[m] or '—' }}
               · <span style="color: var(--dim);">Lower is better</span>
               <div class="guidance-block">
-                <div class="guidance-title">Axis guidance</div>
+                <div class="guidance-title">Decision guidance</div>
                 <div class="guidance-copy">{{ metric_guidance[m].axis }}</div>
               </div>
               <div class="guidance-block">
-                <div class="guidance-title">What this means for adoption</div>
+                <div class="guidance-title">Adoption implication</div>
                 <div class="guidance-copy">{{ metric_guidance[m].adoption }}</div>
               </div>
             </div>

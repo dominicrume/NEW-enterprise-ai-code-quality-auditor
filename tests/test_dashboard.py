@@ -21,7 +21,10 @@ def client(tmp_path, monkeypatch):
     with open(reports / "test_001.csv", "w", newline="") as f:
         csv.writer(f).writerows(rows)
     (reports / "test_001.provenance.json").write_text(json.dumps({
-        "kind": "pilot", "warning": "synthetic data", "is_dissertation_result": False,
+        "kind": "pilot",
+        "warning": "synthetic data",
+        "is_dissertation_result": False,
+        "spec_files": ["specs/synthetic_spec.yaml"],
     }))
     monkeypatch.setattr(dashboard_app, "REPORTS_DIR", reports)
     dashboard_app.app.config["TESTING"] = True
@@ -55,12 +58,19 @@ def test_report_page_exposes_view_mode_controls(client):
     assert "Raw values" in body
 
 
+def test_report_page_surfaces_provenance_spec_summary(client):
+    resp = client.get("/report/test_001")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert "Spec set" in body
+
+
 def test_report_page_shows_metric_guidance_and_adoption_summary(client):
     resp = client.get("/report/test_001")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
-    assert "Axis guidance" in body
-    assert "What this means for adoption" in body
+    assert "Decision guidance" in body
+    assert "Adoption implication" in body
 
 
 def test_unknown_report_is_404(client):

@@ -44,38 +44,55 @@ METRIC_CALIBRATION = {
 
 # Short human descriptions surfaced in the UI.
 METRIC_BLURB = {
-    "security_density": "OWASP/CWE-tagged Bandit findings per 1000 lines of Python (per-language density)",
-    "complexity_mean":  "Mean McCabe cyclomatic complexity per function (radon)",
-    "duplication_pct":  "% of source lines inside a duplicated 6-line shingle",
-    "hallucinations":   "Features shipped that were NOT in the spec",
-    "correction_freq":  "Backspace + delete events per 1000 keystrokes",
+    "security_density": "Security findings per 1,000 lines of Python, expressed as a governance-relevant density signal.",
+    "complexity_mean":  "Average structural complexity per function, indicating how maintainable the code is likely to be.",
+    "duplication_pct":  "Share of code that appears in repeated 6-line patterns, signalling maintainability debt.",
+    "hallucinations":   "Features implemented outside the approved specification, creating delivery and compliance risk.",
+    "correction_freq":  "Frequency of corrective edits during the session, indicating how much rework the workflow required.",
 }
 
 # Explicit interpretation guidance for the charts and the adoption story.
 METRIC_GUIDANCE = {
     "security_density": {
-        "axis": "Axis guidance: lower is better. Values at or below 50 are manageable; 50 to 100 is a warning band; above 100 is a clear governance concern.",
-        "adoption": "What this means for adoption: tools that produce frequent security issues should not be rolled out broadly without remediation and review.",
+        "axis": "Decision guidance: lower is better. Values at or below 50 are manageable; 50 to 100 signals rising governance risk; above 100 is a clear concern.",
+        "adoption": "Adoption implication: tools that produce frequent security issues should not be rolled out broadly without remediation and review.",
     },
     "complexity_mean": {
-        "axis": "Axis guidance: lower is better. Values at or below 3 are broadly sustainable; 3 to 6 signals rising maintainability risk; above 6 is likely to become brittle in production.",
-        "adoption": "What this means for adoption: code that is structurally complex is harder to maintain, review, and govern at scale.",
+        "axis": "Decision guidance: lower is better. Values at or below 3 are broadly sustainable; 3 to 6 signals rising maintainability risk; above 6 is likely to become brittle in production.",
+        "adoption": "Adoption implication: code that is structurally complex is harder to maintain, review, and govern at scale.",
     },
     "duplication_pct": {
-        "axis": "Axis guidance: lower is better. Values at or below 5 are healthy; 5 to 10 suggests avoidable copy-and-paste debt; above 10 is a strong sign of maintainability problems.",
-        "adoption": "What this means for adoption: high duplication increases the chance of inconsistent fixes and makes long-term stewardship harder.",
+        "axis": "Decision guidance: lower is better. Values at or below 5 are healthy; 5 to 10 suggests avoidable copy-and-paste debt; above 10 is a strong sign of maintainability problems.",
+        "adoption": "Adoption implication: high duplication increases the chance of inconsistent fixes and makes long-term stewardship harder.",
     },
     "hallucinations": {
-        "axis": "Axis guidance: lower is better. Zero is ideal; 1 to 3 indicates scope drift and trust risk; above 3 is a serious control failure.",
-        "adoption": "What this means for adoption: a tool that ships features outside the spec creates procedural and compliance risk, even when it appears productive.",
+        "axis": "Decision guidance: lower is better. Zero is ideal; 1 to 3 indicates scope drift and trust risk; above 3 is a serious control failure.",
+        "adoption": "Adoption implication: a tool that ships features outside the spec creates procedural and compliance risk, even when it appears productive.",
     },
     "correction_freq": {
-        "axis": "Axis guidance: lower is better. Values at or below 10 are efficient; 10 to 25 indicates repeated editing effort; above 25 suggests a poor interaction loop for real-world use.",
-        "adoption": "What this means for adoption: high correction frequency points to friction that can erode developer trust and slow delivery.",
+        "axis": "Decision guidance: lower is better. Values at or below 10 are efficient; 10 to 25 indicates repeated editing effort; above 25 suggests a poor interaction loop for real-world use.",
+        "adoption": "Adoption implication: high correction frequency points to friction that can erode developer trust and slow delivery.",
     },
 }
 
 app = Flask(__name__)
+
+
+def _describe_spec_context(provenance: dict | None) -> str:
+    """Return a compact, human-readable spec summary for the report header."""
+    if not provenance:
+        return "unknown"
+    if provenance.get("spec"):
+        return provenance["spec"]
+    spec_files = provenance.get("spec_files") or []
+    if not spec_files:
+        return "unknown"
+    cleaned = [Path(item).stem.replace("_", " ") for item in spec_files if item]
+    if len(cleaned) == 1:
+        return cleaned[0]
+    if len(cleaned) <= 3:
+        return ", ".join(cleaned)
+    return f"{len(cleaned)} spec files"
 
 
 def _is_multi_condition_report(csv_path: Path) -> bool:
@@ -238,6 +255,7 @@ def _load_report(run_id: str) -> dict:
 
     prov_path = REPORTS_DIR / f"{run_id}.provenance.json"
     provenance = json.loads(prov_path.read_text()) if prov_path.exists() else None
+    spec_summary = _describe_spec_context(provenance)
 
     # Auto-classify pilot vs dissertation per protocol §4: dissertation
     # threshold is N >= 5 reps per condition. Computed from the CSV itself,
@@ -283,6 +301,7 @@ def _load_report(run_id: str) -> dict:
         "conditions": conditions,
         "metrics": metrics,
         "provenance": provenance,
+        "spec_summary": spec_summary,
         "banner_kind": banner_kind,
         "banner_text": banner_text,
         "reps_per_condition": reps_per_condition,
