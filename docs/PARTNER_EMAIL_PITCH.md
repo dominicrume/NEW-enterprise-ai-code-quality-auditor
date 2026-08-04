@@ -12,7 +12,7 @@ In a controlled study, we gave a leading AI coding agent a simple command-line-t
 
 That is what my platform catches. It is due diligence for AI coding tools: before an organization adopts one, we run it against their own specification — alongside a human reference — and show exactly where it breaks their rules, across five checks: security, complexity, duplication, off-spec features, and rework. The study behind it was pre-registered (analysis plan locked before any data existed): 66 captured tool sessions across four leading agents and three task domains, each scored on all five checks. No tool won on every check — which tool to trust depends on the task, and we can show which.
 
-Live results, clickable now:
+The tooling is already public — `pip install ai-code-quality-auditor`, ~1,600 PyPI downloads since May — and the results are live, clickable now:
 https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human
 
 In our session I'll walk the story and a live demo in about seven minutes, then take questions. My ask afterwards is one pilot: one engagement team, one specification written to a client's governance rules, four tools evaluated — results in six weeks.

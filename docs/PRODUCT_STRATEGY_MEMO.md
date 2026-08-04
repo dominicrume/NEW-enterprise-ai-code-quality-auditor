@@ -60,7 +60,7 @@ Primary: engineering leaders, AI adoption/governance teams, risk stakeholders, a
 ### 7. Commercial routes
 - **Partner-led evaluation programs** — the immediate Alix Partners opportunity, positioned in their own published language (see docs/ALIX_PARTNERS_INTELLIGENCE.md): their 2026 predictions report tells clients to invest in *trust infrastructure* (10–15% of budgets, rising to 20–30% by 2027) to escape the "AI Productivity Paradox" (20–30% dev acceleration that fails to convert to ROI). This platform is that trust infrastructure made concrete — a repeatable, billable evaluation their consultants can run for clients making adoption decisions. Delivery reality, stated up front: ~2 days to write a client spec, one recorded session per candidate tool, analyzers unattended; the platform is a validated prototype, and a pilot is how productization gets scoped. The internal-QA angle (they build with Claude for clients) is raised in the room as a question, never asserted in writing.
 - **Enterprise pilots** — custom specs reflecting a client's own governance rules.
-- **Self-serve** — CLI and dashboard for engineering teams running internal audits.
+- **Self-serve** — CLI and dashboard for engineering teams running internal audits. Early distribution signal is already real: `ai-code-quality-auditor` on PyPI (MIT, released May 2026) has ~1,600 downloads, ≈250 in the past 30 days — read as packaging traction, not adoption (raw pip counts include CI traffic).
 
 ### 8. Roadmap priorities
 Short term: presentation-ready demo (live + screen-recorded backup), live multi-session re-capture of the two IDE-bound vendors (closing the replay limitation), hallucination inter-rater validation (Cohen's kappa), independent blinded human reference sessions.

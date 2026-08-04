@@ -41,6 +41,7 @@ Due diligence for AI coding tools
 **Now:** a completed pre-registered study (analysis plan locked before any data) and a live platform.
 - 66 captured tool sessions — four leading agents × three task domains — plus human reference sessions, each scored on all five checks
 - No tool won every check; which tool to trust **depends on the task** — and we can show which
+- Shipped and public: `pip install ai-code-quality-auditor` — ~1.6k PyPI downloads since the May release
 - Every result carries provenance back to spec and analyzer versions
 
 ## Slide 7 — Demo (75 sec — live, with screen-recorded backup)
@@ -75,3 +76,4 @@ Hallway version: benchmarks measure whether AI can code; this measures whether y
 - **"What doesn't this cover?"** Data residency, licensing/IP contamination, vendor risk, seat cost — the checks procurement already runs. We measure output trustworthiness; we slot alongside those checks, not instead of them.
 - **"So which tool should we buy?"** The wrong question — no tool wins everywhere, and which tool wins flips with the task. The right question is "which tool for which task, under which governance gates" — precisely what this instrument answers. That's why it's an advisory asset, not a leaderboard.
 - **"How does this become a business?"** One evaluation today: ~2 days to write the client spec, one recorded session per candidate tool, analyzers run unattended. The platform is a validated prototype; the pilot is how we jointly scope productization. IP sits with the research programme — a conversation I'd want to follow a successful pilot, not precede it.
+- **"Are those PyPI downloads real users?"** Honest answer: raw pip counts include CI and mirror traffic, so I read ~1,600 total (≈250/month) as a distribution signal, not an adoption count. Adoption evidence is the pilot path and the dashboard waitlist — the download curve just says the packaging works and people are pulling it.

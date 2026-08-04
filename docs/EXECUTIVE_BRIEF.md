@@ -38,6 +38,7 @@ Every claim below is backed by a completed, pre-registered study — the analysi
 ### 4. The outcome — where we started, where we are
 - **Started with:** a research question and a YAML spec.
 - **Now have:** a completed pre-registered study, a full dissertation, and a deployed end-to-end pipeline (spec → adapter → capture → five analyzers → CSV → live dashboard). The commercially decisive result: **no tool wins on every check** — adoption should be profile-based selection per task type, not a leaderboard.
+- **Already distributed:** the instrument ships as a public CLI — `pip install ai-code-quality-auditor` (MIT-licensed, on PyPI) — with ~1,600 downloads since its May release, ≈250 in the past 30 days. Read honestly: raw pip counts include CI traffic, so this is a distribution signal, not a user count.
 - **Honest delivery picture.** One evaluation today: ~2 days to write a client spec, one recorded session per candidate tool, analyzers run unattended. The platform is a validated prototype, not a product; a pilot is how productization gets scoped. The human reference is currently single-developer, author-executed (disclosed as a reference point, not a comparison); independent blinded participants, live re-capture of the IDE-bound vendors, and hallucination inter-rater validation (Cohen's kappa, protocol prepared) are the stated next steps.
 
 ### 5. How this differs from what is already in the market
