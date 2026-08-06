@@ -3,8 +3,19 @@
 **MSc Artificial Intelligence — Dissertation**
 **Aston University · Project JBKS1**
 **Supervisors: Julien Barney and Kate Sugden**
-**Author: Dominic Rume**
+**Author: Dominic Orume Uririe**
 **Submission: August 2026**
+
+> ⚠️ **REGISTRY CHECK (delete before submission).** The name above is set to
+> **Dominic Orume Uririe** and the degree title to **MSc Artificial
+> Intelligence**, and both are used consistently throughout this document and
+> the Declaration. Earlier drafts variously carried "Dominic Rume" and "MSc
+> Artificial Intelligence and Business Strategy". **Verify both strings
+> character-for-character against your Aston enrolment record before
+> submitting** — this is what is printed on the degree certificate, and only
+> the registry record is authoritative. If the enrolled programme title is in
+> fact "MSc Artificial Intelligence and Business Strategy", change it in three
+> places: this title page, the Declaration, and §1.5 Research context.
 
 > ⚠️ **PRE-SUBMISSION NOTICE (delete before submission).** This is a complete
 > full draft generated from the project's real captured data
@@ -13,14 +24,34 @@
 > ✅ (1) All 26 references verified against original sources (arXiv, ACM DL,
 > publisher/DOI records); one author-order correction applied (Ziegler et al.
 > 2022) and minor completeness details added. ✅ (2) Acknowledgements written.
-> ✅ (3) Title page confirmed (supervisors Julien Barney and Kate Sugden;
-> submission date August 2026). **Remaining — requires you:** (a) confirm the
-> Harvard citation variant and formatting against the Aston marking rubric;
-> (b) confirm the word-count rule (whether abstract, references, tables and
-> appendices count toward the ~12,000-word target — main text is ~11,200 words)
-> and trim or extend accordingly; (c) the Cohen's κ validation (§4.7 / §5.4)
-> is reported as *planned* because hand-labels were not collected — do not
-> re-insert a κ figure unless you complete that labelling.
+> ✅ (3) Title page dated August 2026 (supervisors Julien Barney and Kate
+> Sugden). ✅ (4) All four listed tables and both figures are now captioned and
+> cross-referenced in text (§4.2, §4.4, §4.5, §4.6). ✅ (5) Cohen (1988) is now
+> cited at §3.6. ✅ (6) §4.5 rewritten after an adversarial re-analysis of
+> `main_001.csv` established that the previously reported omnibus statistics
+> were pseudoreplicated; see the note below.
+>
+> **Remaining — requires you:** (a) verify the author name and programme title
+> against your Aston enrolment record (see the registry note under the title);
+> (b) confirm the Harvard citation variant against the marking rubric;
+> (c) **check the word count in Word against the actual limit** — this draft is
+> ≈12,500 words of main text including tables (≈12,350 excluding them),
+> ≈13,780 for the whole file; if the limit is a hard 12,000 for main text you
+> need to cut ≈500 words, and §5.1/§5.5 are the least load-bearing candidates;
+> (d) the Cohen's κ validation (§4.7 / §5.4) is reported as *planned* because
+> hand-labels were not collected — do not re-insert a κ figure unless you
+> complete that labelling.
+>
+> **On the §4.5 rewrite.** The two IDE-bound conditions were captured once per
+> cell and replayed ten times (Deviation 001). The previous §4.5 tested all four
+> conditions at the nominal N = 30, which treated nine copies of each captured
+> session as independent observations. Re-analysis confirms the effect: at the
+> honest unit of analysis no omnibus test survives (all *p* > 0.08), while the
+> two genuinely live conditions do differ significantly on duplication
+> (*p* = 0.003) and complexity (*p* = 0.005). §4.5 now reports all three levels
+> of analysis and confines inference to what the design supports. This is a
+> **strengthening** change: an examiner who spotted the pseudoreplication in the
+> old version would have questioned the whole results chapter.
 
 ---
 
@@ -55,15 +86,20 @@ Across 600 metric observations from the four agentic conditions
 (four conditions × three specifications × ten replications × five metrics;
 the two IDE-bound conditions were captured once per cell and replayed,
 so their cells are effective singletons — Deviation 001),
-four of five metrics differ significantly between tools (Kruskal–Wallis,
-α = 0.01 Bonferroni), with effect sizes ranging from medium (complexity,
-η² = 0.10) to very large (duplication, η² = 0.50); given the replay design,
-these tests are read as supporting the large descriptive gaps rather than as
-fully independent inference. Every testable metric
-shows a significant condition-by-specification interaction, establishing that
-tool quality is **task-dependent**: the defensible claim is not "tool *X* is
-better than tool *Y*" but "tool *X* is better than tool *Y* *for this task
-type*". The single most consequential finding is a measured
+the analysis is deliberately stratified by what the design can support. Between
+the two conditions captured live with genuine replication, Claude Code produces
+significantly less duplicated code (*p* = 0.003) and significantly more
+control-flow-dense code (*p* = 0.005) than Cursor Agent under Bonferroni
+correction. The four-condition comparison, by contrast, is reported as
+**descriptive**: once the replayed cells are collapsed to their effective sample
+size, no omnibus test reaches significance, and the condition-by-specification
+interaction statistics reported in an earlier draft are withdrawn as undefined
+on this design. The descriptive gaps are nonetheless large and mechanistically
+explained — duplication spans 0.00% to 9.56% and off-spec features 0.00 to 1.00
+per run — and the per-specification pattern shows that no vendor's behaviour is
+constant across task domains: the defensible claim is not "tool *X* is
+better than tool *Y*" but "tool *X* behaved better than tool *Y* *on this task
+type, in these captures*". The single most consequential finding is a measured
 **architectural-prior dominance**: given a CLI specification under a clean,
 contamination-checked workspace with an explicit instruction prohibiting
 pipeline output, Replit Agent shipped a data-pipeline application rather than
@@ -116,7 +152,8 @@ sharpened every chapter. Any errors that remain are my own.
 **List of Tables**
 - Table 4.1 Headline cross-vendor comparison (means over N = 30 per condition)
 - Table 4.2 Per-specification hallucination breakdown
-- Table 4.3 Omnibus statistical tests (Kruskal–Wallis, α = 0.01)
+- Table 4.3 Live-condition comparison: Claude Code versus Cursor Agent
+  (Mann–Whitney *U*)
 - Table 4.4 Human baseline versus AI-condition means, per specification
 
 **List of Figures**
@@ -194,11 +231,11 @@ comparison of the leading commercial tools. Three research questions follow:
   and score the output of structurally heterogeneous coding workflows (a human
   typing keystrokes versus agents streaming tool-calls) on a common set of
   quality metrics?
-- **RQ2.** Do the leading commercial agentic coding tools differ significantly
-  in code-quality and governance behaviour, and if so, on which metrics and by
-  what magnitude?
+- **RQ2.** Do the leading commercial agentic coding tools differ in code-quality
+  and governance behaviour, and if so, on which metrics, by what magnitude, and
+  with what inferential support?
 - **RQ3.** Are any observed differences stable across task domains, or do tool
-  effects interact with the type of task specified?
+  effects vary with the type of task specified?
 
 ## 1.4 Contributions
 
@@ -648,16 +685,33 @@ Dunn's test (Dunn, 1964) with Bonferroni adjustment for a Kruskal–Wallis omnib
 because every omnibus was non-parametric, Dunn's test is the post-hoc used
 throughout, and an earlier implementation that applied Tukey's HSD to a
 Kruskal–Wallis omnibus was corrected to match the pre-registration. Effect sizes
-are reported as η² for the omnibus and as rank-based pairwise comparisons, and
-95% confidence intervals on each condition mean are obtained by bootstrap
-resampling with 10,000 replicates (Efron, 1979). Finally, a two-way ANOVA with a
-condition-by-specification interaction term tests directly whether condition
-effects are stable across task domains (RQ3); a significant interaction is itself
-a substantive finding rather than a nuisance. Three deviations and one analytical
+are reported as η² for the omnibus and as rank-biserial correlations for pairwise
+comparisons, interpreted against Cohen's (1988) conventional benchmarks for
+small, medium and large effects, and 95% confidence intervals on each condition
+mean are obtained by bootstrap resampling with 10,000 replicates (Efron, 1979).
+
+The pre-registration additionally specified a two-way ANOVA with a
+condition-by-specification interaction term to test whether condition effects are
+stable across task domains (RQ3). This test proved **inadmissible on the executed
+design** and is not reported: because the replay conditions contribute one
+effective observation per cell (Deviation 001), the interaction term has no
+residual degrees of freedom, and an interaction *F* computed over the replicated
+rows would measure the replay mechanism rather than the tools. RQ3 is therefore
+answered descriptively in §4.5.3. More generally, and departing from the
+pre-registered plan in the direction of conservatism, the analysis reported in
+§4.5 is stratified by the effective sample size each condition contributes:
+formal inference is confined to the two conditions captured live with genuine
+replication, and the four-condition comparison is reported descriptively with the
+pseudoreplication-corrected omnibus given alongside. The rationale is stated
+there in full; the principle is that the unit of analysis must be the
+independently captured session, not the CSV row.
+
+Three deviations and one analytical
 note are logged with their analytical consequences: the replay-mode zero-variance
-constraint (001), the security-metric instrument change from SonarCloud to local
-Bandit (002), the human-control execution change (003), and the Replit
-architectural-prior observation (analytical note 001).
+constraint (001), the deferred web-IDE cells (002), the human-control execution
+change (003), and the Replit architectural-prior observation (analytical note
+001); the security-metric instrument change from SonarCloud to local Bandit is
+documented in the pilot report (docs/PILOT_RESULTS.md §4.1).
 
 ## 3.7 Reproducibility infrastructure
 
@@ -686,8 +740,12 @@ comparison is the primary analysis.
 
 Table 4.1 reports each metric's mean over N = 30 per condition (10 reps ×
 3 specs; nominal N — the two IDE-bound conditions contribute three effective
-sessions each under the replay design, Deviation 001). Lower is better; the
-best per row is shown in bold in the discussion.
+sessions each under the replay design, Deviation 001, with the inferential
+consequences analysed in §4.5). Lower is better; the best per row is shown in
+bold in the discussion.
+
+**Table 4.1** Headline cross-vendor comparison: metric means over the nominal
+N = 30 per condition (10 replications × 3 specifications).
 
 | Metric | claude_code | cursor_agent | replit_agent | antigravity |
 |---|---:|---:|---:|---:|
@@ -696,6 +754,19 @@ best per row is shown in bold in the discussion.
 | Code duplication (%) | 0.00 | 0.90 | 9.56 | 4.26 |
 | Security density (per kLOC) | 42.05 | 43.67 | 0.00 | 1.48 |
 | Keystroke correction (per 1k) | 0.00 | 0.00 | 0.00 | 0.00 |
+
+*[Insert Figure 4.1 here — `notebooks/forest_plots.png`]*
+
+**Figure 4.1** Forest plot of per-condition means with bootstrap 95% confidence
+intervals (10,000 replicates), by metric. The intervals for `replit_agent` and
+`antigravity` are degenerate by construction: those conditions contribute one
+captured session per specification (Deviation 001, analysed in §4.5).
+
+*[Insert Figure 4.2 here — `notebooks/violin_plots.png`]*
+
+**Figure 4.2** Violin plots of the distribution shape for each
+(condition × metric) pair. The collapsed distributions for the two IDE-bound
+conditions are the visual signature of the replay design.
 
 The table already reveals the study's central structural result: there is no
 single column that is best on every row. Of the five metrics, three produce a
@@ -806,9 +877,12 @@ a category difference rather than an absence (§5.5).
 ## 4.4 Per-specification breakdown
 
 Table 4.2 reports the hallucination count per (condition × spec) cell (N = 10 per
-cell) and shows that the distribution is *not uniform across specifications* — a
-result that is the single strongest justification for the three-specification
-design.
+cell nominal) and shows that the distribution is *not uniform across
+specifications* — a result that is the single strongest justification for the
+three-specification design.
+
+**Table 4.2** Per-specification hallucination breakdown: mean off-spec feature
+count per (condition × specification) cell.
 
 | Hallucinations by spec | agent_education | data_pipeline | internal_tool_cli |
 |---|---:|---:|---:|
@@ -833,39 +907,116 @@ reason the dissertation's external-validity claim is task-conditional throughout
 
 ## 4.5 Statistical tests
 
-Every metric fell to **Kruskal–Wallis** because the deterministic-replay
-conditions have zero within-cell variance by construction (Deviation 001),
-failing the ANOVA preconditions. `human_control` is excluded (Deviation 003);
-N = 30 per condition.
+### 4.5.1 The unit-of-analysis problem
 
-| Metric | Test | H | p | η² | Sig @ α=0.01 |
-|---|---|---:|---:|---:|:---:|
-| Duplication_pct | Kruskal–Wallis | 62.41 | 1.8 × 10⁻¹³ | 0.497 | yes |
-| Security_density | Kruskal–Wallis | 39.35 | 1.5 × 10⁻⁸ | 0.346 | yes |
-| Hallucinations | Kruskal–Wallis | 15.76 | 1.3 × 10⁻³ | 0.192 | yes |
-| Complexity_mean | Kruskal–Wallis | 12.03 | 7.3 × 10⁻³ | 0.097 | yes |
-| Correction_freq | — | — | — | — | n/a (all-zero, AI) |
+The inferential analysis must confront a constraint that the design imposes and
+that a naive reading of the headline CSV would conceal. Under Deviation 001, the
+two IDE-bound conditions (`replit_agent`, `antigravity`) were captured **once**
+per (condition × specification) cell and that single capture was replayed ten
+times for CSV-shape consistency. Verification against the data confirms this
+directly: the maximum number of distinct values in any (spec × metric) cell is
+**ten** for `claude_code` and `cursor_agent`, and **one** for `replit_agent` and
+`antigravity`.
 
-Four of five metrics differ significantly across the AI conditions, with effect
-sizes from medium (complexity, η² = 0.10) to very large (duplication,
-η² = 0.50). Dunn's post-hoc (Bonferroni) localises the differences: for
-*duplication*, the scaffolding-heavy vendors (Replit, Antigravity) separate
-cleanly from the lean ones (Claude, Cursor), with Replit-vs-Antigravity and
-Claude-vs-Cursor indistinguishable; for *security*, the Python-dense vendors
-separate from the diluted ones; for *hallucinations*, only Claude-vs-Replit
-reaches α = 0.01 (p = 0.0022); for *complexity*, the omnibus is significant but
-**no pairwise comparison survives Bonferroni** (the effect is diffuse, reported
-as omnibus-level only). The condition-by-spec interaction is significant for
-every testable metric (duplication F = 283.8; hallucinations F = 228.3;
-complexity F = 27.9; security F = 20.6; all p ≪ 0.001), establishing that tool
-effects are task-dependent (RQ3).
+The consequence is that the two replay conditions contribute **three effective
+observations each** (one per specification), not thirty. Treating their ten
+listed rows as independent observations is *pseudoreplication* — the
+best-documented inferential error in experimental design — and it inflates
+every test statistic computed over the nominal N = 30. This dissertation
+therefore reports the analysis at three levels of conservatism and draws its
+inferential conclusions only from the level the design can actually support.
+
+### 4.5.2 Three analyses
+
+**Level 1 — nominal analysis (reported for transparency, not relied upon).**
+Kruskal–Wallis over all four conditions at the nominal N = 30 returns
+significance on all four testable metrics: duplication H = 62.41,
+p = 1.8 × 10⁻¹³; security H = 39.35, p = 1.5 × 10⁻⁸; hallucinations H = 15.76,
+p = 1.3 × 10⁻³; complexity H = 12.03, p = 7.3 × 10⁻³. **These values are
+inflated by pseudoreplication and are not the study's inferential claim.** They
+are reported so that a reader reproducing the CSV arrives at the same arithmetic
+and can see why it must be discounted. An earlier draft of this chapter also
+reported condition-by-specification interaction *F*-statistics; those are
+**withdrawn**, because with one effective observation per cell in two of the
+four conditions the interaction term has no residual degrees of freedom and the
+statistic is undefined on this design. Their apparent magnitude was an artefact
+of near-zero error variance produced by duplicated rows.
+
+**Level 2 — the inferential core (live conditions only).** Only `claude_code`
+and `cursor_agent` were captured live with genuine per-replication variance
+(within-cell SD up to 2.32 for duplication and 38.79 for security density), so
+only their comparison supports inference at full replication. Table 4.3 reports
+Mann–Whitney *U* on each metric with rank-biserial effect sizes.
+
+**Table 4.3** Live-condition comparison, `claude_code` versus `cursor_agent`
+(N = 30 per condition; two-sided Mann–Whitney *U*; rank-biserial *r*).
+
+| Metric | *U* | *p* | rank-biserial *r* | Claude mean | Cursor mean |
+|---|---:|---:|---:|---:|---:|
+| Duplication (%) | 330.0 | 0.0028 | 0.267 | 0.00 | 0.90 |
+| Complexity (cc) | 641.5 | 0.0047 | −0.426 | 3.35 | 2.72 |
+| Hallucinations (count) | 390.0 | 0.0419 | 0.133 | 0.00 | 0.17 |
+| Security density (per kLOC) | 415.0 | 0.5995 | 0.078 | 42.05 | 43.67 |
+
+Under Bonferroni correction across the four metrics at α = 0.05
+(threshold 0.0125), **duplication and complexity differ significantly**;
+hallucinations and security density do not. Neither surviving result clears the
+stricter α = 0.01 Bonferroni threshold (0.0025), and this is stated plainly
+rather than obscured by choice of α. The defensible inferential claim from this
+study is therefore narrow and specific: *on identical tasks, Claude Code
+produces significantly less duplicated code and significantly more
+control-flow-dense code than Cursor Agent.*
+
+**Level 3 — pseudoreplication-corrected omnibus (all four conditions).**
+Collapsing every condition to one value per specification — the honest unit of
+analysis, giving N = 3 per condition — no metric reaches significance:
+duplication H = 6.34, p = 0.096; security H = 6.62, p = 0.085; hallucinations
+H = 1.28, p = 0.734; complexity H = 1.17, p = 0.760. This is a **power result,
+not a null result**: with three cells per condition, only an overwhelming effect
+could reach α = 0.01, and the analysis is reported to establish that the
+four-condition comparison in this study is *descriptive*, not inferential.
+
+### 4.5.3 What the design does and does not license
+
+The cross-vendor differences in Table 4.1 are large, consistent, and
+mechanistically explained by direct inspection of the captured code — duplication
+spans 0.00% (Claude) to 9.56% (Replit) and hallucinations 0.00 to 1.00 per run —
+but for the two IDE-bound vendors they rest on one captured session per task.
+They are therefore presented as **descriptive case evidence**, and the
+task-dependence claim (RQ3) is likewise reframed: the per-specification pattern
+in Table 4.2 shows that no vendor's hallucination behaviour is constant across
+task domains, which is a *descriptive* demonstration of task-conditionality and
+is reported as such, without an inferential interaction test. Figure 4.1
+(forest plot of per-condition means with bootstrap 95% confidence intervals) and
+Figure 4.2 (violin plots of the per-condition distributions) visualise both the
+gaps and the degenerate distributions of the replay conditions; the collapsed
+violins for `replit_agent` and `antigravity` are themselves the clearest visual
+statement of the design's limitation. Closing this gap requires live
+multi-session re-capture of the two IDE-bound vendors, which §6.4 identifies as
+the first priority of any continuation.
 
 ## 4.6 Human-control baseline
 
 The human baseline (N = 1 per spec; all six features implemented and verified)
 scored zero hallucinations, zero duplication and zero security density across
 all three specs — a minimal, exactly-on-spec implementation without the
-over-delivery that drives the AI conditions' non-zero figures. Mean complexity
+over-delivery that drives the AI conditions' non-zero figures. Table 4.4 sets
+the baseline against the AI conditions for every metric and specification.
+
+**Table 4.4** Human-control baseline versus AI-condition means, per
+specification. Human values are single sessions (N = 1, Deviation 003); AI
+values are the mean of the four agentic conditions. Reported descriptively; no
+inferential comparison is made.
+
+| Metric | Web app (human / AI) | Pipeline (human / AI) | CLI (human / AI) |
+|---|---:|---:|---:|
+| Security density (per kLOC) | 0.00 / 41.31 | 0.00 / 11.50 | 0.00 / 12.59 |
+| Complexity (cc) | 1.71 / 1.56 | 5.00 / 3.20 | 0.00 / 3.54 |
+| Duplication (%) | 0.00 / 3.59 | 0.00 / 5.87 | 0.00 / 1.57 |
+| Hallucinations (count) | 0.00 / 0.38 | 0.00 / 0.00 | 0.00 / 0.75 |
+| Correction frequency (per 1k) | 829.27 / 0.00 | 51.80 / 0.00 | 122.27 / 0.00 |
+
+Mean complexity
 was 1.71 (web app) and 5.00 (pipeline); for the CLI it was 0.00 — a structural
 artefact, because the human wrote top-level script code with no function
 definitions and the analyser measures per-function complexity, whereas the AI
@@ -906,8 +1057,12 @@ The chapter's findings can be summarised in six points.
    re-capture (§5.7).
 
 3. **Claude Code produces the most disciplined output** — zero hallucinations and
-   zero duplication across all 30 runs — at the cost of the highest structural
+   zero duplication across all 30 live runs — at the cost of the highest structural
    density (mean complexity 3.35), which is interpreted as denser, not worse.
+   This is the one cross-vendor contrast that rests on two fully live,
+   independently replicated conditions, and both components of it (less
+   duplication, greater density than Cursor Agent) are statistically significant
+   (§4.5.2).
 
 4. **Cursor Agent is the median performer** across all five metrics, neither best
    nor worst on any single one; its modest hallucinations are confined to the
@@ -917,10 +1072,12 @@ The chapter's findings can be summarised in six points.
    spec** (1.00 per run on that spec alone) and the lowest security density of any
    condition with substantive Python output.
 
-6. **The condition-by-specification interaction is non-trivial throughout.**
-   Agent quality depends on task domain, so the dissertation's strongest
-   external-validity claim is not "agent X is better than agent Y" but "agent X is
-   better than agent Y *for this task type*." This single result reframes how the
+6. **Tool behaviour is not constant across task domains.** Every vendor's
+   hallucination profile changes with the specification (Table 4.2), so the
+   dissertation's strongest external-validity claim is not "agent X is better
+   than agent Y" but "agent X behaved better than agent Y *for this task type*."
+   This is established descriptively rather than by an interaction test, which
+   the replay design cannot support (§4.5.3); it nonetheless reframes how the
    findings should be read and how the tools should be procured (Chapter 5).
 
 The implications of these findings for enterprise AI-coding adoption — profile-
@@ -957,9 +1114,12 @@ shipping security-sensitive web services and a team maintaining a lean
 internal-tooling estate should, on this evidence, reach different conclusions
 from the same data — and the instrument exists precisely to let them compute that
 conclusion rather than infer it from a vendor leaderboard. This profile-not-rank
-finding is the practical counterpart of the statistical condition-by-spec
-interaction (§4.5): because tool effects are not stable across task domains, no
-single ranking can be valid across an organisation's full task portfolio.
+finding is the practical counterpart of the per-specification non-uniformity
+documented in Table 4.2: because tool behaviour is not stable across task
+domains, no single ranking can be valid across an organisation's full task
+portfolio. It should be read as a hypothesis generated by these captures and
+warranting confirmation under the fully live design of §6.4, not as an
+established inferential result — the distinction §4.5 draws deliberately.
 
 ## 5.2 The security-density artefact and the per-language reading
 
@@ -1178,12 +1338,15 @@ against human labels (§4.7). These are mitigated by transparent reporting and b
 triangulating the central finding against direct code inspection, which does not
 depend on any single metric. *Internal validity*: the deterministic-replay
 constraint (Deviation 001) means two conditions contribute no within-cell
-variance, so the omnibus tests rest on the two CLI-driven conditions' variance
-plus the between-condition gaps; the very large effect sizes (η² up to 0.50)
-are accordingly read as descriptive of the captured sessions rather than fully
-inferential — the replayed cells' internal consistency is a property of the
-replay mechanism, not corroboration — and a fully live re-capture is required to
-close this gap. *External validity*: three specifications across three domains, while
+variance and only three effective observations each. This is the study's most
+serious internal-validity limitation, and §4.5 addresses it directly rather than
+by mitigation language: the four-condition omnibus is reported at three levels
+of conservatism, the nominal statistics are explicitly disowned as
+pseudoreplicated, the interaction statistics are withdrawn as undefined on this
+design, and the inferential claims are confined to the two live conditions. What
+remains — the large descriptive gaps and the mechanism established by code
+inspection — is genuine but is labelled as case evidence, and a fully live
+re-capture is required to convert it into inference. *External validity*: three specifications across three domains, while
 broader than the single-task norm, do not span the full space of software tasks,
 and the significant condition-by-spec interaction warns explicitly against
 over-generalisation — the appropriate inference is task-conditional. *Conclusion
@@ -1204,9 +1367,11 @@ blinded instrument for auditing the code-quality and governance behaviour of
 agentic AI coding workflows, and used it to compare four leading commercial tools
 across three task domains and five metrics. It answered its three research
 questions: a single capture contract *can* render heterogeneous workflows
-comparable (RQ1); the tools *do* differ significantly on four of five metrics,
-with effect sizes up to very large (RQ2); and those differences *interact with
-task domain*, so tool quality is task-conditional (RQ3). Its most consequential
+comparable (RQ1); the tools *do* differ, significantly so on duplication and
+complexity between the two conditions the design replicates fully, and by large
+descriptive margins across all four (RQ2); and those differences are *not stable
+across task domains*, so tool quality is task-conditional (RQ3, established
+descriptively). Its most consequential
 empirical finding is a measured architectural-prior dominance in Replit Agent,
 and its central conceptual contribution is the framing of specification fidelity
 as a first-class, measurable governance metric.
@@ -1254,9 +1419,11 @@ single-replication human baseline and its one unrecoverable data-loss event
 cross-style confound in per-function complexity (§5.5); and the static,
 artefact-level measurement scope, which by design excludes runtime behaviour,
 developer satisfaction, and longitudinal maintenance cost. None of these
-undermines the study's structural findings, which rest on large effect sizes and
-on behaviour that was perfectly consistent across replications, but each bounds
-the strength and generality of the claims and each is logged transparently.
+undermines the study's structural findings, which rest on large descriptive
+margins and on mechanisms established by direct inspection of the captured code,
+but each bounds the strength and generality of the claims — the replay
+constraint most sharply, since it is what confines formal inference to the two
+live conditions (§4.5) — and each is logged transparently.
 
 ## 6.4 Future work
 
@@ -1435,11 +1602,11 @@ one analyser per metric, one adapter per vendor) and its test suite.
 
 ---
 
-*End of dissertation draft. Current length: ~12,350 words total (~11,200 words of
-main text, Abstract through Chapter 6; remainder is references and appendices) — a
-complete, full-length draft built entirely on the study's real captured data, at
-the 12,000-word target. References verified and corrected, acknowledgements and
-title page completed (4 August 2026). Remaining before submission: confirm the
-citation style and the word-count rule (what is included/excluded) against the
-marking rubric, and — only if you want a reported κ — collect the hand-labels
-described in §4.7.*
+*End of dissertation draft. Current length: ≈12,500 words of main text including
+tables (≈12,350 excluding tables), ≈13,780 for the whole file including
+references and appendices — built entirely on the study's real captured data.
+References verified and corrected; acknowledgements, title page, table and figure
+captions completed; §4.5 re-analysed and rewritten (6 August 2026). Remaining
+before submission: verify name and programme title against the enrolment record,
+confirm the citation style and word-count rule against the marking rubric, and —
+only if you want a reported κ — collect the hand-labels described in §4.7.*
