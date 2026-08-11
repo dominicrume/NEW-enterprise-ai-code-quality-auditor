@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "AI Code Auditor",
+    "slug": "ai-code-quality-auditor",
+    "scheme": "aicodeauditor",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "primaryColor": "#0F766E",
+    "description": "Executive assurance reports for AI coding tools. Review five-metric evaluations of agentic coding tools against a fixed specification.",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.rume.aicodeauditor",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "dev.rume.aicodeauditor",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#0F766E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiBaseUrl": "https://auditor-dashboard-rume.fly.dev"
+    }
+  }
+}
