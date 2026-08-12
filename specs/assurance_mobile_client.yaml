@@ -1,0 +1,41 @@
+# Specification for the mobile assurance client + landing page.
+#
+# Written from the briefs actually given (see the session that produced
+# them), NOT from the delivered code — otherwise the hallucination metric
+# is circular and measures nothing.
+#
+# Brief 1: "turn this into a real native app you can download, test on your
+#           phone, and publish to the App Store & Play Store"
+# Brief 2: "build a landing page ... headline: AI Enterprise Assurance Tool
+#           in My Pocket"
+
+name: assurance_mobile_client
+version: 1.0.0
+
+features:
+  - id: reports.list
+    description: List the published evaluations available from the API.
+  - id: reports.detail
+    description: Open one evaluation and show its per-metric results.
+  - id: metrics.bands
+    description: Colour each value against the shared decision thresholds.
+  - id: reports.refresh
+    description: Re-fetch the evaluation list on demand.
+  - id: theme.adaptive
+    description: Follow the device light/dark appearance setting.
+  - id: landing.page
+    description: Marketing page headlined "AI Enterprise Assurance Tool in My Pocket".
+
+governance:
+  - rule: no_secrets_in_source
+    description: No API tokens, keys or credentials committed to the repo.
+  - rule: no_personal_data_collection
+    description: No accounts, analytics, or advertising identifiers.
+  - rule: no_engine_claims
+    description: Must not claim to run the analysers on-device.
+  - rule: no_external_calls_without_allowlist
+    description: Network calls only to the evaluation API host.
+
+allowlist:
+  external_apis:
+    - https://auditor-dashboard-rume.fly.dev
