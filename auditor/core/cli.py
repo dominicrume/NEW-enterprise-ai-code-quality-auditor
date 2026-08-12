@@ -9,6 +9,7 @@ combined CSV report. Both commands rely on a captures directory laid out as
 of the adapters (see human_control_recorder.py and the per-vendor capture
 flow in docs/METHODOLOGY.md).
 """
+import time
 from pathlib import Path
 
 import click
@@ -25,6 +26,7 @@ def main():
 
     \b
     Audit a folder:   auditor scan .
+    Watch it live:    auditor watch . --spec spec.yaml
     Run the study:    auditor experiment --run-label main_001 --reps 10
     """
 
@@ -110,6 +112,102 @@ def scan_cmd(path: Path, spec: Path | None, as_json: bool, fail_on: str):
     trigger = thresholds[fail_on]
     if trigger and result.worst_band in trigger:
         raise SystemExit(1)
+
+
+def _render_scan_table(console, result):
+    """Shared table renderer for `scan` and `watch`."""
+    from rich.table import Table
+
+    table = Table(show_edge=False, header_style="dim", pad_edge=False)
+    table.add_column("")
+    table.add_column("Check")
+    table.add_column("Value", justify="right")
+    table.add_column("")
+    for o in result.outcomes:
+        if o.applicable:
+            style = BAND_STYLE[o.band]
+            table.add_row(f"[{style}]●[/{style}]", o.label,
+                          f"{o.value:.2f}", f"[{style}]{BAND_MARK[o.band]}[/{style}]")
+        else:
+            table.add_row("[dim]○[/dim]", f"[dim]{o.label}[/dim]",
+                          "[dim]n/a[/dim]", f"[dim]{o.skipped_reason}[/dim]")
+    console.print(table)
+
+
+@main.command("watch")
+@click.argument("path", type=click.Path(exists=True, file_okay=False, path_type=Path),
+                default=".")
+@click.option("--spec", type=click.Path(exists=True, dir_okay=False, path_type=Path),
+              default=None,
+              help="Spec YAML declaring what was asked for. Enables live scope-drift.")
+@click.option("--interval", default=1.0, show_default=True, type=float,
+              help="Seconds between change checks.")
+def watch_cmd(path: Path, spec: Path | None, interval: float):
+    """Re-audit continuously as the code changes.
+
+    \b
+      auditor watch .                       watch the current folder
+      auditor watch . --spec spec.yaml      see scope drift appear live
+
+    Leave this running while an agent works. Ctrl+C to stop.
+    """
+    import yaml
+    from rich.console import Console
+
+    from auditor.core.scan import scan_directory
+    from auditor.core.watch import watch_directory
+
+    console = Console()
+    spec_data = yaml.safe_load(spec.read_text()) if spec else None
+    baseline = scan_directory(path, spec_data)
+
+    console.print()
+    console.print(f"[bold]Watching {Path(path).resolve()}[/bold]")
+    console.print(
+        f"[dim]{baseline.file_count} files · {baseline.total_loc} lines"
+        + (f" · spec: {baseline.spec_name}" if baseline.spec_name else " · no spec")
+        + " · Ctrl+C to stop[/dim]\n"
+    )
+    _render_scan_table(console, baseline)
+    if baseline.coverage_note:
+        console.print(f"\n[yellow]Coverage:[/yellow] {baseline.coverage_note}")
+    console.print("\n[dim]— waiting for changes —[/dim]")
+
+    try:
+        for event in watch_directory(path, spec_data, interval=interval):
+            stamp = time.strftime("%H:%M:%S")
+            shown = ", ".join(event.changed_files[:3])
+            if len(event.changed_files) > 3:
+                shown += f" +{len(event.changed_files) - 3} more"
+            console.print(f"\n[dim]{stamp}[/dim]  [cyan]{shown}[/cyan]")
+
+            if not event.deltas:
+                console.print("  [dim]no change to any metric[/dim]")
+                continue
+
+            for d in event.deltas:
+                if d.became_measurable:
+                    style = BAND_STYLE[d.after_band]
+                    console.print(
+                        f"  [{style}]▲[/{style}] {d.label} now measurable — "
+                        f"[{style}]{d.after:.2f} {BAND_MARK[d.after_band]}[/{style}]"
+                    )
+                elif d.became_unmeasurable:
+                    console.print(f"  [dim]○ {d.label} no longer measurable[/dim]")
+                else:
+                    arrow = "↑" if d.direction == "worse" else "↓"
+                    style = BAND_STYLE[d.after_band] if d.after_band else "white"
+                    line = (f"  [{style}]{arrow}[/{style}] {d.label} "
+                            f"{d.before:.2f} → [{style}]{d.after:.2f}[/{style}]")
+                    if d.changed_band:
+                        line += (f"  [{style}]{BAND_MARK[d.before_band]}"
+                                 f" → {BAND_MARK[d.after_band]}[/{style}]")
+                    console.print(line)
+
+            if event.notable:
+                console.print("  [yellow]↳ threshold crossed — worth a look[/yellow]")
+    except KeyboardInterrupt:
+        console.print("\n[dim]stopped[/dim]\n")
 
 
 @main.command("run")

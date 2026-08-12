@@ -32,6 +32,25 @@ def _excluded(rel_parts: tuple[str, ...]) -> bool:
                for part in rel_parts)
 
 
+def iter_source_files(work_dir: Path):
+    """Yield ``(relative_posix_path, absolute_path)`` for every scorable file.
+
+    The single definition of "a file this instrument looks at". The codebase
+    loader and the watcher both consume it, so a file can never be measured
+    but not watched, or the reverse.
+    """
+    work_dir = Path(work_dir)
+    for path in sorted(work_dir.rglob("*")):
+        if not path.is_file() or path.name == "manifest.json":
+            continue
+        if path.suffix not in CODE_SUFFIXES:
+            continue
+        rel = path.relative_to(work_dir)
+        if _excluded(rel.parts):
+            continue
+        yield rel.as_posix(), path
+
+
 def load_codebase(work_dir: Path) -> dict:
     """Walk ``work_dir``, return the capture-contract codebase dict.
 
@@ -43,15 +62,11 @@ def load_codebase(work_dir: Path) -> dict:
         raise FileNotFoundError(f"work_dir not found: {work_dir}")
 
     files: dict[str, str] = {}
-    for path in sorted(work_dir.rglob("*")):
-        if not path.is_file() or path.name == "manifest.json":
-            continue
-        if path.suffix not in CODE_SUFFIXES:
-            continue
-        rel = path.relative_to(work_dir)
-        if _excluded(rel.parts):
-            continue
-        files[rel.as_posix()] = path.read_text(encoding="utf-8")
+    for rel, path in iter_source_files(work_dir):
+        try:
+            files[rel] = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue  # binary or vanished mid-walk — skip, never crash a scan
 
     manifest_path = work_dir / "manifest.json"
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else []
