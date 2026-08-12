@@ -143,3 +143,34 @@ def test_stream_paints_immediately(client):
         first = next(res.response).decode()
     assert first.startswith("data: ")
     assert "metrics" in first
+
+
+# ------------------------------------------------------- install resilience
+
+def test_free_port_falls_through_a_collision():
+    """A port collision must never be a decision the user has to make."""
+    import socket
+
+    from auditor.core.cli import _free_port
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as taken:
+        taken.bind(("127.0.0.1", 0))
+        occupied = taken.getsockname()[1]
+        taken.listen(1)
+        assert _free_port(occupied) != occupied
+
+
+def test_module_entrypoint_exists():
+    """`python -m auditor` must work when the console script isn't on PATH."""
+    import auditor.__main__ as entry
+
+    assert callable(entry.main)
+
+
+def test_empty_project_reports_no_files_without_crashing(tmp_path):
+    session = LiveSession(tmp_path, interval=0.2)
+    client = create_app(session).test_client()
+    report = client.get("/api/state").get_json()["report"]
+    assert report["files"] == 0
+    assert all(m["value"] is None for m in report["metrics"])
+    session.stop()

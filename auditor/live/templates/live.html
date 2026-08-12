@@ -134,8 +134,10 @@ const fmt = v => Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2);
 let prev = {};
 
 function render(r){
-  meta.innerHTML = `<b>${r.files}</b> files · <b>${r.loc}</b> lines · <b>${r.python_files}</b> Python`
-    + (r.spec ? ` · spec: <b>${r.spec}</b>` : ' · no brief yet');
+  meta.innerHTML = r.files === 0
+    ? 'Empty folder — start building, or point your agent here. Results appear automatically.'
+    : `<b>${r.files}</b> files · <b>${r.loc}</b> lines · <b>${r.python_files}</b> Python`
+      + (r.spec ? ` · spec: <b>${r.spec}</b>` : ' · no brief yet');
   cards.innerHTML = '';
   for (const m of r.metrics){
     const na = m.value === null || m.value === undefined;

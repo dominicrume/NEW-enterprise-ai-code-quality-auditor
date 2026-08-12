@@ -32,6 +32,27 @@ def main():
     """
 
 
+def _free_port(preferred: int, attempts: int = 20) -> int:
+    """The preferred port, or the next free one.
+
+    A port collision is not a decision a user should have to make; the tool
+    knows how to find a free one and the URL is printed either way.
+    """
+    import socket
+
+    for candidate in range(preferred, preferred + attempts):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                sock.bind(("127.0.0.1", candidate))
+                return candidate
+            except OSError:
+                continue
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))  # let the OS choose
+        return sock.getsockname()[1]
+
+
 @main.command("live")
 @click.argument("path", type=click.Path(exists=True, file_okay=False, path_type=Path),
                 default=".")
@@ -62,15 +83,21 @@ def live_cmd(path: Path, port: int, no_open: bool, interval: float):
     flask.cli.show_server_banner = lambda *a, **k: None
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
+    port = _free_port(port)
     session = LiveSession(path, interval=interval)
     app = create_app(session)  # starts the watcher
 
     url = f"http://127.0.0.1:{port}"
+    empty = session.latest.file_count == 0
     click.echo()
     click.echo(f"  Live audit  {session.project}")
     click.echo(f"  {url}")
-    click.echo(f"  {session.latest.file_count} files · "
-               f"{session.latest.total_loc} lines · Ctrl+C to stop")
+    if empty:
+        click.echo("  Empty folder — start building and results appear automatically.")
+    else:
+        click.echo(f"  {session.latest.file_count} files · "
+                   f"{session.latest.total_loc} lines")
+    click.echo("  Ctrl+C to stop")
     click.echo()
 
     if not no_open:
