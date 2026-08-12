@@ -49,7 +49,7 @@ A third party then drops these six lines into their own workflow:
 
 See `.github/workflows/example-usage.yml` for the full template.
 
-## 3. Hosted dashboard — `https://auditor-dashboard.fly.dev`
+## 3. Hosted dashboard — `https://auditor-dashboard-rume.fly.dev`
 
 Fly.io free tier handles this. One-time setup:
 

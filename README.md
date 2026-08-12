@@ -3,7 +3,7 @@
 [![CI](https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor/actions/workflows/ci.yml/badge.svg)](https://github.com/dominicrume/NEW-enterprise-ai-code-quality-auditor/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/ai-code-quality-auditor.svg)](https://pypi.org/project/ai-code-quality-auditor/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Live dashboard](https://img.shields.io/badge/live-dashboard-purple)](https://auditor-dashboard.fly.dev)
+[![Live dashboard](https://img.shields.io/badge/live-dashboard-purple)](https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human)
 
 > An empirical Safety Harness for agentic AI coding systems.
 > Quantifies where AI-assisted development fails at governance, security,
@@ -28,7 +28,7 @@ jobs:
           conditions: claude_code,cursor_agent
 ```
 
-**📊 Live dashboard:** https://auditor-dashboard.fly.dev *(pending deploy — see below)*
+**📊 Live dashboard:** https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human
 
 This is the experimental instrument for the MSc dissertation
 **"AI-Assisted Coding Assessment Tool: Evaluating LLM Performance, Governance,

@@ -1,6 +1,6 @@
 [project]
 name = "ai-code-quality-auditor"
-version = "0.2.0"
+version = "0.2.1"
 description = "Empirical Safety Harness for agentic AI coding systems. Scores AI-generated code on 5 metrics across 5 vendor conditions against one fixed spec."
 readme = "README.md"
 license = { file = "LICENSE" }
