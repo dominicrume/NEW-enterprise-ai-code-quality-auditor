@@ -1,0 +1,544 @@
+<title>AI Enterprise Assurance Tool in My Pocket</title>
+<style>
+  /* ============================== TOKENS ============================== */
+  :root {
+    --paper:      #F4F6F3;
+    --surface:    #FFFFFF;
+    --ink:        #161C1A;
+    --muted:      #58635D;
+    --line:       #D9DFD8;
+    --accent:     #0F766E;
+    --accent-ink: #0B5D57;
+    --good:       #0F766E;
+    --warn:       #B07D2E;
+    --critical:   #A8443A;
+    --track:      #E4E8E3;
+
+    /* The hero is a single committed world in both themes: an instrument
+       housing. Only these three tokens stay fixed. */
+    --housing:      #0C110F;
+    --housing-ink:  #EEF2EE;
+    --housing-mute: #8A968E;
+
+    --measure: 34rem;
+    --gutter: clamp(1.15rem, 4vw, 2.5rem);
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --grot: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #0E1211;
+      --surface:    #171D1A;
+      --ink:        #E9EDE9;
+      --muted:      #96A099;
+      --line:       #262E2A;
+      --accent:     #35B8A6;
+      --accent-ink: #5ECDBE;
+      --good:       #35B8A6;
+      --warn:       #D4A45C;
+      --critical:   #D9705E;
+      --track:      #212925;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #0E1211;
+    --surface:    #171D1A;
+    --ink:        #E9EDE9;
+    --muted:      #96A099;
+    --line:       #262E2A;
+    --accent:     #35B8A6;
+    --accent-ink: #5ECDBE;
+    --good:       #35B8A6;
+    --warn:       #D4A45C;
+    --critical:   #D9705E;
+    --track:      #212925;
+  }
+  :root[data-theme="light"] {
+    --paper:      #F4F6F3;
+    --surface:    #FFFFFF;
+    --ink:        #161C1A;
+    --muted:      #58635D;
+    --line:       #D9DFD8;
+    --accent:     #0F766E;
+    --accent-ink: #0B5D57;
+    --good:       #0F766E;
+    --warn:       #B07D2E;
+    --critical:   #A8443A;
+    --track:      #E4E8E3;
+  }
+
+  /* ============================== BASE ============================== */
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    -webkit-text-size-adjust: 100%;
+  }
+  h1, h2, h3 { font-family: var(--grot); text-wrap: balance; margin: 0; }
+  p { margin: 0; max-width: var(--measure); }
+  a { color: var(--accent-ink); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  .wrap { max-width: 68rem; margin-inline: auto; padding-inline: var(--gutter); }
+  .eyebrow {
+    font-family: var(--mono); font-size: .68rem; letter-spacing: .17em;
+    text-transform: uppercase; color: var(--accent-ink); margin: 0;
+  }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ============================== HERO ============================== */
+  .hero { background: var(--housing); color: var(--housing-ink); position: relative; overflow: hidden; }
+  /* faint calibration rule across the housing — instrument, not decoration */
+  .hero::after {
+    content: ""; position: absolute; inset-inline: 0; bottom: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, #35B8A655 25%, #35B8A655 75%, transparent);
+  }
+  .hero .eyebrow { color: #5ECDBE; }
+  .hero-grid {
+    display: grid; gap: clamp(2rem, 5vw, 3.5rem);
+    grid-template-columns: 1fr; align-items: center;
+    padding-block: clamp(3rem, 8vw, 5.5rem);
+  }
+  @media (min-width: 60rem) { .hero-grid { grid-template-columns: 1.08fr .92fr; } }
+
+  .hero-copy { display: flex; flex-direction: column; gap: 1.35rem; }
+  .hero h1 {
+    font-size: clamp(2.35rem, 7.2vw, 4.15rem);
+    line-height: .98; letter-spacing: -.043em; font-weight: 700;
+  }
+  .hero h1 .pocket { display: block; color: #5ECDBE; }
+  .caption {
+    font-family: var(--mono); font-size: .74rem; letter-spacing: .1em;
+    text-transform: uppercase; color: #5ECDBE; margin: 0;
+    padding-top: .9rem; border-top: 1px solid #FFFFFF1F; max-width: 30rem;
+  }
+  .deck { color: var(--housing-mute); font-size: 1.09rem; max-width: 31rem; }
+  .deck strong { color: var(--housing-ink); font-weight: 400; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: .7rem; align-items: center; margin-top: .3rem; }
+  .btn {
+    font-family: var(--grot); font-size: .92rem; font-weight: 600;
+    text-decoration: none; border-radius: 7px; padding: .72rem 1.25rem;
+    border: 1px solid transparent; display: inline-block;
+  }
+  .btn-primary { background: #35B8A6; color: #07100E; }
+  .btn-primary:hover { background: #5ECDBE; }
+  .btn-ghost { border-color: #FFFFFF33; color: var(--housing-ink); }
+  .btn-ghost:hover { border-color: #5ECDBE; color: #5ECDBE; }
+  .status-note {
+    font-family: var(--mono); font-size: .7rem; color: var(--housing-mute);
+    letter-spacing: .04em; margin: 0;
+  }
+
+  /* ---------- the device: the product IS the screen ---------- */
+  .device-stage { display: flex; justify-content: center; }
+  .device {
+    width: min(19rem, 82vw); border-radius: 2.35rem; padding: .52rem;
+    background: linear-gradient(160deg, #2B3733, #101614 55%);
+    box-shadow: 0 1.6rem 3.5rem #00000075, 0 0 0 1px #FFFFFF14;
+  }
+  .screen {
+    background: #0E1211; border-radius: 1.95rem; padding: 1.5rem 1.15rem 1.35rem;
+    display: flex; flex-direction: column; gap: .9rem; position: relative;
+  }
+  .notch {
+    width: 4.4rem; height: .32rem; border-radius: 999px;
+    background: #FFFFFF22; margin: -.55rem auto .25rem;
+  }
+  .scr-eyebrow { font-family: var(--mono); font-size: .55rem; letter-spacing: .16em; text-transform: uppercase; color: #5ECDBE; }
+  .scr-title { font-family: var(--grot); font-size: 1.16rem; font-weight: 700; letter-spacing: -.02em; color: #EEF2EE; }
+  .scr-meta { font-family: var(--mono); font-size: .58rem; color: #8A968E; letter-spacing: .03em; }
+  .scr-banner {
+    display: flex; gap: .55rem; align-items: flex-start; font-size: .62rem;
+    line-height: 1.45; color: #C9D2CC; background: #FFFFFF0A;
+    border: 1px solid #35B8A63D; border-radius: 6px; padding: .5rem .6rem;
+    font-family: var(--grot);
+  }
+  .scr-banner b { color: #5ECDBE; font-weight: 600; }
+  .scr-card {
+    background: #FFFFFF08; border: 1px solid #FFFFFF14; border-radius: 9px;
+    padding: .82rem .8rem; display: flex; flex-direction: column; gap: .62rem;
+  }
+  .scr-card h4 { font-family: var(--grot); font-size: .82rem; font-weight: 700; color: #EEF2EE; margin: 0; letter-spacing: -.01em; }
+  .scr-card .sub { font-family: var(--grot); font-size: .58rem; color: #8A968E; margin: -.42rem 0 0; }
+  .scr-row { display: flex; flex-direction: column; gap: .2rem; }
+  .scr-row-top { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+  .scr-cond { font-family: var(--grot); font-size: .64rem; color: #D3DAD5; }
+  .scr-val { font-family: var(--mono); font-size: .6rem; color: #8A968E; }
+  .scr-track { height: .3rem; border-radius: 999px; background: #FFFFFF12; overflow: hidden; }
+  .scr-fill { height: 100%; border-radius: 999px; width: var(--w); transform-origin: left center; }
+  @media (prefers-reduced-motion: no-preference) {
+    .scr-fill { animation: grow .85s cubic-bezier(.22,.7,.3,1) var(--d, 0s) backwards; }
+  }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* ============================== SECTIONS ============================== */
+  .band { padding-block: clamp(3.2rem, 8vw, 5rem); border-top: 1px solid var(--line); }
+  .band:first-of-type { border-top: 0; }
+  .sec-head { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 2.4rem; }
+  .sec-head h2 { font-size: clamp(1.55rem, 3.6vw, 2.15rem); letter-spacing: -.028em; line-height: 1.1; }
+  .sec-head p { color: var(--muted); }
+
+  /* ---------- gauges: the real calibration policy ---------- */
+  .gauges { display: grid; gap: 1.5rem; }
+  @media (min-width: 46rem) { .gauges { grid-template-columns: 1fr 1fr; gap: 1.5rem 2.6rem; } }
+  .gauge { display: flex; flex-direction: column; gap: .5rem; }
+  .gauge-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .gauge h3 { font-size: 1rem; letter-spacing: -.012em; }
+  .gauge .obs { font-family: var(--mono); font-size: .7rem; color: var(--muted); white-space: nowrap; }
+  .gauge .what { font-size: .93rem; color: var(--muted); margin: 0; }
+  .scale { display: flex; height: .48rem; border-radius: 999px; overflow: hidden; position: relative; }
+  .zone-good { background: color-mix(in srgb, var(--good) 42%, var(--track)); }
+  .zone-warn { background: color-mix(in srgb, var(--warn) 46%, var(--track)); }
+  .zone-crit { background: color-mix(in srgb, var(--critical) 52%, var(--track)); }
+  .needle {
+    position: absolute; top: -.28rem; bottom: -.28rem; width: 2px; border-radius: 2px;
+    background: var(--ink); left: var(--at);
+  }
+  .ticks {
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: .6rem; color: var(--muted); letter-spacing: .03em;
+  }
+
+  /* ---------- the finding ---------- */
+  .finding { background: var(--surface); border-block: 1px solid var(--line); }
+  .finding-inner { padding-block: clamp(3rem, 7vw, 4.5rem); display: flex; flex-direction: column; gap: 1.3rem; }
+  .finding blockquote {
+    margin: 0; font-family: var(--grot); font-weight: 700; letter-spacing: -.032em;
+    font-size: clamp(1.75rem, 5vw, 3rem); line-height: 1.06; max-width: 20ch;
+  }
+  .finding blockquote span { display: block; }
+  .finding blockquote .said { color: var(--muted); }
+  .finding blockquote .did { color: var(--critical); }
+  .finding .after { max-width: 38rem; color: var(--muted); }
+  .finding .after b { color: var(--ink); font-weight: 400; }
+
+  /* ---------- flow ---------- */
+  .flow { display: grid; gap: 1.1rem; counter-reset: step; }
+  @media (min-width: 52rem) { .flow { grid-template-columns: repeat(3, 1fr); gap: 1.6rem; } }
+  .step {
+    border: 1px solid var(--line); border-radius: 10px; padding: 1.3rem;
+    background: var(--surface); display: flex; flex-direction: column; gap: .5rem;
+  }
+  .step .n {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .12em;
+    color: var(--accent-ink);
+  }
+  .step h3 { font-size: 1.02rem; letter-spacing: -.014em; }
+  .step p { font-size: .95rem; color: var(--muted); }
+
+  /* ---------- honesty panel ---------- */
+  .honest {
+    border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 8px; background: var(--surface);
+    padding: 1.4rem 1.5rem; display: flex; flex-direction: column; gap: .7rem;
+    max-width: 46rem;
+  }
+  .honest h3 { font-size: 1.02rem; letter-spacing: -.014em; }
+  .honest p { font-size: .96rem; color: var(--muted); max-width: none; }
+
+  /* ---------- ship ---------- */
+  .ship { display: grid; gap: 1.6rem; align-items: start; }
+  @media (min-width: 52rem) { .ship { grid-template-columns: 1.15fr .85fr; gap: 3rem; } }
+  .routes { display: flex; flex-direction: column; gap: .1rem; margin: 0; padding: 0; list-style: none; }
+  .route {
+    display: flex; gap: 1rem; align-items: baseline;
+    padding-block: .85rem; border-top: 1px solid var(--line);
+  }
+  .route:last-child { border-bottom: 1px solid var(--line); }
+  .route .when {
+    font-family: var(--mono); font-size: .66rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent-ink); flex: 0 0 5.6rem;
+  }
+  .route .what { font-size: .97rem; }
+  .route .what b { font-family: var(--grot); font-size: .95rem; font-weight: 600; display: block; }
+  .route .what span { color: var(--muted); font-size: .92rem; }
+
+  footer { border-top: 1px solid var(--line); padding-block: 2.2rem 3rem; }
+  footer p { font-family: var(--mono); font-size: .7rem; color: var(--muted); letter-spacing: .03em; max-width: none; }
+</style>
+
+<!-- ================================ HERO ================================ -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">AI Code Quality Auditor · iOS &amp; Android</p>
+      <h1>AI Enterprise Assurance Tool<span class="pocket">in My Pocket.</span></h1>
+      <p class="caption">AI Enterprise Assurance Tool in My Pocket</p>
+      <p class="deck">
+        The instrument that decides whether an AI coding tool is safe to adopt —
+        five checks, one fixed specification, evidence you can hold up in a
+        governance meeting — <strong>now on the phone of the person who has to
+        make the call.</strong>
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#ship">How to get it</a>
+        <a class="btn btn-ghost" href="https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human">See live results</a>
+      </div>
+      <p class="status-note">Testable today via Expo Go &amp; TestFlight · Store submission in preparation</p>
+    </div>
+
+    <!-- The hero is the device, showing the real report UI and real data. -->
+    <div class="device-stage">
+      <div class="device" role="img"
+           aria-label="Phone showing the auditor app: a duplication report where Claude Code scores 0.00 percent and Replit Agent scores 9.56 percent.">
+        <div class="screen">
+          <div class="notch"></div>
+          <div>
+            <p class="scr-eyebrow">Assurance report</p>
+            <p class="scr-title">main_001</p>
+            <p class="scr-meta">5 METRICS · 4 TOOLS + HUMAN REFERENCE</p>
+          </div>
+          <div class="scr-banner">
+            <b>✓</b><div>Every value traces back to the spec and analyser version that produced it.</div>
+          </div>
+          <div class="scr-card">
+            <h4>Duplication</h4>
+            <p class="sub">Share of code that is repeated boilerplate</p>
+            <div class="scr-row">
+              <div class="scr-row-top"><span class="scr-cond">Claude Code</span><span class="scr-val num">0.00%</span></div>
+              <div class="scr-track"><div class="scr-fill" style="--d:.15s;--w:2%;  background:#35B8A6"></div></div>
+            </div>
+            <div class="scr-row">
+              <div class="scr-row-top"><span class="scr-cond">Cursor Agent</span><span class="scr-val num">0.90%</span></div>
+              <div class="scr-track"><div class="scr-fill" style="--d:.24s;--w:9%;  background:#35B8A6"></div></div>
+            </div>
+            <div class="scr-row">
+              <div class="scr-row-top"><span class="scr-cond">Antigravity</span><span class="scr-val num">4.26%</span></div>
+              <div class="scr-track"><div class="scr-fill" style="--d:.33s;--w:45%; background:#35B8A6"></div></div>
+            </div>
+            <div class="scr-row">
+              <div class="scr-row-top"><span class="scr-cond">Replit Agent</span><span class="scr-val num">9.56%</span></div>
+              <div class="scr-track"><div class="scr-fill" style="--d:.42s;--w:100%;background:#D4A45C"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============================== THE FIVE ============================== -->
+<section class="band wrap">
+  <div class="sec-head">
+    <p class="eyebrow">Five levels of credibility check</p>
+    <h2>The same calibrated scales the auditor uses — read at a glance.</h2>
+    <p>
+      Each check carries decision bands, not a bare number. The app paints every
+      value against these thresholds, so a red bar means the same thing on the
+      phone as it does in the report. Markers below show a real value observed
+      in the study.
+    </p>
+  </div>
+
+  <div class="gauges">
+    <div class="gauge">
+      <div class="gauge-top">
+        <h3>Security</h3>
+        <span class="obs num">observed 43.7 · Cursor</span>
+      </div>
+      <p class="what">CWE-tagged findings per 1,000 lines of Python.</p>
+      <div class="scale">
+        <div class="zone-good" style="flex:50"></div>
+        <div class="zone-warn" style="flex:50"></div>
+        <div class="zone-crit" style="flex:30"></div>
+        <div class="needle" style="--at:33%"></div>
+      </div>
+      <div class="ticks"><span>0</span><span>50</span><span>100</span><span>130+</span></div>
+    </div>
+
+    <div class="gauge">
+      <div class="gauge-top">
+        <h3>Complexity</h3>
+        <span class="obs num">observed 3.35 · Claude</span>
+      </div>
+      <p class="what">Structural density per function — read beside duplication.</p>
+      <div class="scale">
+        <div class="zone-good" style="flex:30"></div>
+        <div class="zone-warn" style="flex:30"></div>
+        <div class="zone-crit" style="flex:20"></div>
+        <div class="needle" style="--at:42%"></div>
+      </div>
+      <div class="ticks"><span>0</span><span>3</span><span>6</span><span>8+</span></div>
+    </div>
+
+    <div class="gauge">
+      <div class="gauge-top">
+        <h3>Duplication</h3>
+        <span class="obs num">observed 9.56 · Replit</span>
+      </div>
+      <p class="what">Repeated-block detection, language-agnostic.</p>
+      <div class="scale">
+        <div class="zone-good" style="flex:50"></div>
+        <div class="zone-warn" style="flex:50"></div>
+        <div class="zone-crit" style="flex:30"></div>
+        <div class="needle" style="--at:73%"></div>
+      </div>
+      <div class="ticks"><span>0</span><span>5</span><span>10</span><span>13+</span></div>
+    </div>
+
+    <div class="gauge">
+      <div class="gauge-top">
+        <h3>Scope drift</h3>
+        <span class="obs num">observed 1.00 · Replit</span>
+      </div>
+      <p class="what">Features shipped that the specification never asked for.</p>
+      <div class="scale">
+        <div class="zone-good" style="flex:20"></div>
+        <div class="zone-warn" style="flex:40"></div>
+        <div class="zone-crit" style="flex:20"></div>
+        <div class="needle" style="--at:25%"></div>
+      </div>
+      <div class="ticks"><span>0</span><span>1</span><span>3</span><span>4+</span></div>
+    </div>
+
+    <div class="gauge">
+      <div class="gauge-top">
+        <h3>Rework</h3>
+        <span class="obs num">observed 51.8 · human</span>
+      </div>
+      <p class="what">Correction effort during the session — the human reference.</p>
+      <div class="scale">
+        <div class="zone-good" style="flex:10"></div>
+        <div class="zone-warn" style="flex:15"></div>
+        <div class="zone-crit" style="flex:35"></div>
+        <div class="needle" style="--at:87%"></div>
+      </div>
+      <div class="ticks"><span>0</span><span>10</span><span>25</span><span>60+</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== THE FINDING ============================== -->
+<section class="finding">
+  <div class="wrap finding-inner">
+    <p class="eyebrow">Why this is worth carrying</p>
+    <blockquote>
+      <span class="said">“Do not build a pipeline.”</span>
+      <span class="did">It built a pipeline.</span>
+    </blockquote>
+    <p class="after">
+      Given a command-line-tool specification in a clean, contamination-checked
+      workspace — with an explicit instruction forbidding pipeline output — a
+      leading agent shipped a data-pipeline application instead. Confirmed by
+      reading the code. <b>Every functional test would have passed it: the wrong
+      product, built well.</b> That is the class of risk no benchmark reports and
+      no green CI badge reveals — and it is what this instrument exists to catch.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== HOW ============================== -->
+<section class="band wrap">
+  <div class="sec-head">
+    <p class="eyebrow">How it works</p>
+    <h2>The engine measures. The phone reports.</h2>
+    <p>
+      Evaluations run where static analysis belongs — on a machine with a
+      filesystem and a toolchain. The app is the client that puts the resulting
+      evidence in your hand.
+    </p>
+  </div>
+  <div class="flow">
+    <div class="step">
+      <span class="n">STEP 01</span>
+      <h3>One fixed specification</h3>
+      <p>
+        The same versioned brief goes to every candidate tool — and to a human
+        reference. Nothing is compared unless it was produced under identical
+        conditions.
+      </p>
+    </div>
+    <div class="step">
+      <span class="n">STEP 02</span>
+      <h3>Five analysers score it</h3>
+      <p>
+        Security, complexity, duplication, scope drift and rework — each its own
+        deterministic, version-pinned analyser, blind to which tool produced the
+        code.
+      </p>
+    </div>
+    <div class="step">
+      <span class="n">STEP 03</span>
+      <h3>Evidence in your pocket</h3>
+      <p>
+        Results publish to the dashboard API; the app reads them over HTTPS and
+        renders the report — same numbers, same thresholds, same provenance, on
+        the device you already carry.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== HONESTY ============================== -->
+<section class="band wrap">
+  <div class="honest">
+    <p class="eyebrow">Stated plainly</p>
+    <h3>What the app does not do</h3>
+    <p>
+      It does not run the analysers on your phone. They shell out to static
+      analysis tools and walk a filesystem, which no mobile sandbox permits —
+      so the app is a reporting client, not the engine. It collects no personal
+      data, has no accounts, no analytics and no advertising identifiers; it
+      makes anonymous read-only requests to the evaluation API.
+    </p>
+    <p>
+      We say this here for the same reason the instrument reports its own blind
+      spots: an assurance product that overstates itself has already failed its
+      own test.
+    </p>
+  </div>
+</section>
+
+<!-- ============================== SHIP ============================== -->
+<section class="band wrap" id="ship">
+  <div class="ship">
+    <div class="sec-head" style="margin-bottom:0">
+      <p class="eyebrow">Getting it on a device</p>
+      <h2>Three routes, in the order they become available.</h2>
+      <p>
+        Built with Expo and React Native from one TypeScript codebase, so iOS and
+        Android ship together. Builds run in the cloud — no Mac required for the
+        iOS binary.
+      </p>
+    </div>
+    <ul class="routes">
+      <li class="route">
+        <span class="when">Today</span>
+        <span class="what">
+          <b>Expo Go</b>
+          <span>Scan a QR code and the app opens on your phone against the live
+          API. Best for demos — no account, no build, no review.</span>
+        </span>
+      </li>
+      <li class="route">
+        <span class="when">This week</span>
+        <span class="what">
+          <b>TestFlight &amp; Play internal testing</b>
+          <span>A real signed build, installed from a link. The right route for
+          partners and pilot clients: no public review queue.</span>
+        </span>
+      </li>
+      <li class="route">
+        <span class="when">Next</span>
+        <span class="what">
+          <b>App Store &amp; Google Play</b>
+          <span>Public release once developer-account verification and store
+          review complete. Bundle ID <code>dev.rume.aicodeauditor</code>.</span>
+        </span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>
+    AI Code Quality Auditor — MSc AI research instrument, Aston University ·
+    <a href="https://auditor-dashboard-rume.fly.dev/report/main_001_plus_human">Live dashboard</a> ·
+    <code>pip install ai-code-quality-auditor</code>
+  </p>
+</footer>
