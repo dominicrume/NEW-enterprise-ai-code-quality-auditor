@@ -21,7 +21,95 @@ CONDITIONS = ["human_control", "claude_code", "cursor_agent", "antigravity", "re
 
 @click.group()
 def main():
-    """AI Code Quality Auditor."""
+    """AI Code Quality Auditor.
+
+    \b
+    Audit a folder:   auditor scan .
+    Run the study:    auditor experiment --run-label main_001 --reps 10
+    """
+
+
+BAND_STYLE = {"good": "green", "warn": "yellow", "critical": "red"}
+BAND_MARK = {"good": "OK", "warn": "WARN", "critical": "RISK"}
+
+
+@main.command("scan")
+@click.argument("path", type=click.Path(exists=True, file_okay=False, path_type=Path),
+                default=".")
+@click.option("--spec", type=click.Path(exists=True, dir_okay=False, path_type=Path),
+              default=None,
+              help="Spec YAML declaring what was asked for. Enables the scope-drift check.")
+@click.option("--json", "as_json", is_flag=True, help="Emit JSON instead of a table.")
+@click.option("--fail-on", type=click.Choice(["never", "warn", "critical"]),
+              default="never", show_default=True,
+              help="Exit non-zero at this severity, for CI gating.")
+def scan_cmd(path: Path, spec: Path | None, as_json: bool, fail_on: str):
+    """Audit a directory in place — no session, no setup.
+
+    \b
+      auditor scan .                       audit the current folder
+      auditor scan ./src --spec spec.yaml  include the scope-drift check
+      auditor scan . --fail-on critical    gate a CI pipeline
+    """
+    import json as _json
+
+    import yaml
+    from rich.console import Console
+    from rich.table import Table
+
+    from auditor.core.scan import scan_directory
+
+    spec_data = yaml.safe_load(spec.read_text()) if spec else None
+    result = scan_directory(path, spec_data)
+
+    if as_json:
+        click.echo(_json.dumps({
+            "path": str(result.path),
+            "files": result.file_count,
+            "total_loc": result.total_loc,
+            "python_files": result.python_files,
+            "spec": result.spec_name,
+            "coverage_note": result.coverage_note,
+            "metrics": {
+                o.name: ({"value": o.value, "unit": o.unit, "band": o.band}
+                         if o.applicable else {"skipped": o.skipped_reason})
+                for o in result.outcomes
+            },
+        }, indent=2))
+    else:
+        console = Console()
+        console.print()
+        console.print(f"[bold]{result.path}[/bold]")
+        console.print(
+            f"[dim]{result.file_count} files · {result.total_loc} lines · "
+            f"{result.python_files} Python"
+            + (f" · spec: {result.spec_name}" if result.spec_name else "")
+            + "[/dim]\n"
+        )
+
+        table = Table(show_edge=False, header_style="dim", pad_edge=False)
+        table.add_column("")
+        table.add_column("Check")
+        table.add_column("Value", justify="right")
+        table.add_column("")
+        for o in result.outcomes:
+            if o.applicable:
+                style = BAND_STYLE[o.band]
+                table.add_row(f"[{style}]●[/{style}]", o.label,
+                              f"{o.value:.2f}", f"[{style}]{BAND_MARK[o.band]}[/{style}]")
+            else:
+                table.add_row("[dim]○[/dim]", f"[dim]{o.label}[/dim]",
+                              "[dim]n/a[/dim]", f"[dim]{o.skipped_reason}[/dim]")
+        console.print(table)
+
+        if result.coverage_note:
+            console.print(f"\n[yellow]Coverage:[/yellow] {result.coverage_note}")
+        console.print()
+
+    thresholds = {"never": None, "warn": ("warn", "critical"), "critical": ("critical",)}
+    trigger = thresholds[fail_on]
+    if trigger and result.worst_band in trigger:
+        raise SystemExit(1)
 
 
 @main.command("run")

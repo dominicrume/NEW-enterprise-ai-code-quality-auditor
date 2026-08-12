@@ -19,6 +19,8 @@ from pathlib import Path
 
 from flask import Flask, abort, jsonify, render_template
 
+from auditor.core.calibration import BANDS
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 REPORTS_DIR = ROOT / "data" / "reports"
 
@@ -31,16 +33,10 @@ METRIC_LOWER_BETTER = {
     "correction_freq": True,
 }
 
-# Calibrated interpretation for partner-facing charts.
-# These values are not arbitrary; they reflect the metric semantics in
-# docs/METRICS.md and the practical decision thresholds for enterprise use.
-METRIC_CALIBRATION = {
-    "security_density": {"ideal": 0.0, "warning": 50.0, "critical": 100.0},
-    "complexity_mean": {"ideal": 0.0, "warning": 3.0, "critical": 6.0},
-    "duplication_pct": {"ideal": 0.0, "warning": 5.0, "critical": 10.0},
-    "hallucinations": {"ideal": 0.0, "warning": 1.0, "critical": 3.0},
-    "correction_freq": {"ideal": 0.0, "warning": 10.0, "critical": 25.0},
-}
+# Calibrated interpretation for partner-facing charts. Declared once in
+# auditor/core/calibration.py so the CLI, dashboard and mobile client cannot
+# drift apart and report three different verdicts for the same number.
+METRIC_CALIBRATION = BANDS
 
 # Short human descriptions surfaced in the UI.
 METRIC_BLURB = {
