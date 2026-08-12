@@ -25,10 +25,65 @@ def main():
     """AI Code Quality Auditor.
 
     \b
+    Start here:       auditor live
     Audit a folder:   auditor scan .
-    Watch it live:    auditor watch . --spec spec.yaml
+    Watch a folder:   auditor watch .
     Run the study:    auditor experiment --run-label main_001 --reps 10
     """
+
+
+@main.command("live")
+@click.argument("path", type=click.Path(exists=True, file_okay=False, path_type=Path),
+                default=".")
+@click.option("--port", default=7777, show_default=True, type=int)
+@click.option("--no-open", is_flag=True, help="Don't open a browser automatically.")
+@click.option("--interval", default=1.0, show_default=True, type=float,
+              help="Seconds between change checks.")
+def live_cmd(path: Path, port: int, no_open: bool, interval: float):
+    """Open a live audit dashboard for a folder. Start here.
+
+    \b
+      auditor live            audit this folder, live, in your browser
+
+    Watches the folder and updates as code changes — yours or an agent's.
+    Type what you asked the agent to build and scope-drift checking turns
+    on. Ctrl+C to stop.
+    """
+    import logging
+    import threading
+    import webbrowser
+
+    import flask.cli
+
+    from auditor.live.server import LiveSession, create_app
+
+    # A local audit tool is not a deployment. The dev-server banner and the
+    # per-request log are noise that reads as an error to a first-time user.
+    flask.cli.show_server_banner = lambda *a, **k: None
+    logging.getLogger("werkzeug").setLevel(logging.ERROR)
+
+    session = LiveSession(path, interval=interval)
+    app = create_app(session)  # starts the watcher
+
+    url = f"http://127.0.0.1:{port}"
+    click.echo()
+    click.echo(f"  Live audit  {session.project}")
+    click.echo(f"  {url}")
+    click.echo(f"  {session.latest.file_count} files · "
+               f"{session.latest.total_loc} lines · Ctrl+C to stop")
+    click.echo()
+
+    if not no_open:
+        threading.Timer(0.7, lambda: webbrowser.open(url)).start()
+
+    try:
+        app.run(host="127.0.0.1", port=port, threaded=True,
+                debug=False, use_reloader=False)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        session.stop()
+        click.echo("stopped")
 
 
 BAND_STYLE = {"good": "green", "warn": "yellow", "critical": "red"}

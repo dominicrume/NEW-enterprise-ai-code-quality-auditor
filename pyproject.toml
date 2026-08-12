@@ -1,6 +1,6 @@
 [project]
 name = "ai-code-quality-auditor"
-version = "0.2.1"
+version = "0.3.0"
 description = "Empirical Safety Harness for agentic AI coding systems. Scores AI-generated code on 5 metrics across 5 vendor conditions against one fixed spec."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -28,6 +28,9 @@ dependencies = [
   "radon>=6.0",
   "python-dotenv>=1.0",
   "bandit>=1.8",
+  # `auditor live` is the primary entry point; a user should never have to
+  # know about extras to run the command the docs open with.
+  "flask>=3.0",
 ]
 
 [project.optional-dependencies]
@@ -59,6 +62,7 @@ exclude = ["tests*", "data*", "scripts*", "docs*", "specs*"]
 
 [tool.setuptools.package-data]
 "auditor.dashboard" = ["templates/*.html", "static/*"]
+"auditor.live" = ["templates/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

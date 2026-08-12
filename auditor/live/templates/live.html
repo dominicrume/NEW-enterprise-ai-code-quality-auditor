@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ project }} — live audit</title>
+<style>
+  :root{
+    --paper:#F4F6F3; --surface:#FFF; --ink:#161C1A; --muted:#58635D; --line:#DDE3DC;
+    --accent:#0F766E; --good:#0F766E; --warn:#B07D2E; --critical:#A8443A;
+    --track:#E6EAE5; --shadow:0 1px 2px #0000000A, 0 8px 24px #0000000A;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0E1211; --surface:#171D1A; --ink:#E9EDE9; --muted:#96A099; --line:#28302C;
+    --accent:#35B8A6; --good:#35B8A6; --warn:#D4A45C; --critical:#D9705E;
+    --track:#212925; --shadow:0 1px 2px #00000040, 0 8px 24px #00000040;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:66rem;margin:0 auto;padding:1.5rem 1.25rem 4rem}
+
+  header{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin-bottom:.35rem}
+  h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
+  .live{display:inline-flex;align-items:center;gap:.45rem;font:600 .7rem/1 var(--mono);
+    letter-spacing:.1em;text-transform:uppercase;color:var(--accent);
+    border:1px solid var(--accent);border-radius:999px;padding:.34rem .7rem}
+  .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--accent)}
+  @media (prefers-reduced-motion:no-preference){.dot{animation:pulse 2s ease-in-out infinite}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .sub{color:var(--muted);font-size:.88rem;margin:0 0 1.5rem}
+  .sub b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+  /* ---------- brief prompt: the first thing a new user meets ---------- */
+  .brief{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:10px;padding:1.15rem 1.25rem;margin-bottom:1.5rem;box-shadow:var(--shadow)}
+  .brief h2{margin:0 0 .3rem;font-size:1.05rem;letter-spacing:-.01em}
+  .brief p{margin:0 0 .8rem;color:var(--muted);font-size:.9rem}
+  textarea{width:100%;min-height:5.5rem;resize:vertical;padding:.7rem .8rem;
+    border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);
+    font:inherit;font-size:.92rem}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .brief-row{display:flex;gap:.6rem;align-items:center;margin-top:.7rem;flex-wrap:wrap}
+  button{font:600 .9rem/1 inherit;padding:.62rem 1.1rem;border-radius:7px;border:0;
+    background:var(--accent);color:var(--paper);cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  button:disabled{opacity:.5;cursor:default}
+  .hint{color:var(--muted);font-size:.82rem}
+  .brief.done{border-left-color:var(--good)}
+  .brief.done textarea,.brief.done .brief-row{display:none}
+
+  /* ---------- metric cards ---------- */
+  .grid{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));
+    margin-bottom:1.6rem}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:11px;
+    padding:1rem 1.05rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .card .rail{position:absolute;inset-inline-start:0;inset-block:0;width:3px;background:var(--track)}
+  .card.good .rail{background:var(--good)} .card.warn .rail{background:var(--warn)}
+  .card.critical .rail{background:var(--critical)}
+  .card h3{margin:0;font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-family:var(--mono);font-weight:600}
+  .val{font-size:2.15rem;font-weight:700;letter-spacing:-.045em;margin:.35rem 0 .1rem;
+    font-variant-numeric:tabular-nums;line-height:1}
+  .card.good .val{color:var(--good)} .card.warn .val{color:var(--warn)}
+  .card.critical .val{color:var(--critical)}
+  .card.na .val{font-size:1.35rem;color:var(--muted);font-weight:600}
+  .unit{font-size:.76rem;color:var(--muted);font-family:var(--mono)}
+  .why{font-size:.78rem;color:var(--muted);margin-top:.3rem;line-height:1.35}
+  @media (prefers-reduced-motion:no-preference){
+    .card.bump{animation:bump .5s cubic-bezier(.3,1.4,.5,1)}
+    @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.045)}100%{transform:scale(1)}}
+  }
+
+  .note{background:color-mix(in srgb,var(--warn) 12%,var(--surface));
+    border:1px solid color-mix(in srgb,var(--warn) 35%,var(--line));
+    border-radius:9px;padding:.8rem 1rem;font-size:.88rem;margin-bottom:1.6rem}
+
+  /* ---------- activity feed ---------- */
+  h2.feed-title{font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-family:var(--mono);margin:0 0 .7rem}
+  .feed{display:flex;flex-direction:column;gap:.5rem}
+  .ev{background:var(--surface);border:1px solid var(--line);border-radius:9px;
+    padding:.7rem .9rem;font-size:.88rem}
+  @media (prefers-reduced-motion:no-preference){.ev{animation:in .35s ease-out}}
+  @keyframes in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+  .ev .when{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .ev .files{font-family:var(--mono);font-size:.78rem;color:var(--accent);
+    word-break:break-all;margin:.15rem 0 .3rem}
+  .ev .line{display:flex;gap:.45rem;align-items:baseline}
+  .ev .line + .line{margin-top:.15rem}
+  .up{color:var(--critical);font-weight:700} .down{color:var(--good);font-weight:700}
+  .new{color:var(--accent);font-weight:700}
+  .idle{color:var(--muted);font-size:.88rem;padding:.8rem .1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="proj">{{ project }}</h1>
+    <span class="live"><span class="dot"></span><span id="conn">watching</span></span>
+  </header>
+  <p class="sub" id="meta">starting…</p>
+
+  <section class="brief" id="briefBox" hidden>
+    <h2>What did you ask the agent to build?</h2>
+    <p>Paste the prompt you gave it — one feature per line. This turns on scope-drift
+       detection, which catches the agent building things nobody asked for.</p>
+    <textarea id="briefText" placeholder="Users can register with email and password&#10;Users can log in&#10;List available courses&#10;View a course and its lessons"></textarea>
+    <div class="brief-row">
+      <button id="briefBtn">Start checking scope</button>
+      <span class="hint" id="briefHint">Saved to .auditor/spec.yaml — editable any time.</span>
+    </div>
+  </section>
+
+  <div class="grid" id="cards"></div>
+  <div class="note" id="note" hidden></div>
+
+  <h2 class="feed-title">Activity</h2>
+  <div class="feed" id="feed">
+    <div class="idle" id="idle">Waiting for changes. Edit a file, or let your agent work —
+      results update here automatically.</div>
+  </div>
+</div>
+
+<script>
+const cards = document.getElementById('cards');
+const feed  = document.getElementById('feed');
+const idle  = document.getElementById('idle');
+const note  = document.getElementById('note');
+const meta  = document.getElementById('meta');
+const briefBox = document.getElementById('briefBox');
+const fmt = v => Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(2);
+let prev = {};
+
+function render(r){
+  meta.innerHTML = `<b>${r.files}</b> files · <b>${r.loc}</b> lines · <b>${r.python_files}</b> Python`
+    + (r.spec ? ` · spec: <b>${r.spec}</b>` : ' · no brief yet');
+  cards.innerHTML = '';
+  for (const m of r.metrics){
+    const na = m.value === null || m.value === undefined;
+    const el = document.createElement('div');
+    el.className = 'card ' + (na ? 'na' : m.band);
+    el.innerHTML = `<span class="rail"></span><h3>${m.label}</h3>`
+      + (na ? `<div class="val">n/a</div><div class="why">${m.skipped}</div>`
+            : `<div class="val">${fmt(m.value)}</div><span class="unit">${m.unit}</span>`);
+    if (!na && prev[m.name] !== undefined && prev[m.name] !== m.value) el.classList.add('bump');
+    cards.appendChild(el);
+    prev[m.name] = na ? undefined : m.value;
+  }
+  if (r.coverage_note){ note.hidden = false; note.textContent = r.coverage_note; }
+  else note.hidden = true;
+  briefBox.hidden = !!r.spec;
+}
+
+function addEvent(ev){
+  idle.remove?.();
+  const when = new Date().toLocaleTimeString();
+  const files = ev.report.changed.slice(0,4).join(', ')
+    + (ev.report.changed.length > 4 ? ` +${ev.report.changed.length-4} more` : '');
+  let lines = '';
+  for (const d of ev.deltas){
+    if (d.became_measurable)
+      lines += `<div class="line"><span class="new">▲</span><span><b>${d.label}</b> now measurable — ${fmt(d.after)}</span></div>`;
+    else if (d.became_unmeasurable)
+      lines += `<div class="line"><span>○</span><span><b>${d.label}</b> no longer measurable</span></div>`;
+    else {
+      const worse = d.direction === 'worse';
+      lines += `<div class="line"><span class="${worse?'up':'down'}">${worse?'↑':'↓'}</span>`
+        + `<span><b>${d.label}</b> ${fmt(d.before)} → ${fmt(d.after)}`
+        + (d.changed_band ? ` <b>(${d.before_band} → ${d.after_band})</b>` : '') + `</span></div>`;
+    }
+  }
+  if (!lines) lines = '<div class="line"><span>·</span><span>no metric changed</span></div>';
+  const el = document.createElement('div');
+  el.className = 'ev';
+  el.innerHTML = `<div class="when">${when}</div><div class="files">${files||'—'}</div>${lines}`;
+  feed.prepend(el);
+  while (feed.children.length > 40) feed.lastChild.remove();
+}
+
+const es = new EventSource('/api/stream');
+es.onmessage = e => {
+  const msg = JSON.parse(e.data);
+  render(msg.report);
+  if (msg.report.changed?.length || msg.deltas?.length) addEvent(msg);
+};
+es.onerror = () => { document.getElementById('conn').textContent = 'reconnecting'; };
+es.onopen  = () => { document.getElementById('conn').textContent = 'watching'; };
+
+const btn = document.getElementById('briefBtn');
+btn.onclick = async () => {
+  const brief = document.getElementById('briefText').value.trim();
+  if (!brief) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const res = await fetch('/api/brief', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({brief})
+  });
+  const data = await res.json();
+  btn.disabled = false; btn.textContent = 'Start checking scope';
+  if (res.ok){
+    briefBox.classList.add('done');
+    briefBox.querySelector('h2').textContent = `Checking ${data.features} requested features`;
+    briefBox.querySelector('p').textContent = `Saved to ${data.spec_path}`;
+  } else {
+    document.getElementById('briefHint').textContent = data.error;
+  }
+};
+
+fetch('/api/state').then(r => r.json()).then(s => render(s.report));
+</script>
+</body>
+</html>

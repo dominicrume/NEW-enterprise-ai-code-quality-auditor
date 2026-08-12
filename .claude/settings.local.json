@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(curl -s --max-time 20 https://auditor-dashboard-rume.fly.dev/api/reports)",
+      "Bash(curl -s --max-time 20 https://auditor-dashboard-rume.fly.dev/api/report/main_001_plus_human)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\); print\\('conditions:',d.get\\('conditions'\\)\\); print\\('metrics sample:', json.dumps\\(d.get\\('metrics',[]\\)[:1]\\)[:500]\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(npm view *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\({k:v for k,v in d.items\\(\\) if 'react' in k.lower\\(\\)}\\)\")",
+      "Bash(npx --yes create-expo-app@latest mobile --template blank-typescript --no-install)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"=== exit: $? ===\")",
+      "Bash(npx expo *)",
+      "Bash(rm -rf /tmp/expo-export-check; grep -n \"node_modules\" .gitignore || echo \"!! node_modules NOT ignored\"; ls mobile/.gitignore 2>/dev/null && cat mobile/.gitignore)",
+      "Bash(git add *)",
+      "Bash(git check-ignore *)",
+      "Bash(git rm *)",
+      "Bash(rm -rf mobile/.claude)",
+      "Bash(git commit -q -m ' *)",
+      "Bash(python3 -)",
+      "Bash(auditor --help)",
+      "Bash(echo \"--- exit: $? ---\")",
+      "Bash(curl -s https://pypi.org/pypi/ai-code-quality-auditor/json)",
+      "Bash(.venv/bin/auditor --help)",
+      "Bash(.venv/bin/python -V)",
+      "Bash(.venv/bin/python -m pip install --quiet build twine)",
+      "Bash(.venv/bin/python -m build)",
+      "Bash(.venv/bin/python -m twine check dist/*)",
+      "Bash(.venv/bin/python -c ' *)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp/expo-export-check"
+    ]
+  }
+}
