@@ -83,6 +83,30 @@ def beat(n: int, title: str, say: str) -> None:
     input(f"{DIM}    press Enter{OFF}")
 
 
+def reset(project: Path) -> None:
+    """Clear anything a previous run left behind.
+
+    A rehearsal leaves main.py, utils.py and the saved spec in place. Start
+    the real demo on top of those and the panel opens already showing the
+    end state — scope drift at 2.00, nothing left to move, no story. So the
+    driver always begins from empty rather than trusting anyone to remember.
+    """
+    import shutil
+
+    removed = []
+    for name in ("main.py", "utils.py"):
+        target = project / name
+        if target.exists():
+            target.unlink()
+            removed.append(name)
+    spec_dir = project / ".auditor"
+    if spec_dir.exists():
+        shutil.rmtree(spec_dir)
+        removed.append(".auditor/")
+    if removed:
+        print(f"{DIM}    reset: removed {', '.join(removed)}{OFF}")
+
+
 def main() -> int:
     if len(sys.argv) < 2:
         print("usage: python scripts/demo_agent.py <project-folder>")
@@ -92,7 +116,10 @@ def main() -> int:
     main_py = project / "main.py"
 
     print(f"\n{BOLD}DEMO DRIVER{OFF}  →  {project}")
+    reset(project)
     print(f"{DIM}Have `auditor live {project}` running in another window.{OFF}")
+    print(f"{AMBER}    If it was already running, press Ctrl+C there and start it "
+          f"again now — so it opens on an empty folder.{OFF}")
     print(f"\n{BOLD}The brief to paste into the browser box:{OFF}\n{GREEN}{BRIEF}{OFF}")
     input(f"\n{DIM}Paste it, press 'Start checking scope', then press Enter here{OFF}")
 
