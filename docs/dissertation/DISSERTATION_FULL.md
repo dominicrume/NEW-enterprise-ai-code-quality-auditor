@@ -157,8 +157,12 @@ sharpened every chapter. Any errors that remain are my own.
 - Table 4.4 Human baseline versus AI-condition means, per specification
 
 **List of Figures**
+- Figure 3.1 Instrument architecture: specification to report
+- Figure 3.2 The capture contract: one comparable shape from heterogeneous workflows
+- Figure 3.3 Decision bands for each metric
 - Figure 4.1 Forest plot: per-condition means with bootstrap 95% CIs
 - Figure 4.2 Violin plots: distribution shape per (condition × metric)
+- Figure 4.3 Off-spec features by tool and task domain
 
 ---
 
@@ -504,7 +508,19 @@ and process metrics; and the *specification* is treated as a second, crossed
 factor so that condition-by-task interactions can be estimated directly (RQ3).
 Holding the specification fixed across conditions is the design's central control:
 because every condition implements the identical brief, differences in the
-measured artefacts are attributable to the workflow rather than to the task. The
+measured artefacts are attributable to the workflow rather than to the task.
+Figure 3.1 sets out the resulting pipeline end to end.
+
+![Instrument architecture](figures/fig_3_1_architecture.png)
+
+**Figure 3.1** The instrument's architecture. One fixed, versioned specification
+is issued to every condition; one adapter per vendor captures the result into a
+single capture contract; one analyser per metric scores that contract without
+sight of which condition produced it; and a provenance-stamped report is emitted.
+The file-level isolation — one adapter per vendor, one analyser per metric — is
+what allows a condition or a metric to be added without touching any other.
+
+The
 use of three specifications spanning distinct domains (a web application, an ETL
 pipeline, and a command-line tool) is a deliberate external-validity device — a
 single-specification study could not distinguish a general tool property from a
@@ -543,6 +559,17 @@ edit) is normalised to `agent_action` with vendor-native detail preserved in
 sibling keys for forensics but hidden from the analysers. The contract is the
 boundary that makes a human and an agent comparable, and it is enforced at load
 time: malformed events abort the run rather than silently degrading a metric.
+
+The normalisation this requires is shown in Figure 3.2.
+
+![The capture contract](figures/fig_3_2_capture_contract.png)
+
+**Figure 3.2** The capture contract. A human pressing keys and an agent
+streaming tool-calls produce structurally unrelated traces; both are normalised
+into the same two artefacts — a `codebase` mapping and a typed
+`interaction_log` — before any analyser sees them. Vendor-native detail is
+preserved in sibling fields for forensics, but comparability is enforced at this
+boundary rather than inside each metric.
 
 The design significance of the capture contract is that it relocates all
 vendor-specific reasoning to a thin *adapter* layer — one file per vendor — whose
@@ -612,6 +639,16 @@ by the orchestrator after scoring. The pipeline is therefore blinded not by
 discipline but by interface design — a deliberate guard against the
 vendor-favouring bias that unblinded, hand-tuned evaluation harnesses are prone
 to. The five analysers are as follows.
+
+Figure 3.3 shows the decision bands each metric is read against.
+
+![Decision bands for each metric](figures/fig_3_3_metric_bands.png)
+
+**Figure 3.3** Decision bands applied to each metric when results are presented
+to a non-specialist audience. The thresholds are interpretation *policy*, held
+in one module (`auditor/core/calibration.py`) so that the command line, the
+dashboard and the reporting client cannot report different verdicts for the same
+number. They bound the reading of a value; they do not affect its measurement.
 
 *Security density (§3.4.1).* The analyser materialises the captured codebase to
 a temporary directory and invokes the Bandit static analyser, counting only
@@ -755,14 +792,14 @@ N = 30 per condition (10 replications × 3 specifications).
 | Security density (per kLOC) | 42.05 | 43.67 | 0.00 | 1.48 |
 | Keystroke correction (per 1k) | 0.00 | 0.00 | 0.00 | 0.00 |
 
-*[Insert Figure 4.1 here — `notebooks/forest_plots.png`]*
+![Forest plot of per-condition means](../../notebooks/forest_plots.png)
 
 **Figure 4.1** Forest plot of per-condition means with bootstrap 95% confidence
 intervals (10,000 replicates), by metric. The intervals for `replit_agent` and
 `antigravity` are degenerate by construction: those conditions contribute one
 captured session per specification (Deviation 001, analysed in §4.5).
 
-*[Insert Figure 4.2 here — `notebooks/violin_plots.png`]*
+![Violin plots of per-condition distributions](../../notebooks/violin_plots.png)
 
 **Figure 4.2** Violin plots of the distribution shape for each
 (condition × metric) pair. The collapsed distributions for the two IDE-bound
@@ -891,7 +928,15 @@ count per (condition × specification) cell.
 | replit_agent | 0.00 | 0.00 | 3.00 |
 | antigravity | 1.00 | 0.00 | 0.00 |
 
-Three patterns are visible by inspection. Cursor's hallucinations are confined to
+![Off-spec features by tool and task domain](figures/fig_4_3_hallucination_heatmap.png)
+
+**Figure 4.3** Table 4.2 rendered as a heatmap. The concentration of off-spec
+output in a single cell — `replit_agent` on the CLI specification — is the
+study's most consequential result, and its isolation from every other cell is
+the clearest available statement that tool behaviour is task-conditional rather
+than uniform.
+
+Figure 4.3 renders the same data as a heatmap, in which the pattern is immediate. Three patterns are visible by inspection. Cursor's hallucinations are confined to
 `agent_education_system`, the web-app spec; Antigravity's are likewise localised
 to that same web-app spec, where it averages a full off-spec route per run; and
 Replit's hallucinations are *entirely concentrated in the CLI spec* — zero in the
