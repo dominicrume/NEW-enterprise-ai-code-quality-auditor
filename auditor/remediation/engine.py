@@ -161,19 +161,32 @@ def _within(path: Path, root: Path) -> bool:
         return False
 
 
+def _contained(path: Path, root: Path) -> Path:
+    """Rebuild ``path`` from ``root`` so the result cannot escape it.
+
+    Validating a path and then writing to the original leaves the write
+    target still derived from untrusted input — and a reader (human or
+    scanner) has to trace the guard to know it is safe. Deriving the target
+    from ``root`` plus a verified relative segment makes containment a
+    property of how the path is constructed, not of a check somewhere above.
+    """
+    root = Path(root).resolve()
+    rel = Path(path).resolve().relative_to(root)      # raises if outside
+    return root.joinpath(rel)
+
+
 def _write_proposals(path: Path, proposals: list[tuple[int, Proposal]],
                      root: Path) -> None:
     """Apply every proposal for one file, bottom-up so line numbers hold."""
-    if not _within(path, root):
-        raise ValueError(f"refusing to write outside the sandbox: {path}")
-    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    target = _contained(path, root)
+    lines = target.read_text(encoding="utf-8").splitlines(keepends=True)
     imports: list[str] = []
     for ln, p in sorted(proposals, key=lambda t: -t[0]):
         lines[ln - 1] = p.after
         imports.extend(p.needs_imports)
     if imports:
         lines = _ensure_imports(lines, tuple(sorted(set(imports))))
-    path.write_text("".join(lines), encoding="utf-8")
+    target.write_text("".join(lines), encoding="utf-8")
 
 
 def remediate(root: Path, apply: bool = False) -> Remediation:
@@ -267,8 +280,10 @@ def remediate(root: Path, apply: bool = False) -> Remediation:
 
         if apply and report.fixed:
             for rel in {o.file for o in report.fixed}:
-                src, dest = sandbox / rel, root / rel
-                if not (_within(src, sandbox) and _within(dest, root)):
+                try:
+                    src = _contained(sandbox / rel, sandbox)
+                    dest = _contained(root / rel, root)
+                except ValueError:
                     continue        # never copy out of, or into, an unexpected path
                 shutil.copy2(src, dest)
             report.applied = True
