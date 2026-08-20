@@ -52,12 +52,47 @@ def _run_bandit(scan_dir: Path) -> list[dict]:
     return data.get("results", [])
 
 
+def _is_test_file(rel: str) -> bool:
+    """True for files whose purpose is testing."""
+    name = rel.rsplit("/", 1)[-1]
+    return (
+        name.startswith("test_")
+        or name.endswith("_test.py")
+        or name == "conftest.py"
+        or "/tests/" in f"/{rel}"
+        or rel.startswith("tests/")
+    )
+
+
+def _counts(issues: list[dict], scan_dir: Path) -> list[dict]:
+    """CWE-tagged issues, excluding assertions inside test files.
+
+    B101 fires on every `assert`, because assertions are removed when Python
+    runs with -O and a production check would silently vanish. In a test file
+    the assertion *is* the test: flagging it measures how thoroughly a
+    codebase is tested and reports it as a security score. On this repository
+    that single rule accounted for 291 findings and inflated the density
+    tenfold, so a well-tested submission would score worse than an untested
+    one — the opposite of what the metric is for.
+    """
+    kept = []
+    for issue in issues:
+        if not (issue.get("issue_cwe") or {}).get("id"):
+            continue
+        rel = str(Path(issue["filename"]).relative_to(scan_dir)) \
+            if str(issue["filename"]).startswith(str(scan_dir)) else issue["filename"]
+        if issue.get("test_id") == "B101" and _is_test_file(rel.replace("\\", "/")):
+            continue
+        kept.append(issue)
+    return kept
+
+
 def analyze(codebase: dict, interaction_log: list[dict], spec: dict) -> MetricScore:
     with tempfile.TemporaryDirectory() as tmp:
         scan_dir = Path(tmp) / "code"
         scan_dir.mkdir()
         loc = _write_codebase(codebase, scan_dir) or 1
         issues = _run_bandit(scan_dir)
-    cwe_tagged = [i for i in issues if (i.get("issue_cwe") or {}).get("id")]
+        cwe_tagged = _counts(issues, scan_dir)
     density = (len(cwe_tagged) / loc) * 1000
     return MetricScore(name="security_density", value=density, unit="per_kloc")

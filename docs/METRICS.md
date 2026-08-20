@@ -20,6 +20,15 @@ Each metric lives in its own analyzer file. This document is the contract.
   per-kLOC figures — see PILOT_RESULTS.md §4.1. Local Bandit scoping
   restores per-condition isolation, determinism, and version-pinning.
   SonarQube remains in CI for the host repo's own quality signal only.
+- **Exclusion — assertions in test files.** `B101` fires on every `assert`,
+  because assertions are stripped when Python runs under `-O` and a check
+  written as an assertion would silently disappear from a shipped build. That
+  reasoning does not apply to a test file, where the assertion *is* the test.
+  Counting them makes the metric reward untested code: on this repository
+  alone, B101 in `tests/` produced 291 findings and raised the density from
+  3.27 to 47.05 per kLOC. Assertions are therefore not counted in files named
+  `test_*.py`, `*_test.py`, `conftest.py`, or living under a `tests/`
+  directory. Assertions in production code still count.
 - **Output:** `MetricScore(name="security_density", value=float, unit="per_kloc")`.
 
 ## 2. Cyclomatic complexity

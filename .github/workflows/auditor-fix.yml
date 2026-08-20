@@ -1,0 +1,102 @@
+name: Auditor — propose fixes
+
+# Runs the auditor against this repository and, if it can verify any fixes,
+# opens a pull request containing them.
+#
+# Nothing is ever committed to a branch directly: every change arrives as a PR
+# with the before/after for each edit, so a human decides. A fix only appears
+# here at all if re-scanning proved the finding gone.
+
+on:
+  workflow_dispatch:          # a button in the Actions tab
+    inputs:
+      path:
+        description: "Folder to audit"
+        default: "."
+        required: false
+  schedule:
+    - cron: "0 7 * * 1"       # Monday morning, so the PR is waiting for you
+
+permissions:
+  contents: write             # to push the fix branch
+  pull-requests: write        # to open the PR
+
+jobs:
+  propose-fixes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the auditor
+        run: |
+          pip install -r requirements.lock
+          pip install -e .
+
+      - name: Audit before
+        id: before
+        run: |
+          auditor scan "${{ inputs.path || '.' }}" --json > /tmp/before.json || true
+          echo "report<<EOF" >> "$GITHUB_OUTPUT"
+          auditor scan "${{ inputs.path || '.' }}" >> "$GITHUB_OUTPUT" || true
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Apply verified fixes
+        id: fix
+        run: |
+          auditor fix "${{ inputs.path || '.' }}" > /tmp/fix.txt 2>&1 || true
+          cat /tmp/fix.txt
+          auditor fix "${{ inputs.path || '.' }}" --apply >/dev/null 2>&1 || true
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open a pull request
+        if: steps.fix.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="auditor/fixes-$(date +%Y%m%d-%H%M%S)"
+          git config user.name  "ai-code-quality-auditor"
+          git config user.email "noreply@github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "Apply verified security fixes
+
+          Produced by \`auditor fix --apply\`. Every edit was made on a copy and
+          the scan re-run; only fixes that cleared their finding, without
+          introducing a new one, are included."
+
+          git push origin "$BRANCH"
+
+          {
+            echo "Fixes proposed by \`auditor fix\`."
+            echo
+            echo "Each edit below was applied to a sandbox copy and the scan"
+            echo "re-run. A fix is included **only** where the finding was"
+            echo "cleared and nothing new appeared. Anything that could not be"
+            echo "fixed without guessing is listed with the reason instead."
+            echo
+            echo '```'
+            cat /tmp/fix.txt
+            echo '```'
+            echo
+            echo "Review the diff before merging — some fixes change behaviour"
+            echo "(a hardcoded secret moved to the environment needs that"
+            echo "variable set)."
+          } > /tmp/body.md
+
+          gh pr create \
+            --title "Auditor: verified security fixes" \
+            --body-file /tmp/body.md \
+            --base "${{ github.ref_name }}" \
+            --head "$BRANCH"
+
+      - name: Nothing to fix
+        if: steps.fix.outputs.changed == 'false'
+        run: echo "No verifiable fixes available — nothing to propose."

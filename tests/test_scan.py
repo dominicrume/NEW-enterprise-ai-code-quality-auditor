@@ -104,3 +104,34 @@ def test_worst_band_drives_the_ci_verdict(py_project):
 ])
 def test_duplication_bands(value, expected):
     assert band_for("duplication_pct", value) == expected
+
+
+# ------------------------------------------------- test-assert noise
+
+def test_asserts_in_test_files_are_not_security_findings(tmp_path):
+    """B101 fires on every assert. In a test file the assert IS the test —
+    counting it would score a well-tested codebase worse than an untested one."""
+    (tmp_path / "app.py").write_text("def add(a, b):\n    return a + b\n")
+    tests = tmp_path / "tests"
+    tests.mkdir()
+    (tests / "test_app.py").write_text(
+        "from app import add\n\n"
+        "def test_add():\n"
+        + "".join(f"    assert add({i}, 1) == {i + 1}\n" for i in range(40))
+    )
+    security = next(o for o in scan_directory(tmp_path).outcomes
+                    if o.name == "security_density")
+    assert security.applicable
+    assert security.value == 0.0, "test assertions were counted as vulnerabilities"
+
+
+def test_asserts_in_production_code_are_still_findings(tmp_path):
+    """The rule exists for a reason: -O strips asserts from shipped code."""
+    (tmp_path / "auth.py").write_text(
+        "def check(user):\n"
+        "    assert user.is_admin, 'not an admin'\n"
+        "    return True\n"
+    )
+    security = next(o for o in scan_directory(tmp_path).outcomes
+                    if o.name == "security_density")
+    assert security.value > 0, "an assert used as a production check must still count"
