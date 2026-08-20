@@ -69,7 +69,7 @@ def metrics():
 INSECURE = '''"""Utilities the agent added on its own."""
 import subprocess
 
-API_KEY = "sk-live-51H9xQ2vBnM4kL8dR"          # hardcoded credential
+API_KEY = "EXAMPLE-FAKE-KEY-DO-NOT-USE"       # hardcoded credential (demo)
 
 
 def backup(path):
