@@ -27,6 +27,7 @@ def main():
     \b
     Start here:       auditor live
     Audit a folder:   auditor scan .
+    Fix findings:     auditor fix . --apply
     Watch a folder:   auditor watch .
     Run the study:    auditor experiment --run-label main_001 --reps 10
     """
@@ -194,6 +195,68 @@ def scan_cmd(path: Path, spec: Path | None, as_json: bool, fail_on: str):
     trigger = thresholds[fail_on]
     if trigger and result.worst_band in trigger:
         raise SystemExit(1)
+
+
+@main.command("fix")
+@click.argument("path", type=click.Path(exists=True, file_okay=False, path_type=Path),
+                default=".")
+@click.option("--apply", "do_apply", is_flag=True,
+              help="Write the verified fixes to disk. Without it, this is a dry run.")
+def fix_cmd(path: Path, do_apply: bool):
+    """Fix security findings, and prove each fix worked.
+
+    \b
+      auditor fix .            show what would change, touch nothing
+      auditor fix . --apply    write the fixes that verified
+
+    Every edit is made on a copy and the scan is re-run. A fix is kept only
+    when the finding is gone and nothing new appeared. Anything that cannot be
+    fixed without guessing is reported with the reason instead.
+    """
+    from rich.console import Console
+
+    from auditor.remediation import remediate
+
+    console = Console()
+    console.print()
+    with console.status("[dim]scanning and verifying fixes...[/dim]"):
+        report = remediate(path, apply=do_apply)
+
+    if report.findings_before == 0:
+        console.print(f"[green]No security findings in {report.root}.[/green]\n")
+        return
+
+    fixed, unfixed = report.fixed, report.unfixed
+    console.print(f"[bold]{report.root}[/bold]")
+    console.print(f"[dim]{report.findings_before} findings -> "
+                  f"{report.findings_after} after fixes[/dim]\n")
+
+    for o in fixed:
+        console.print(f"[green]FIXED[/green]  [dim]{o.test_id}[/dim] "
+                      f"{o.file}:{o.line}  [dim]({o.severity})[/dim]")
+        console.print(f"        {o.explanation}")
+        console.print(f"        [red]- {o.before.strip()}[/red]")
+        console.print(f"        [green]+ {o.after.strip()}[/green]")
+        if o.behaviour_note:
+            console.print(f"        [yellow]! {o.behaviour_note}[/yellow]")
+        console.print()
+
+    for o in unfixed:
+        console.print(f"[dim]SKIPPED {o.test_id} {o.file}:{o.line} "
+                      f"({o.severity}) - {o.reason}[/dim]")
+
+    console.print()
+    if not fixed:
+        console.print("[yellow]Nothing could be fixed safely. "
+                      "The reasons are above.[/yellow]\n")
+    elif report.applied:
+        console.print(f"[green]Applied {len(fixed)} verified "
+                      f"fix{'es' if len(fixed) != 1 else ''}.[/green]")
+        console.print("[dim]Review with `git diff` before committing.[/dim]\n")
+    else:
+        console.print(f"[bold]{len(fixed)} fix{'es' if len(fixed) != 1 else ''} "
+                      f"verified.[/bold] Nothing written - this was a dry run.")
+        console.print("[dim]Run again with --apply to write them.[/dim]\n")
 
 
 def _render_scan_table(console, result):
