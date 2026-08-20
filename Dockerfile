@@ -10,7 +10,7 @@ WORKDIR /app
 # Install the auditor and its dashboard extras.
 COPY pyproject.toml README.md LICENSE ./
 COPY auditor ./auditor
-RUN pip install --no-cache-dir -e ".[dashboard]" gunicorn
+RUN pip install --no-cache-dir -e ".[dashboard]" "gunicorn==23.0.0"
 
 # Bring sample reports so the live URL renders something on first hit.
 COPY data ./data

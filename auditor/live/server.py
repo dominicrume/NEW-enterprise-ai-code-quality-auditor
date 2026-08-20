@@ -15,6 +15,8 @@ import threading
 from dataclasses import asdict
 from pathlib import Path
 
+from urllib.parse import urlparse
+
 from flask import Flask, Response, jsonify, render_template, request
 
 from auditor.core.scan import ScanResult, scan_directory
@@ -137,6 +139,22 @@ class LiveSession:
         return {"spec_path": str(path), "features": len(spec["features"])}
 
 
+def _same_origin(request) -> bool:
+    """Reject state-changing requests that did not come from our own page.
+
+    Binding to 127.0.0.1 keeps other machines out, but it does not keep out a
+    web page the user has open in the same browser: any site can POST to
+    localhost. Without this check such a page could silently rewrite the spec
+    the audit is measured against. Browsers set Origin on cross-origin POSTs
+    and will not let a page forge it, so comparing it to our own host is
+    sufficient here.
+    """
+    origin = request.headers.get("Origin")
+    if origin is None:                      # non-browser client (curl, tests)
+        return request.headers.get("Sec-Fetch-Site") in (None, "same-origin")
+    return urlparse(origin).netloc == request.host
+
+
 def create_app(session: LiveSession) -> Flask:
     app = Flask(__name__, template_folder="templates")
     app.config["SESSION"] = session
@@ -158,6 +176,8 @@ def create_app(session: LiveSession) -> Flask:
 
     @app.post("/api/brief")
     def brief():
+        if not _same_origin(request):
+            return jsonify({"error": "Cross-origin requests are not accepted."}), 403
         text = (request.get_json(silent=True) or {}).get("brief", "").strip()
         if not text:
             return jsonify({"error": "Type what you asked the agent to build."}), 400

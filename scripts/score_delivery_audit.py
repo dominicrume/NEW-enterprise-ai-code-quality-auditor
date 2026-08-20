@@ -5,6 +5,7 @@ session, against the spec of what was actually requested.
 """
 import json
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, "/Users/dominicorumeuririe/Downloads/NEW-enterprise-ai-code-quality-auditor")
@@ -85,5 +86,5 @@ print(f"  no_external_calls_without_allowlist : "
       f"{'review' if unexpected else 'pass'}"
       + (f"  -> {unexpected}" if unexpected else ""))
 
-Path("/tmp/delivery_audit.json").write_text(json.dumps(
+Path(tempfile.gettempdir(), "delivery_audit.json").write_text(json.dumps(
     {k: {"value": v, "unit": u} for k, (v, u) in results.items()}, indent=2))

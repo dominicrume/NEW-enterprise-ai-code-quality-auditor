@@ -146,8 +146,26 @@ def _propose(root: Path, findings: list[dict]) -> dict[Path, list[tuple[int, Pro
     return by_file
 
 
-def _write_proposals(path: Path, proposals: list[tuple[int, Proposal]]) -> None:
+def _within(path: Path, root: Path) -> bool:
+    """True only if ``path`` really sits under ``root``.
+
+    The paths this module writes to come from a scanner's output rather than
+    from us. Resolving both and comparing means a traversal sequence or a
+    symlink pointing outside the sandbox cannot turn a fix into a write
+    somewhere it was never meant to touch.
+    """
+    try:
+        Path(path).resolve().relative_to(Path(root).resolve())
+        return True
+    except (ValueError, OSError):
+        return False
+
+
+def _write_proposals(path: Path, proposals: list[tuple[int, Proposal]],
+                     root: Path) -> None:
     """Apply every proposal for one file, bottom-up so line numbers hold."""
+    if not _within(path, root):
+        raise ValueError(f"refusing to write outside the sandbox: {path}")
     lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
     imports: list[str] = []
     for ln, p in sorted(proposals, key=lambda t: -t[0]):
@@ -179,7 +197,7 @@ def remediate(root: Path, apply: bool = False) -> Remediation:
         sandbox_before = _bandit(sandbox)
         proposals = _propose(sandbox, sandbox_before)
         for path, items in proposals.items():
-            _write_proposals(path, items)
+            _write_proposals(path, items, sandbox)
 
         after = _bandit(sandbox)
         report.findings_after = len(after)
@@ -249,7 +267,10 @@ def remediate(root: Path, apply: bool = False) -> Remediation:
 
         if apply and report.fixed:
             for rel in {o.file for o in report.fixed}:
-                shutil.copy2(sandbox / rel, root / rel)
+                src, dest = sandbox / rel, root / rel
+                if not (_within(src, sandbox) and _within(dest, root)):
+                    continue        # never copy out of, or into, an unexpected path
+                shutil.copy2(src, dest)
             report.applied = True
 
     return report

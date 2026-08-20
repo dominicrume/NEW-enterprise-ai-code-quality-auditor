@@ -10,9 +10,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install (with dashboard extras + bandit)
-        run: pip install -e ".[dashboard]" bandit python-dotenv pynput
+        run: pip install -e ".[dashboard]" "bandit==1.9.4" "python-dotenv==1.2.2" "pynput==1.8.2"
       - name: Lint (ruff if configured, else skip)
-        run: pip install ruff && ruff check . || true
+        run: pip install "ruff==0.14.5" && ruff check . || true
       - name: Tests
         run: pytest -q
 

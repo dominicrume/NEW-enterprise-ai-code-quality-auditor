@@ -15,6 +15,7 @@ import random
 import time
 import traceback
 from datetime import datetime, timezone
+import tempfile
 from pathlib import Path
 from typing import Callable, Iterable
 
@@ -83,7 +84,7 @@ def _run_one(condition: str, spec: dict, spec_key: str, rep: int,
             if not replay.exists():
                 status.update(outcome="missing_replay", note=str(replay))
                 return status
-            adapter = ReplitAgentAdapter(work_dir="/tmp/unused", replay_dir=replay,
+            adapter = ReplitAgentAdapter(work_dir=str(Path(tempfile.gettempdir()) / "auditor_replay_unused"), replay_dir=replay,
                                          run_id=run_id,
                                          raw_root=repo_root / "data" / "raw")
             model = "replit-agent-default"
@@ -92,7 +93,7 @@ def _run_one(condition: str, spec: dict, spec_key: str, rep: int,
             if not replay.exists():
                 status.update(outcome="missing_replay", note=str(replay))
                 return status
-            adapter = AntigravityAdapter(work_dir="/tmp/unused", replay_dir=replay,
+            adapter = AntigravityAdapter(work_dir=str(Path(tempfile.gettempdir()) / "auditor_replay_unused"), replay_dir=replay,
                                          run_id=run_id,
                                          raw_root=repo_root / "data" / "raw")
             model = "gemini-3.5-flash-medium"

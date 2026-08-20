@@ -174,3 +174,28 @@ def test_empty_project_reports_no_files_without_crashing(tmp_path):
     assert report["files"] == 0
     assert all(m["value"] is None for m in report["metrics"])
     session.stop()
+
+
+# ------------------------------------------------------------------- csrf
+
+def test_cross_origin_brief_is_rejected(client):
+    """Binding to localhost does not stop a web page the user has open."""
+    c, _ = client
+    res = c.post("/api/brief",
+                 json={"brief": "Attacker rewrites the spec"},
+                 headers={"Origin": "https://evil.example"})
+    assert res.status_code == 403
+    assert "Cross-origin" in res.get_json()["error"]
+
+
+def test_same_origin_brief_is_accepted(client):
+    c, _ = client
+    res = c.post("/api/brief", json={"brief": "Users can log in"},
+                 headers={"Origin": "http://localhost"})
+    assert res.status_code == 200
+
+
+def test_non_browser_client_still_works(client):
+    """curl and tests send no Origin header and must not be locked out."""
+    c, _ = client
+    assert c.post("/api/brief", json={"brief": "Users can log in"}).status_code == 200
