@@ -19,5 +19,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "image-size": "^2.0.2",
+    "uuid": "^14.0.2"
+  }
 }

@@ -119,3 +119,32 @@ a link to the dashboard and the PyPI package. If the target audience is a
 handful of partners and clients rather than the public, **TestFlight and Play
 internal testing are the better distribution route** — no public review, and
 you can share an install link the same day.
+
+## Dependency advisories
+
+Dependabot reports advisories against two transitive npm packages. Both come
+from Expo's build tooling; neither is code that ships inside the app.
+
+**`uuid` — fixed.** Pinned to 14.x through an `overrides` entry in
+`package.json`, replacing the 7.0.3 that `xcode` pulls in. The bundle was
+rebuilt and verified after the change.
+
+**`image-size` — no fix exists.** The advisory's affected range is `*`: every
+published version is covered, so there is no version to upgrade to. npm's only
+proposed remedy is downgrading Expo from 57 to 53, which trades one advisory
+for four major versions of missing security work. Pinned to the newest release
+(2.0.2) and left flagged rather than pretending otherwise.
+
+Assessment for the `image-size` advisories: they are denial-of-service loops in
+the ICNS, JXL and HEIF parsers. Metro calls `image-size` at **build time** to
+read the dimensions of assets in this repository. Triggering it would require a
+malicious image to already be committed here — that is, write access to the
+repository, at which point the parser is not the exposure that matters. Nothing
+reaches an end user, because the parser does not ship in the app bundle.
+
+Re-check with:
+
+```bash
+npm audit
+npx expo export --platform android    # confirm the build still works
+```
