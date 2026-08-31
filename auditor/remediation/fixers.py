@@ -14,6 +14,8 @@ here is why" is more useful than a plausible edit that changes what the
 program does.
 """
 from __future__ import annotations
+import os
+import tempfile
 
 import re
 import shlex
@@ -78,7 +80,7 @@ def fix_hardcoded_tmp(lines: Lines, ln: int, test_id: str) -> Proposal | None:
     m = _TMP_LITERAL.search(line)
     if not m:
         return None
-    tail = m.group(2)[len("/tmp/"):]
+    tail = m.group(2)[len(os.path.join(tempfile.gettempdir(), "")):]
     replacement = f'os.path.join(tempfile.gettempdir(), "{tail}")'
     return Proposal(
         test_id=test_id, line_number=ln, before=line,
