@@ -107,10 +107,18 @@ def scan_directory(path: Path, spec: dict | None = None) -> ScanResult:
             band=band_for(name, score.value),
         ))
 
-    # correction_freq needs a keystroke log, which a directory does not have.
+    # correction_freq counts backspaces per thousand keystrokes, so it needs an
+    # interaction log captured while the code was being written. A directory has
+    # no such thing and never will: scan reads what was produced, not how.
+    #
+    # The hint used to name `auditor session`, which is not a command -- a user
+    # following it got "Error: No such command". Only the adapters produce an
+    # interaction log, from a captures directory, so point at the command that
+    # reads them.
     result.outcomes.append(MetricOutcome(
         name="correction_freq", label="Rework",
-        skipped_reason="needs a recorded session (auditor session)",
+        skipped_reason="not measurable from a directory; needs a captured "
+                       "session (auditor run --workflow ...)",
     ))
     return result
 

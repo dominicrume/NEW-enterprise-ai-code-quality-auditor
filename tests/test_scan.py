@@ -79,6 +79,31 @@ def test_rework_always_needs_a_recorded_session(py_project):
     assert "session" in rework.skipped_reason
 
 
+def test_rework_hint_names_a_command_that_exists(py_project):
+    """The hint must point somewhere a user can actually go.
+
+    It used to read "needs a recorded session (auditor session)". There is no
+    `session` command, so anyone following the tool's own instruction got
+    "Error: No such command 'session'" -- on the one metric that never
+    produces a number. The old test asserted the word "session" appeared,
+    which the broken hint satisfied perfectly.
+
+    So assert the thing that matters instead: every `auditor <word>` named in
+    the hint is a command the CLI actually has.
+    """
+    import re
+
+    from auditor.core.cli import main
+
+    hint = _outcome(scan_directory(py_project), "correction_freq").skipped_reason
+    named = set(re.findall(r"auditor ([a-z][a-z_-]*)", hint))
+    assert named, "the hint should tell the user which command to run"
+    assert named <= set(main.commands), (
+        "hint names %s, but the CLI has %s"
+        % (sorted(named), sorted(main.commands))
+    )
+
+
 def test_empty_directory_skips_everything(tmp_path):
     result = scan_directory(tmp_path)
     assert result.file_count == 0
